@@ -44,59 +44,59 @@ public final class Types {
 
 	private Types() { }
 
-	public static boolean bit(final long value) { return (value != 0); }
+	public static boolean bit(final long value) { return value != 0; }
 
-	public static boolean bit(final double value) { return bit((long) value); }
+	public static boolean bit(final double value) { return value != 0; }
 
 	public static boolean bit(final boolean value) { return value; }
 
-	public static boolean bit(final BigInteger value) { return (value.compareTo(BigInteger.ZERO) != 0) ? true : false; }
+	public static boolean bit(final BigInteger value) { return value.compareTo(BigInteger.ZERO) != 0; }
 
-	public static long uint2(final long value) { return (value & 0x3);}
+	public static byte uint2(final long value) { return (byte) (value & 0x3);}
 
-	public static long uint2(final double value) { return uint2((long) value); }
+	public static byte uint2(final double value) { return uint2((long) value); }
 
-	public static long uint2(final BigInteger value) { return uint2(value.longValue()); }
+	public static byte uint2(final Number value) { return uint2(value.longValue()); }
 
-	public static long uint2(final boolean value) { return uint8(value); }
+	public static byte uint2(final boolean value) { return (byte) uint8(value); }
 
-	public static long uint4(final long value) { return (value & 0xf); }
+	public static byte uint4(final long value) { return (byte) (value & 0xf); }
 
-	public static long uint4(final double value) { return uint4((long) value); }
+	public static byte uint4(final double value) { return uint4((long) value); }
 
-	public static long uint4(final BigInteger value) { return uint4(value.longValue()); }
+	public static byte uint4(final Number value) { return uint4(value.longValue()); }
 
-	public static long uint4(final boolean value) { return uint8(value); }
+	public static byte uint4(final boolean value) { return (byte) uint8(value); }
 
 	public static byte int8(final long value) { return (byte) value; }
 
 	public static byte int8(final double value) { return (byte) value; }
 
-	public static byte int8(final BigInteger value) { return value.byteValue(); }
+	public static byte int8(final Number value) { return value.byteValue(); }
 
 	public static byte int8(final boolean value) { return value ? (byte) 1 : (byte) 0; }
 
-	public static int uint8(final long value) { return (int) (value & 0xff); }
+	public static short uint8(final long value) { return (short) (value & 0xff); }
 
-	public static int uint8(final double value) { return uint8((long) value); }
+	public static short uint8(final double value) { return uint8((long) value); }
 
-	public static int uint8(final BigInteger value) { return uint8(value.longValue()); }
+	public static short uint8(final Number value) { return uint8(value.longValue()); }
 
-	public static int uint8(final boolean value) { return value ? 1 : 0; }
+	public static short uint8(final boolean value) { return (short) (value ? 1 : 0); }
 
-	public static long uint12(final long value) { return (value & 0xfff); }
+	public static short uint12(final long value) { return (short) (value & 0xfff); }
 
-	public static long uint12(final double value) { return uint12((long) value); }
+	public static short uint12(final double value) { return uint12((long) value); }
 
-	public static long uint12(final BigInteger value) { return uint12(value.longValue()); }
+	public static short uint12(final Number value) { return uint12(value.longValue()); }
 
-	public static long uint12(final boolean value) { return uint8(value); }
+	public static short uint12(final boolean value) { return uint8(value); }
 
 	public static short int16(final long value) { return (short) value; }
 
 	public static short int16(final double value) { return (short) value; }
 
-	public static short int16(final BigInteger value) { return value.shortValue(); }
+	public static short int16(final Number value) { return value.shortValue(); }
 
 	public static short int16(final boolean value) { return value ? (short) 1 : (short) 0; }
 
@@ -104,7 +104,7 @@ public final class Types {
 
 	public static int uint16(final double value) { return uint16((long) value); }
 
-	public static int uint16(final BigInteger value) { return uint16(value.longValue()); }
+	public static int uint16(final Number value) { return uint16(value.longValue()); }
 
 	public static int uint16(final boolean value) { return value ? 1 : 0; }
 
@@ -112,7 +112,7 @@ public final class Types {
 
 	public static int int32(final double value) { return (int) value; }
 
-	public static int int32(final BigInteger value) { return value.intValue(); }
+	public static int int32(final Number value) { return value.intValue(); }
 
 	public static int int32(final boolean value) { return value ? 1  : 0; }
 
@@ -120,7 +120,7 @@ public final class Types {
 
 	public static long uint32(final double value) { return uint32((long) value); }
 
-	public static long uint32(final BigInteger value) { return uint32(value.longValue()); }
+	public static long uint32(final Number value) { return uint32(value.longValue()); }
 
 	public static long uint32(final boolean value) { return uint8(value); }
 
@@ -128,17 +128,22 @@ public final class Types {
 
 	public static long int64(final double value) { return (long) value; }
 
-	public static long int64(final BigInteger value) { return value.longValue(); }
+	public static long int64(final Number value) { return value.longValue(); }
 
 	public static long int64(final boolean value) { return uint8(value); }
 
-	public static long uint64(final long value) { return (value & 0xffffffffffffffffL); }
+	public static BigInteger uint64(final long value) { 
+		BigInteger original = BigInteger.valueOf(value);
+		BigInteger mask = new BigInteger("+FFFFFFFFFFFFFFFF", 16);
+		BigInteger result = original.and(mask);
+		return result;
+	}
 
-	public static long uint64(final double value) { return uint64((long) value); }
+	public static BigInteger uint64(final double value) { return uint64((long) value); }
 
-	public static long uint64(final BigInteger value) { return uint64(value.longValue()); }
+	public static BigInteger uint64(final Number value) { return uint64(value.longValue()); }
 
-	public static long uint64(final boolean value) { return uint8(value); }
+	public static BigInteger uint64(final boolean value) { return value ? BigInteger.ONE : BigInteger.ZERO; }
 
 	public static BigInteger uint128(final long value) {
 		final BigInteger bi = BigInteger.valueOf(value);
@@ -171,7 +176,7 @@ public final class Types {
 
 	public static float float32(final double value) { return (float) value; }
 
-	public static float float32(final BigInteger value) { return value.floatValue(); }
+	public static float float32(final Number value) { return value.floatValue(); }
 
 	public static float float32(final boolean value) { return value ? 1 : 0; }
 
@@ -179,8 +184,8 @@ public final class Types {
 
 	public static double float64(final double value) { return value; }
 
-	public static double float64(final BigInteger value) { return value.doubleValue(); }
+	public static double float64(final Number value) { return value.doubleValue(); }
 
-	public static double float64(final boolean value) { return float32(value); }
+	public static double float64(final boolean value) { return value ? 1 : 0; }
 
 }
