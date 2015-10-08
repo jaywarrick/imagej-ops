@@ -3,22 +3,82 @@
 [TestConvertType.java]
 types = ```
 [
-	[op: "Bit",      built:"bit",      imglibT:"BitType",            posValue:"true",                       posReal:"1",                          posImag:"0",               zeroValue:"false",                                                                                             cast:"bit"],
-	[op: "Uint2",    built:"uint2",    imglibT:"Unsigned2BitType",   posValue:"2",                          posReal:"2",                          posImag:"0",               zeroValue:"0",                                                                                                 cast:"uint2"],
-	[op: "Uint4",    built:"uint4",    imglibT:"Unsigned4BitType",   posValue:"15",                         posReal:"15",                         posImag:"0",               zeroValue:"0",                                                                                                 cast:"uint4"],
-	[op: "Int8",     built:"int8",     imglibT:"ByteType",           posValue:"(byte) 8",                   posReal:"(byte) 8",                   posImag:"(byte) 0",        zeroValue:"(byte) 0",        negValue:"(byte) -12",         negReal:"(byte) -12",        negImag:"(byte) 0",   cast:"int8"],
-	[op: "Uint8",    built:"uint8",    imglibT:"UnsignedByteType",   posValue:"100",                        posReal:"100",                        posImag:"0",               zeroValue:"0",                                                                                                 cast:"uint8"],
-	[op: "Uint12",   built:"uint12",   imglibT:"Unsigned12BitType",  posValue:"212L",                       posReal:"212L",                       posImag:"0L",              zeroValue:"0L",                                                                                                cast:"uint12"],
-	[op: "Int16",    built:"int16",    imglibT:"ShortType",          posValue:"(short) 52",                 posReal:"(short) 52",                 posImag:"(short) 0",       zeroValue:"(short) 0",       negValue:"(short) -154",       negReal:"(short) -154",      negImag:"(short) 0",  cast:"int16"],
-	[op: "Uint16",   built:"uint16",   imglibT:"UnsignedShortType",  posValue:"480",                        posReal:"480",                        posImag:"0",               zeroValue:"0",                                                                                                 cast:"uint16"],
-	[op: "Int32",    built:"int32",    imglibT:"IntType",            posValue:"301",                        posReal:"301",                        posImag:"0",               zeroValue:"0",               negValue:"-89",                negReal:"-89",               negImag:"0",          cast:"int32"],
-	[op: "Uint32",   built:"uint32",   imglibT:"UnsignedIntType",    posValue:"20L",                        posReal:"20L",                        posImag:"0L",              zeroValue:"0L",                                                                                                cast:"uint32"],
-	[op: "Int64",    built:"int64",    imglibT:"LongType",           posValue:"891L",                       posReal:"891L",                       posImag:"0L",              zeroValue:"0L",              negValue:"-1024L",             negReal:"-1024L",            negImag:"0L",         cast:"int64"],
-	[op: "Uint64",   built:"uint64",   imglibT:"UnsignedLongType",   posValue:"1049L",                      posReal:"1049L",                      posImag:"0L",              zeroValue:"0L",                                                                                                cast:"uint64"],
-	[op: "Uint128",  built:"uint128",  imglibT:"Unsigned128BitType", posValue:"BigInteger.valueOf(0xbeef)", posReal:"BigInteger.valueOf(0xbeef)", posImag:"BigInteger.ZERO", zeroValue:"BigInteger.ZERO",                                                                                   cast:"uint128"],
-	[op: "Float32",  built:"float32",  imglibT:"FloatType",          posValue:"123453.125f",                posReal:"123453.125f",                posImag:"0f",              zeroValue:"0f",              negValue:"-2523485349058.0f",  negReal:"-2523485349058.0f", negImag:"0f",         cast:"float32"],
-	[op: "Cfloat32", built:"cfloat32", imglibT:"ComplexFloatType",   posValue:"5839.25f, 120f",             posReal:"5839.25f",                   posImag:"120f",            zeroValue:"0f",              negValue:"-4.25f, -123.0625f", negReal:"-4.25f",            negImag:"-123.0625f", cast:"float32"],
-	[op: "Float64",  built:"float64",  imglibT:"DoubleType",         posValue:"4098d",                      posReal:"4098d",                      posImag:"0d",              zeroValue:"0d",              negValue:"-10948.015625d",     negReal:"-10948.015625d",    negImag:"0d",         cast:"float64"],
-	[op: "Cfloat64", built:"cfloat64", imglibT:"ComplexDoubleType",  posValue:"9087d, 879542.125d",         posReal:"9087d",                      posImag:"879542.125d",     zeroValue:"0d",              negValue:"-234.25d, -9.0d",    negReal:"-234.25d",          negImag:"-9.0d",      cast:"float64"]
+	[op: "Bit",      built: "bit",      imglibT: "Bit",            outMethod: "bit",      values: [
+		[v: "true",                            r: "1",                                i: "0"],
+		[v: "false",                           r: "0",                                i: "0"]
+	]],
+	[op: "Uint2",    built:"uint2",     imglibT: "Unsigned2Bit",   outMethod: "uint2",    values: [
+		[v: "2",                                r: "2",                                i: "0"],
+		[v: "0",                                r: "0",                                i: "0"]
+	]],
+	[op: "Uint4",    built: "uint4",    imglibT: "Unsigned4Bit",   outMethod: "uint4",    values: [
+		[v: "15",                               r: "15",                               i: "0"],
+		[v: "0",                                r: "0",                                i: "0"]
+	]],
+	[op: "Int8",     built: "int8",     imglibT: "Byte",           outMethod: "int8",     values: [
+		[v: "(byte) 8",                         r: "(byte) 8",                         i: "(byte) 0"],
+		[v: "(byte) 0",                         r: "(byte) 0",                         i: "(byte) 0"],
+		[v: "(byte) -12",                       r: "(byte) -12",                       i: "(byte) 0"]
+	]],
+	[op: "Uint8",    built: "uint8",    imglibT: "UnsignedByte",   outMethod: "uint8",    values: [
+		[v: "100",                              r: "100",                              i: "0"],
+		[v: "0",                                r: "0",                                i: "0"]
+	]],
+	[op: "Uint12",   built: "uint12",   imglibT: "Unsigned12Bit",  outMethod: "uint12",   values: [
+		[v: "212L",                             r: "212L",                             i: "0L"],
+		[v: "0L",                               r: "0L",                               i: "0L"]
+	]],
+	[op: "Int16",    built: "int16",    imglibT: "Short",          outMethod: "int16",    values: [
+		[v: "(short) 52",                       r: "(short) 52",                       i: "(short) 0"],
+		[v: "(short) 0",                        r: "(short) 0",                        i: "(short) 0"],
+		[v: "(short) -154",                     r: "(short) -154",                     i: "(short) 0"]
+	]],
+	[op: "Uint16",   built: "uint16",   imglibT: "UnsignedShort",  outMethod: "uint16",   values: [
+		[v: "480",                              r: "480",                              i: "0"],
+		[v: "0",                                r: "0",                                i: "0"]
+	]],
+	[op: "Int32",    built: "int32",    imglibT: "Int",            outMethod: "int32",    values: [
+		[v: "301",                              r: "301",                              i: "0"],
+		[v: "0",                                r: "0",                                i: "0"],
+		[v: "-89",                              r: "-89",                              i: "0"]
+	]],
+	[op: "Uint32",   built: "uint32",   imglibT: "UnsignedInt",    outMethod: "uint32",   values: [
+		[v: "20L",                              r: "20L",                              i: "0L"],
+		[v: "0L",                               r: "0L",                               i: "0L"]
+	]],
+	[op: "Int64",    built: "int64",    imglibT: "Long",           outMethod: "int64",    values: [
+		[v: "891L",                             r: "891L",                             i: "0L"],
+		[v: "0L",                               r: "0L",                               i: "0L"],
+		[v: "-1024L",                           r: "-1024L",                           i: "0L"]
+	]],
+	[op: "Uint64",   built: "uint64",   imglibT: "UnsignedLong",   outMethod: "uint64",   values: [
+		[v: "1049L",                            r: "1049L",                            i: "0L"],
+		[v: "0L",                               r: "0L",                               i: "0L"]
+	]],
+	[op: "Uint128",  built: "uint128",  imglibT: "Unsigned128Bit", outMethod: "uint128",  values: [
+		[v: "BigInteger.valueOf(0xbeef)",       r: "BigInteger.valueOf(0xbeef)",       i: "BigInteger.ZERO"],
+		[v: "BigInteger.ZERO",                  r: "BigInteger.ZERO",                  i: "BigInteger.ZERO"],
+		[v: 'new BigInteger("2CAFE0321BEEF0717BABE0929DEAD0311", 16)', r: 'new BigInteger("2CAFE0321BEEF0717BABE0929DEAD0311", 16)', i: "BigInteger.ZERO"]
+	]],
+	[op: "Float32",  built: "float32",  imglibT: "Float",          outMethod: "float32",   values: [
+		[v: "123453.125f",                      r: "123453.125f",                      i: "0f"],
+		[v: "0f",                               r: "0f",                               i: "0f"],
+		[v: "-2523485349058.0f",                r: "-2523485349058.0f",                i: "0f"]
+	]],
+	[op: "Cfloat32", built: "cfloat32", imglibT: "ComplexFloat",   outMethod: "float32",   values: [
+		[v: "5839.25f, 120f",                   r: "5839.25f",                         i: "120f"],
+		[v: "0f, 0f",                           r: "0f",                               i: "0f"],
+		[v: "-4.25f, -123.0625f",               r: "-4.25f",                           i: "-123.0625f"]
+	]],
+	[op: "Float64",  built: "float64",  imglibT: "Double",         outMethod: "float64",   values: [
+		[v: "4098d",                            r: "4098d",                            i: "0d"],
+		[v: "0d",                               r: "0d",                               i: "0d"],
+		[v: "-10948.015625d",                   r: "-10948.015625d",                   i: "0d"]
+	]],
+	[op: "Cfloat64", built: "cfloat64", imglibT: "ComplexDouble",  outMethod: "float64", values: [
+		[v: "9087d, 879542.125d",               r: "9087d",                            i: "879542.125d"],
+		[v: "0d, 0d",                           r: "0d",                               i: "0d"],
+		[v: "-234.25d, -9.0d",                  r: "-234.25d",                         i: "-9.0d"]
+	]]
 ]
 ```

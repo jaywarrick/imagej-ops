@@ -7,13 +7,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -62,73 +62,50 @@ import org.junit.Test;
  * @author Alison Walter
  */
 public class TestConvertType extends AbstractOpTest{
-#foreach ($type in $types)
-#set ($className = "ConvertTypes.ComplexTo$type.op")
-#set ($methodName = "Types.$type.cast")
-#foreach ($type2 in $types)
+#foreach ($toType in $types)
+#set ($className = "ConvertTypes.ComplexTo$toType.op")
+#set ($methodName = "Types.$toType.outMethod")
+#set ($imgLibType = "$toType.imglibT" + "Type")
+#if ($toType.op.equals("Cfloat32"))
+#set ($getR = "getRealFloat()")
+#set ($getI = "getImaginaryFloat()")
+#else
+#set ($getR = "getRealDouble()")
+#set ($getI = "getImaginaryDouble()")
+#end
+#foreach ($fromType in $types)
+#set ($imgLibType2 = "$fromType.imglibT" + "Type")
+#set ($first = "true")
 	/** Tests {@link $className}. */
 	@Test
-	public void test${type2.op}To${type.op}() {
-		final $type2.imglibT b = new ${type2.imglibT}(${type2.posValue});
-		final Object result = ops.convert().${type.built}(b);
-		assertTrue(result instanceof $type.imglibT);
+	public void test${fromType.op}To${toType.op}() {
 
-#if ($type.op.equals("Cfloat32"))
-		assertEquals($methodName(${type2.posReal}), ((${type.imglibT})result).getRealFloat(), 0);
-		assertEquals($methodName(${type2.posImag}), ((${type.imglibT})result).getImaginaryFloat(), 0);
-#if ($type2.op.contains("C"))
-		b.set($type2.zeroValue, $type2.zeroValue);
+#foreach ($value in ${fromType.values})
+#if ($first.equals("true"))
+		final $imgLibType2 b = new $imgLibType2($value.v);
+		final Object result = ops.convert().${toType.built}(b);
+		assertTrue(result instanceof $imgLibType);
+#if($toType.op.contains("C"))
+		assertEquals($methodName($value.r), (($imgLibType) result).$getR, 0);
+		assertEquals($methodName($value.i), (($imgLibType) result).$getI, 0);
+#elseif ($toType.op.contains("Float"))
+		assertEquals($methodName($value.r), (($imgLibType) result).get(), 0);
 #else
-		b.set($type2.zeroValue);
+		assertEquals($methodName($value.r), (($imgLibType) result).get());
 #end
-		assertEquals($type.zeroValue, ops.convert().${type.built}(b).getRealFloat(), 0);
-		assertEquals($type.zeroValue, ops.convert().${type.built}(b).getImaginaryFloat(), 0);
-
-#elseif ($type.op.equals("Cfloat64"))
-		assertEquals($methodName(${type2.posReal}), ((${type.imglibT})result).getRealDouble(), 0);
-		assertEquals($methodName(${type2.posImag}), ((${type.imglibT})result).getImaginaryDouble(), 0);
-
-#if ($type2.op.contains("C"))
-		b.set($type2.zeroValue, $type2.zeroValue);
+#set ($first = "false")
 #else
-		b.set($type2.zeroValue);
+		b.set($value.v);
+#if($toType.op.contains("C"))
+		assertEquals($methodName($value.r), ops.convert().${toType.built}(b).$getR, 0);
+		assertEquals($methodName($value.i), ops.convert().${toType.built}(b).$getI, 0);
+#elseif ($toType.op.contains("Float"))
+		assertEquals($methodName($value.r), ops.convert().${toType.built}(b).get(), 0);
+#else
+		assertEquals($methodName($value.r), ops.convert().${toType.built}(b).get());
 #end
-		assertEquals($type.zeroValue, ops.convert().${type.built}(b).getRealDouble(), 0);
-		assertEquals($type.zeroValue, ops.convert().${type.built}(b).getImaginaryDouble(), 0);
-
-#elseif ($type.op.contains("Float"))
-		assertEquals($methodName(${type2.posReal}), ((${type.imglibT})result).get(), 0);
-
-#if ($type2.op.contains("C"))
-		b.set($type2.zeroValue, $type2.zeroValue);
-#else
-		b.set($type2.zeroValue);
-#end
-		assertEquals($type.zeroValue, ops.convert().${type.built}(b).get(), 0);
-#else
-		assertEquals($methodName(${type2.posReal}), ((${type.imglibT})result).get());
-
-#if ($type2.op.contains("C"))
-		b.set($type2.zeroValue, $type2.zeroValue);
-#else
-		b.set($type2.zeroValue);
-#end
-		assertEquals($type.zeroValue, ops.convert().${type.built}(b).get());
 #end
 
-#if ($type2.negValue)
-		b.set($type2.negValue);
-#if ($type.op.equals("Cfloat32"))
-		assertEquals($methodName(${type2.negReal}), ops.convert().${type.built}(b).getRealFloat(), 0);
-		assertEquals($methodName(${type2.negImag}), ops.convert().${type.built}(b).getImaginaryFloat(), 0);
-#elseif ($type.op.equals("Cfloat64"))
-		assertEquals($methodName(${type2.negReal}), ops.convert().${type.built}(b).getRealDouble(), 0);
-		assertEquals($methodName(${type2.negImag}), ops.convert().${type.built}(b).getImaginaryDouble(), 0);
-#elseif($type.op.contains("Float"))
-		assertEquals($methodName(${type2.negReal}), ops.convert().${type.built}(b).get(), 0);
-#else
-		assertEquals($methodName(${type2.negReal}), ops.convert().${type.built}(b).get());
-#end
 #end
 	}
 
