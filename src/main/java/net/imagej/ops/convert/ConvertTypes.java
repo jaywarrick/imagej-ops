@@ -30,6 +30,7 @@
 
 package net.imagej.ops.convert;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import net.imagej.ops.AbstractHybridOp;
@@ -498,7 +499,10 @@ public final class ConvertTypes {
 
 		@Override
 		public void compute(final C input, final Unsigned128BitType output) {
-			output.set(BigInteger.valueOf((long) input.getRealDouble()));
+			BigDecimal bd = new BigDecimal(input.getRealDouble());
+			BigDecimal r = bd.remainder(BigDecimal.ONE);
+			if(r.compareTo(BigDecimal.ZERO) == 0){ output.set(bd.toBigIntegerExact()); }
+			else { output.set(bd.toBigInteger()); }
 		}
 
 	}
