@@ -277,6 +277,24 @@ public class ConvertNamespace extends AbstractNamespace {
 		return result;
 	}
 
+	@OpMethod(op = net.imagej.ops.convert.ConvertTypes.IntegerToInt8.class)
+	public <T extends IntegerType<T>> ByteType int8(final T in) {
+		final ByteType result =
+			(ByteType) ops().run(
+				net.imagej.ops.convert.ConvertTypes.IntegerToInt8.class, in);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.convert.ConvertTypes.IntegerToInt8.class)
+	public <T extends IntegerType<T>> ByteType
+		int8(final ByteType out, final T in)
+	{
+		final ByteType result =
+			(ByteType) ops().run(
+				net.imagej.ops.convert.ConvertTypes.IntegerToInt8.class, out, in);
+		return result;
+	}
+
 	@OpMethod(op = Ops.Convert.Uint8.class)
 	public Object uint8(final Object... args) {
 		return ops().run(Ops.Convert.Uint8.class, args);
@@ -379,6 +397,24 @@ public class ConvertNamespace extends AbstractNamespace {
 		final ShortType result =
 			(ShortType) ops().run(
 				net.imagej.ops.convert.ConvertTypes.ComplexToInt16.class, out, in);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.convert.ConvertTypes.IntegerToInt16.class)
+	public <T extends IntegerType<T>> ShortType int16(final T in) {
+		final ShortType result =
+			(ShortType) ops().run(
+				net.imagej.ops.convert.ConvertTypes.IntegerToInt16.class, in);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.convert.ConvertTypes.IntegerToInt16.class)
+	public <T extends IntegerType<T>> ShortType int16(final ShortType out,
+		final T in)
+	{
+		final ShortType result =
+			(ShortType) ops().run(
+				net.imagej.ops.convert.ConvertTypes.IntegerToInt16.class, out, in);
 		return result;
 	}
 
