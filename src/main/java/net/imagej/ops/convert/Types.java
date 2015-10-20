@@ -42,6 +42,8 @@ import net.imglib2.type.numeric.integer.Unsigned128BitType;
  */
 public final class Types {
 
+	private static BigInteger maskBI = new BigInteger("+FFFFFFFFFFFFFFFF", 16);
+
 	private Types() { }
 
 	public static boolean bit(final long value) { return value != 0; }
@@ -72,7 +74,7 @@ public final class Types {
 
 	public static byte int8(final double value) { return (byte) value; }
 
-	public static byte int8(final Number value) { return value.byteValue(); }
+	public static byte int8(final BigInteger value) { return value.and(maskBI).byteValue(); }
 
 	public static byte int8(final boolean value) { return value ? (byte) 1 : (byte) 0; }
 
@@ -96,7 +98,7 @@ public final class Types {
 
 	public static short int16(final double value) { return (short) value; }
 
-	public static short int16(final Number value) { return value.shortValue(); }
+	public static short int16(final BigInteger value) { return value.and(maskBI).shortValue(); }
 
 	public static short int16(final boolean value) { return value ? (short) 1 : (short) 0; }
 
@@ -122,13 +124,13 @@ public final class Types {
 
 	public static long uint32(final Number value) { return uint32(value.longValue()); }
 
-	public static long uint32(final boolean value) { return uint8(value); }
+	public static long uint32(final boolean value) { return value ? 1 : 0; }
 
 	public static long int64(final long value) { return value; }
 
 	public static long int64(final double value) { return (long) value; }
 
-	public static long int64(final Number value) { return value.longValue(); }
+	public static long int64(final BigInteger value) { return value.and(maskBI).longValue(); }
 
 	public static long int64(final boolean value) { return uint8(value); }
 
@@ -168,7 +170,7 @@ public final class Types {
 
 	public static BigInteger uint128(final double value) { return uint128((long) value); }
 
-	public static BigInteger uint128(final BigInteger value) { return value; }
+	public static BigInteger uint128(final BigInteger value) { return value.and(maskBI); }
 
 	public static BigInteger uint128(final boolean value) { return value ? BigInteger.ONE : BigInteger.ZERO; }
 
@@ -176,7 +178,7 @@ public final class Types {
 
 	public static float float32(final double value) { return (float) value; }
 
-	public static float float32(final Number value) { return value.floatValue(); }
+	public static float float32(final BigInteger value) { return value.and(maskBI).longValue(); }
 
 	public static float float32(final boolean value) { return value ? 1 : 0; }
 
@@ -184,7 +186,7 @@ public final class Types {
 
 	public static double float64(final double value) { return value; }
 
-	public static double float64(final Number value) { return value.doubleValue(); }
+	public static double float64(final BigInteger value) { return value.and(maskBI).longValue(); }
 
 	public static double float64(final boolean value) { return value ? 1 : 0; }
 
