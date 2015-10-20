@@ -58,7 +58,8 @@ types = ```
 	[op: "Uint128",  built: "uint128",  imglibT: "Unsigned128Bit", outMethod: "uint128",  values: [
 		[v: "BigInteger.valueOf(0xbeef)",       r: "BigInteger.valueOf(0xbeef)",       i: "BigInteger.ZERO"],
 		[v: "BigInteger.ZERO",                  r: "BigInteger.ZERO",                  i: "BigInteger.ZERO"],
-		[v: 'new BigInteger("2CAFE0321BEEF0717BABE0929DEAD0311", 16)', r: 'new BigInteger("2CAFE0321BEEF0717BABE0929DEAD0311", 16)', i: "BigInteger.ZERO"]
+		[v: 'new BigInteger("2CAFE0321BEEF0717BABE0929DEAD0311", 16)', r: 'new BigInteger("2CAFE0321BEEF0717BABE0929DEAD0311", 16)', i: "BigInteger.ZERO"],
+		[v: 'new BigInteger("-482301498A285BFD0982EE7DE02398BC9080459284CCDE90E9F0D00C043981210481AAADEF2", 16)', r: 'new BigInteger("-482301498A285BFD0982EE7DE02398BC9080459284CCDE90E9F0D00C043981210481AAADEF2", 16)', i: "BigInteger.ZERO"]
 	]],
 	[op: "Float32",  built: "float32",  imglibT: "Float",          outMethod: "float32",   values: [
 		[v: "123453.125f",                      r: "123453.125f",                      i: "0f"],
@@ -73,7 +74,8 @@ types = ```
 	[op: "Float64",  built: "float64",  imglibT: "Double",         outMethod: "float64",   values: [
 		[v: "4098d",                            r: "4098d",                            i: "0d"],
 		[v: "0d",                               r: "0d",                               i: "0d"],
-		[v: "-10948.015625d",                   r: "-10948.015625d",                   i: "0d"]
+		[v: "-10948.015625d",                   r: "-10948.015625d",                   i: "0d"],
+		[v: "1.0000152587890625e20",            r: "1.0000152587890625e20",            i: "0"]
 	]],
 	[op: "Cfloat64", built: "cfloat64", imglibT: "ComplexDouble",  outMethod: "float64", values: [
 		[v: "9087d, 879542.125d",               r: "9087d",                            i: "879542.125d"],
