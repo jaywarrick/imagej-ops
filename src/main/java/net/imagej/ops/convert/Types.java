@@ -30,6 +30,7 @@
 
 package net.imagej.ops.convert;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import net.imglib2.type.numeric.integer.Unsigned128BitType;
@@ -42,7 +43,7 @@ import net.imglib2.type.numeric.integer.Unsigned128BitType;
  */
 public final class Types {
 
-	private static BigInteger maskBI = new BigInteger("+FFFFFFFFFFFFFFFF", 16);
+	private static BigInteger maskBI = new BigInteger("+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16);
 
 	private Types() { }
 
@@ -141,7 +142,7 @@ public final class Types {
 		return result;
 	}
 
-	public static BigInteger uint64(final double value) { return uint64((long) value); }
+	public static BigInteger uint64(final double value) { return (new BigDecimal(value).toBigInteger()).and(maskBI); }
 
 	public static BigInteger uint64(final Number value) { return uint64(value.longValue()); }
 
@@ -150,25 +151,31 @@ public final class Types {
 	public static BigInteger uint128(final long value) {
 		final BigInteger bi = BigInteger.valueOf(value);
 		if (bi.compareTo(BigInteger.ZERO) >= 0) return bi;
-
-		final int validBytes = validBytes(value);
-		return bi.add(new BigInteger("2").pow(8 * validBytes));
+		return new BigInteger(validBytes(bi.toByteArray()));
 	}
 
-	private static int validBytes(final long value) {
-		for (int b=8; b>=0; b--) {
-			final long v = value >>> 8 * (b - 1);
-			boolean pattern = false;
-			if(((value >>> 8 * b) & 0x01) == 1 && (v & 0x80) == 0){
-				pattern = true;
-			}
-			if ((v & 0xff) != 0xff && pattern) return b+1;
-			if ((v & 0xff) != 0xff) return b;
+	public static BigInteger uint128(final double value) { 
+		BigDecimal bd = new BigDecimal(value);
+		BigInteger bi = bd.toBigInteger();
+		if (bi.compareTo(BigInteger.ZERO) >= 0) return bi;
+		return new BigInteger(validBytes(bi.toByteArray())); 
 		}
-		throw new IllegalStateException("unknown valid bytes: " + value);
-	}
 
-	public static BigInteger uint128(final double value) { return uint128((long) value); }
+	private static byte[] validBytes(final byte[] value) {
+		int start = 0;
+		int startBI = 16-value.length + 1;
+		if(value.length > 16){
+			start = value.length - 16;
+			startBI = 0;
+		}
+		byte[] b = new byte[17];
+		b[0] = 0;
+		int cutoff = Math.min(value.length, start+16);
+		for(int i = start, h = startBI; i < cutoff || h < 16; i++, h++){
+			b[h] = (byte)(value[i] & 0xfffL);
+		}
+		return b;
+	}
 
 	public static BigInteger uint128(final BigInteger value) { return value.and(maskBI); }
 
