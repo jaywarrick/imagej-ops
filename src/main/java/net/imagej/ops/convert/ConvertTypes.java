@@ -499,10 +499,14 @@ public final class ConvertTypes {
 
 		@Override
 		public void compute(final C input, final Unsigned128BitType output) {
-			BigDecimal bd = new BigDecimal(input.getRealDouble());
-			BigDecimal r = bd.remainder(BigDecimal.ONE);
-			if(r.compareTo(BigDecimal.ZERO) == 0){ output.set(bd.toBigIntegerExact()); }
-			else { output.set(bd.toBigInteger()); }
+			final BigDecimal bd = new BigDecimal(input.getRealDouble());
+			final BigDecimal r = bd.remainder(BigDecimal.ONE);
+			if (r.compareTo(BigDecimal.ZERO) == 0) {
+				output.set(bd.toBigIntegerExact());
+			}
+			else {
+				output.set(bd.toBigInteger());
+			}
 		}
 
 	}
@@ -520,7 +524,17 @@ public final class ConvertTypes {
 
 		@Override
 		public void compute(final T input, final Unsigned128BitType output) {
-			output.set(BigInteger.valueOf(input.getIntegerLong()));
+			/**
+			 * HACK The IntegerType interface does not currently have a method which
+			 * returns a BigInteger. See issue {@link https
+			 * ://github.com/imglib/imglib2/issues/105}.
+			 */
+			if (input instanceof Unsigned128BitType) {
+				output.set(((Unsigned128BitType) input).get());
+			}
+			else {
+				output.set(BigInteger.valueOf(input.getIntegerLong()));
+			}
 		}
 
 	}
