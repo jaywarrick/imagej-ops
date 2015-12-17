@@ -11,7 +11,7 @@ import org.scijava.plugin.Plugin;
 public class IItoRAIRealMathComputers {
 
 	@Plugin(type = Ops.Math.Add.class, priority = Priority.HIGH_PRIORITY + 0.1)
-	public static class Add<I extends RealType<I>,O extends RealType<O>> extends AbstractIItoRAIRealWrappedComputerOp<I,O>
+	public static class Add<I extends RealType<I>,O extends RealType<O>> extends AbstractIItoRAIRealWrappedUnaryComputerOp<I,O>
 		implements Ops.Math.Add
 	{
 		@Override
@@ -27,7 +27,7 @@ public class IItoRAIRealMathComputers {
 	}
 	
 	@Plugin(type = Ops.Math.Subtract.class, priority = Priority.HIGH_PRIORITY + 0.1)
-	public static class Subtract<I extends RealType<I>,O extends RealType<O>> extends AbstractIItoRAIRealWrappedComputerOp<I,O>
+	public static class Subtract<I extends RealType<I>,O extends RealType<O>> extends AbstractIItoRAIRealWrappedUnaryComputerOp<I,O>
 		implements Ops.Math.Subtract
 	{
 		@Override
@@ -43,7 +43,7 @@ public class IItoRAIRealMathComputers {
 	}
 	
 	@Plugin(type = Ops.Math.Multiply.class, priority = Priority.HIGH_PRIORITY + 0.1)
-	public static class Multiply<I extends RealType<I>,O extends RealType<O>> extends AbstractIItoRAIRealWrappedComputerOp<I,O>
+	public static class Multiply<I extends RealType<I>,O extends RealType<O>> extends AbstractIItoRAIRealWrappedUnaryComputerOp<I,O>
 		implements Ops.Math.Multiply
 	{
 		@Override
@@ -59,7 +59,7 @@ public class IItoRAIRealMathComputers {
 	}
 	
 	@Plugin(type = Ops.Math.Divide.class, priority = Priority.HIGH_PRIORITY + 0.1)
-	public static class Divide<I extends RealType<I>,O extends RealType<O>> extends AbstractIItoRAIRealWrappedComputerOp<I,O>
+	public static class Divide<I extends RealType<I>,O extends RealType<O>> extends AbstractIItoRAIRealWrappedUnaryComputerOp<I,O>
 		implements Ops.Math.Divide
 	{
 		@Override

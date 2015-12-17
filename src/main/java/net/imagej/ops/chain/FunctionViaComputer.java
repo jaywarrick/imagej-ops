@@ -44,24 +44,6 @@ import net.imglib2.type.numeric.real.DoubleType;
  * <p>
  * This is mostly useful when the {@link UnaryComputerOp} in question has a
  * generic type as output, which needs to be narrowed to a concrete type for the
-<<<<<<< HEAD
- * purposes of the {@link UnaryFunctionOp} portion's return type. In this
- * scenario, a {@link UnaryHybridOp} cannot be used directly with type-safe
- * generics.
- * </p>
- * <p>
- * For example, a {@link UnaryComputerOp} whose output variable is a
- * {@code T extends RealType<T>} cannot be a {@link UnaryHybridOp} because we do
- * not know at runtime which sort of {@link RealType} matches the caller's
- * {@code T} parameter. However, a separate {@link UnaryFunctionOp} can be
- * created whose output is typed on e.g. {@link DoubleType}, with the
- * computation delegating to the wrapped {@link UnaryComputerOp}.
- * </p>
- */
-public abstract class FunctionViaComputer<I, O> extends
-	AbstractUnaryFunctionOp<I, O> implements
-	DelegatingUnaryOp<UnaryComputerOp<I, O>, I, O>, UnaryOutputFactory<I, O>
-=======
  * purposes of the {@link UnaryFunctionOp} portion's return type. In this scenario, a
  * {@link UnaryHybridOp} cannot be used directly with type-safe generics.
  * </p>
@@ -76,7 +58,6 @@ public abstract class FunctionViaComputer<I, O> extends
  */
 public abstract class FunctionViaComputer<I, O> extends AbstractUnaryFunctionOp<I, O>
 	implements DelegatingUnaryOp<UnaryComputerOp<I, O>, I, O>, UnaryOutputFactory<I, O>
->>>>>>> parent of 2bb6ac3... Revert "Merge remote-tracking branch 'imagej/master' into Boolean-Image-Ops"
 {
 
 	private UnaryComputerOp<I, O> worker;

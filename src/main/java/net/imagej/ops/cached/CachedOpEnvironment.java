@@ -218,14 +218,9 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 		}
 
 		@Override
-<<<<<<< HEAD
-		public O compute(final I input) {
 
-			final Hash hash = new Hash(input, delegate.getClass(), args);
-=======
 		public O compute1(final I input) {
 			final Hash hash = new Hash(input, delegate, args);
->>>>>>> imagej/master
 
 			@SuppressWarnings("unchecked")
 			O output = (O) cache.get(hash);
@@ -267,28 +262,11 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 
 		private final int hash;
 
-<<<<<<< HEAD
-		private Class<?> delegate;
-
-		public Hash(final Object o1, final Class<?> delegate, final Object[] args) {
-			this.delegate = delegate;
-
-			// Implement hash joining algorithm from Jon Skeet on SO:
-			// http://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-an-overridden-system-object-gethashcode
-			long hash = 17;
-
-			hash = hash * 23 + o1.hashCode();
-			hash = hash * 23 + delegate.getSimpleName().hashCode();
-
-			for (final Object o : args) {
-				hash = hash * 23 + o.hashCode();
-=======
 		public Hash(final Object o1, final Object o2, final Object[] args) {
 			long h = o1.hashCode() ^ o2.getClass().getSimpleName().hashCode();
 
 			for (final Object o : args) {
 				h ^= o.hashCode();
->>>>>>> imagej/master
 			}
 
 			hash = (int) h;
@@ -302,8 +280,7 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 		@Override
 		public boolean equals(final Object obj) {
 			if (obj == this) return true;
-			if (obj instanceof Hash) return ((Hash) obj).delegate == delegate &&
-				((Hash) obj).hash == hash;
+			if (obj instanceof Hash) return hash == ((Hash) obj).hash;
 			return false;
 		}
 	}

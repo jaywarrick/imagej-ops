@@ -31,15 +31,10 @@ package net.imagej.ops.features.tamura2d;
 
 import java.util.ArrayList;
 
-<<<<<<< HEAD
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.FunctionOp;
-=======
->>>>>>> imagej/master
 import net.imagej.ops.Ops;
-import net.imagej.ops.Ops.Stats.StdDev;
 import net.imagej.ops.image.histogram.HistogramCreate;
 import net.imagej.ops.special.Functions;
 import net.imagej.ops.special.UnaryFunctionOp;
@@ -75,14 +70,8 @@ public class DefaultDirectionalityFeature<I extends RealType<I>, O extends RealT
 
 	@Override
 	public void initialize() {
-<<<<<<< HEAD
-		stdOp = ops().function(StdDev.class, RealType.class, Iterable.class);
-		histOp = ops().function(HistogramCreate.class, Histogram1d.class, Iterable.class, histogramSize);
-=======
 		stdOp = Functions.unary(ops(), Ops.Stats.StdDev.class, RealType.class, Iterable.class);
-		histOp = Functions.unary(ops(), HistogramCreate.class, Histogram1d.class,
-			Iterable.class, histogramSize);
->>>>>>> imagej/master
+		histOp = Functions.unary(ops(), HistogramCreate.class, Histogram1d.class, Iterable.class, histogramSize);
 	}
 
 	@SuppressWarnings("unchecked")

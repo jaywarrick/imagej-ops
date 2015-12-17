@@ -33,17 +33,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.imagej.ops.FunctionOp;
+import org.scijava.plugin.Attr;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+
 import net.imagej.ops.OpService;
 import net.imagej.ops.featuresets.AbstractOpRefFeatureSet;
 import net.imagej.ops.featuresets.DimensionBoundFeatureSet;
 import net.imagej.ops.featuresets.FeatureSet;
 import net.imagej.ops.featuresets.NamedFeature;
+import net.imagej.ops.special.UnaryFunctionOp;
 import net.imglib2.type.numeric.RealType;
-
-import org.scijava.plugin.Attr;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
 /**
  * {@link FeatureSet} to calculate Geometric2DFeatureSet
@@ -133,14 +133,14 @@ public class Geometric2DFeatureSet<I, O extends RealType<O>> extends AbstractOpR
 	private boolean isSolidityActive = true;
 	
 	@Override
-	public Map<NamedFeature, O> compute(final I input) {
+	public Map<NamedFeature, O> compute1(final I input) {
 		final Map<NamedFeature, O> res = new HashMap<NamedFeature, O>();
 
 		// For some reason the converter was not being engaged automatically.
 //		Polygon newInput = convert(input);
 		
-		for (final Entry<NamedFeature, FunctionOp<Object, ? extends O>> entry : namedFeatureMap.entrySet()) {
-			res.put(entry.getKey(), entry.getValue().compute(input));
+		for (final Entry<NamedFeature, UnaryFunctionOp<Object, ? extends O>> entry : namedFeatureMap.entrySet()) {
+			res.put(entry.getKey(), entry.getValue().compute1(input));
 		}
 
 		return res;

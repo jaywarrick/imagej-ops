@@ -34,20 +34,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import net.imagej.ops.Contingent;
-import net.imagej.ops.FunctionOp;
-import net.imagej.ops.Op;
-import net.imagej.ops.OpRef;
-import net.imagej.ops.features.haralick.HaralickFeature;
-import net.imagej.ops.featuresets.AbstractOpRefFeatureSet;
-import net.imagej.ops.featuresets.DimensionBoundFeatureSet;
-import net.imagej.ops.featuresets.FeatureSet;
-import net.imagej.ops.featuresets.NamedFeature;
-import net.imagej.ops.image.cooccurrencematrix.MatrixOrientation2D;
-import net.imglib2.IterableInterval;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.ItemIO;
 import org.scijava.Priority;
 import org.scijava.command.CommandInfo;
@@ -56,6 +42,20 @@ import org.scijava.module.ModuleItem;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.Contingent;
+import net.imagej.ops.Op;
+import net.imagej.ops.OpRef;
+import net.imagej.ops.features.haralick.HaralickFeature;
+import net.imagej.ops.featuresets.AbstractOpRefFeatureSet;
+import net.imagej.ops.featuresets.DimensionBoundFeatureSet;
+import net.imagej.ops.featuresets.FeatureSet;
+import net.imagej.ops.featuresets.NamedFeature;
+import net.imagej.ops.image.cooccurrencematrix.MatrixOrientation2D;
+import net.imagej.ops.special.UnaryFunctionOp;
+import net.imglib2.IterableInterval;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * {@link FeatureSet} for {@link HaralickFeature}s
@@ -178,7 +178,7 @@ public class Haralick2DFeatureSet<T, O extends RealType<O>> extends AbstractOpRe
 			}
 		}
 		
-		this.namedFeatureMap = new LinkedHashMap<NamedFeature, FunctionOp<Object, ? extends O>>();
+		this.namedFeatureMap = new LinkedHashMap<NamedFeature, UnaryFunctionOp<Object, ? extends O>>();
 
 		final Module self = this.cs.getCommand(this.getClass()).createModule(this);
 		try {
@@ -196,8 +196,7 @@ public class Haralick2DFeatureSet<T, O extends RealType<O>> extends AbstractOpRe
 					final Class<? extends O> outType = this.outType == null ? (Class<? extends O>) DoubleType.class
 							: this.outType;
 
-					@SuppressWarnings("rawtypes")
-					final OpRef ref = new OpRef(Class.forName((String) item.get(ATTR_TYPE)), args);
+					final OpRef<? extends Op> ref = OpRef.create((Class<? extends Op>)Class.forName((String) item.get(ATTR_TYPE)), args);
 					
 					// Convert the String orientation to a MatrixOrientation
 					Object[] currentArgs = ref.getArgs();
@@ -215,8 +214,8 @@ public class Haralick2DFeatureSet<T, O extends RealType<O>> extends AbstractOpRe
 						}
 					}
 
-					namedFeatureMap.put(new NamedFeature(ref), (FunctionOp<Object, ? extends O>) ops()
-							.function(ref.getType(), outType, in(), newArgs));
+					namedFeatureMap.put(new NamedFeature(ref), (UnaryFunctionOp<Object, ? extends O>) ops()
+							.op(ref.getType(), outType, in(), newArgs));
 				}
 			}
 		} catch (final ClassNotFoundException e) {

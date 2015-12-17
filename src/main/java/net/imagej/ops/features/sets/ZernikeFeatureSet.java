@@ -92,7 +92,7 @@ public class ZernikeFeatureSet<I extends RealType<I>>
 	}
 
 	@Override
-	public Map<NamedFeature, DoubleType> compute(IterableInterval<I> input) {
+	public Map<NamedFeature, DoubleType> compute1(IterableInterval<I> input) {
 		HashMap<NamedFeature, DoubleType> map = new HashMap<NamedFeature, DoubleType>();
 
 		for (int order = orderMin; order <= orderMax; order++) {
@@ -101,7 +101,7 @@ public class ZernikeFeatureSet<I extends RealType<I>>
 					zernikeComputer.setOrder(order);
 					zernikeComputer.setRepetition(repetition);
 
-					ZernikeMoment results = zernikeComputer.compute(input);
+					ZernikeMoment results = zernikeComputer.compute1(input);
 
 					map.put(new NamedFeature("Magnitude for Order " + order + " and Repetition " + repetition),
 							new DoubleType(results.getMagnitude()));

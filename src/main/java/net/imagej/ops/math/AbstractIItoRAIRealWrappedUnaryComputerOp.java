@@ -30,11 +30,11 @@
 
 package net.imagej.ops.math;
 
-import net.imagej.ops.AbstractComputerOp;
-import net.imagej.ops.ComputerOp;
 import net.imagej.ops.ComputerWrapper;
 import net.imagej.ops.Contingent;
 import net.imagej.ops.Op;
+import net.imagej.ops.special.AbstractUnaryComputerOp;
+import net.imagej.ops.special.UnaryComputerOp;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
@@ -42,16 +42,16 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 
 /**
- * Base class for {@link ComputerOp}<{@link IterableInterval}<I>, {@link 
+ * Base class for {@link UnaryComputerOp}<{@link IterableInterval}<I>, {@link 
  * RandomAccessibleInterval}<O>> that delegate to,
- * lower level {@link ComputerOp}< implementations.
+ * lower level {@link UnaryComputerOp}< implementations.
  * 
  * Hopefully this provides Blitter-like capabilities (ImageJ1)
  * 
  * @author Jay Warrick
  */
-public abstract class AbstractIItoRAIRealWrappedComputerOp<I extends RealType<I>, O extends RealType<O>> extends
-AbstractComputerOp<IterableInterval<I>, RandomAccessibleInterval<O>> implements Contingent
+public abstract class AbstractIItoRAIRealWrappedUnaryComputerOp<I extends RealType<I>, O extends RealType<O>> extends
+AbstractUnaryComputerOp<IterableInterval<I>, RandomAccessibleInterval<O>> implements Contingent
 {
 
 	private Class<? extends Op> workerClass;
@@ -66,7 +66,7 @@ AbstractComputerOp<IterableInterval<I>, RandomAccessibleInterval<O>> implements 
 	}
 
 	@Override
-	public void compute(final IterableInterval<I> input, final RandomAccessibleInterval<O> output) {
+	public void compute1(final IterableInterval<I> input, final RandomAccessibleInterval<O> output) {
 
 		final long[] pos = new long[input.numDimensions()];
 		final Cursor<I> cursor = input.cursor();

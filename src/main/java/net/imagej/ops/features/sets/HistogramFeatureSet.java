@@ -34,10 +34,11 @@ import org.scijava.ItemIO;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.FunctionOp;
 import net.imagej.ops.featuresets.AbstractIteratingFeatureSet;
 import net.imagej.ops.featuresets.FeatureSet;
 import net.imagej.ops.image.histogram.HistogramCreate;
+import net.imagej.ops.special.Functions;
+import net.imagej.ops.special.UnaryFunctionOp;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.LongType;
@@ -56,21 +57,21 @@ public class HistogramFeatureSet<I extends RealType<I>> extends AbstractIteratin
 	private int numBins = 256;
 
 	@SuppressWarnings("rawtypes")
-	private FunctionOp<Iterable<I>, Histogram1d> histogramFunc;
+	private UnaryFunctionOp<Iterable<I>, Histogram1d> histogramFunc;
 
 	private Histogram1d<I> histogram;
 
 	@Override
 	public void initialize() {
 		super.initialize();
-		histogramFunc = ops().function(HistogramCreate.class, Histogram1d.class, in(), numBins);
+		histogramFunc = Functions.unary(ops(), HistogramCreate.class, Histogram1d.class, in(), numBins);
 
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void preCompute(final Iterable<I> input) {
-		histogram = histogramFunc.compute(input);
+		histogram = histogramFunc.compute1(input);
 	}
 
 	@Override
