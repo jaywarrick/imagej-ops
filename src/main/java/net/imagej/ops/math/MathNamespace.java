@@ -107,6 +107,38 @@ public class MathNamespace extends AbstractNamespace {
 	public Object add(final Object... args) {
 		return ops().run(net.imagej.ops.Ops.Math.Add.class, args);
 	}
+	
+	@OpMethod(op = net.imagej.ops.math.IItoRAIRealMathComputers.Add.class)
+	public <I extends RealType<I>, O extends RealType<O>> RandomAccessibleInterval<O> add(final RandomAccessibleInterval<O> out, final IterableInterval<I> in) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<O> result =
+			(RandomAccessibleInterval<O>) ops().run(net.imagej.ops.math.IItoRAIRealMathComputers.Add.class, out, in);
+		return result;
+	}
+	
+	@OpMethod(op = net.imagej.ops.math.IItoRAIRealMathComputers.Subtract.class)
+	public <I extends RealType<I>, O extends RealType<O>> RandomAccessibleInterval<O> subtract(final RandomAccessibleInterval<O> out, final IterableInterval<I> in) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<O> result =
+			(RandomAccessibleInterval<O>) ops().run(net.imagej.ops.math.IItoRAIRealMathComputers.Subtract.class, out, in);
+		return result;
+	}
+	
+	@OpMethod(op = net.imagej.ops.math.IItoRAIRealMathComputers.Multiply.class)
+	public <I extends RealType<I>, O extends RealType<O>> RandomAccessibleInterval<O> multiply(final RandomAccessibleInterval<O> out, final IterableInterval<I> in) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<O> result =
+			(RandomAccessibleInterval<O>) ops().run(net.imagej.ops.math.IItoRAIRealMathComputers.Multiply.class, out, in);
+		return result;
+	}
+	
+	@OpMethod(op = net.imagej.ops.math.IItoRAIRealMathComputers.Divide.class)
+	public <I extends RealType<I>, O extends RealType<O>> RandomAccessibleInterval<O> divide(final RandomAccessibleInterval<O> out, final IterableInterval<I> in) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<O> result =
+			(RandomAccessibleInterval<O>) ops().run(net.imagej.ops.math.IItoRAIRealMathComputers.Divide.class, out, in);
+		return result;
+	}
 
 	@OpMethod(ops = {
 		net.imagej.ops.math.ConstantToArrayImageP.AddByte.class,

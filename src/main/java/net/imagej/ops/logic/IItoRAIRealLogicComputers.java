@@ -10,14 +10,14 @@ import net.imglib2.type.numeric.RealType;
 
 public class IItoRAIRealLogicComputers {
 
-	@Plugin(type = Ops.Logic.Equal.class, priority = 0.1)
-	public static class Equal<I extends RealType<I>,O extends RealType<O>> extends AbstractIItoRAIRealWrappedUnaryComputerOp<I,O>
-		implements Ops.Logic.Equal
+	@Plugin(type = Ops.Logic.LogicalEqual.class, priority = 0.1)
+	public static class LogicalEqual<I extends RealType<I>,O extends RealType<O>> extends AbstractIItoRAIRealWrappedUnaryComputerOp<I,O>
+		implements Ops.Logic.LogicalEqual
 	{
 		@Override
 		protected Class<? extends Op> getWorkerClass()
 		{
-			return Ops.Logic.Equal.class;
+			return Ops.Logic.LogicalEqual.class;
 		}
 		@Override
 		protected ComputerWrapper<I,O> createWrapper()

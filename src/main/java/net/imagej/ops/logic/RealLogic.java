@@ -19,15 +19,34 @@ public class RealLogic {
 		// Prevent instantiation of utility class.
 	}
 
-
-	/** Op that computes the Equal logic operation of two RealType values.
-	 * True if boolean(A) == boolean(B). Similar to And but their boolean
-	 * versions of themselves must be both the same instead of both
-	 * just not 0.
+	/** Op that computes the traditional Equal logic operation of two RealType values.
+	 * True if A == B.
 	 */
 	@Plugin(type = Ops.Logic.Equal.class, priority = 0.1)
 	public static class Equal<A extends RealType<A>,B extends RealType<B>> extends AbstractUnaryComputerOp<A,B>
 	implements Ops.Logic.Equal
+	{
+		@Override
+		public void compute1(A input, B output) {
+			if(input.getRealDouble() == output.getRealDouble())
+			{
+				output.setReal(output.getMaxValue());
+			}
+			else
+			{
+				output.setReal(0.0);
+			}
+		}
+	}
+
+	/** Op that computes the LogicalEqual logic operation of two RealType values.
+	 * True if boolean(A) == boolean(B). Similar to And but their boolean
+	 * versions of themselves must be both the same instead of both
+	 * just not 0.
+	 */
+	@Plugin(type = Ops.Logic.LogicalEqual.class, priority = 0.1)
+	public static class LogicalEqual<A extends RealType<A>,B extends RealType<B>> extends AbstractUnaryComputerOp<A,B>
+	implements Ops.Logic.LogicalEqual
 	{
 		@Override
 		public void compute1(A input, B output) {

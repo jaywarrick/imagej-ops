@@ -32,6 +32,8 @@ package net.imagej.ops.logic;
 
 import java.util.List;
 
+import org.scijava.plugin.Plugin;
+
 import net.imagej.ops.AbstractNamespace;
 import net.imagej.ops.Namespace;
 import net.imagej.ops.OpMethod;
@@ -39,8 +41,6 @@ import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.logic.BoolType;
 import net.imglib2.type.numeric.RealType;
-
-import org.scijava.plugin.Plugin;
 
 /**
  * The logic namespace contains logical (i.e., boolean) operations.
@@ -61,16 +61,69 @@ public class LogicNamespace extends AbstractNamespace {
 	}
 	
 	@OpMethod(op = net.imagej.ops.logic.RealLogic.And.class)
-	public <A extends RealType<A>, B extends RealType<B>> BoolType and(final A a, final B b) {
-		final BoolType result =
-			(BoolType) ops().run(net.imagej.ops.logic.RealLogic.And.class,
-				a, b);
+	public <A extends RealType<A>, B extends RealType<B>> B and(final B b, final A a) {
+		@SuppressWarnings("unchecked")
+		final B result =
+			(B) ops().run(net.imagej.ops.logic.RealLogic.And.class,
+				b, a);
+		return result;
+	}
+	
+	@OpMethod(op = net.imagej.ops.logic.RealLogic.LogicalEqual.class)
+	public <A extends RealType<A>, B extends RealType<B>> B logicalEqual(final B b, final A a) {
+		@SuppressWarnings("unchecked")
+		final B result =
+			(B) ops().run(net.imagej.ops.logic.RealLogic.LogicalEqual.class,
+				b, a);
 		return result;
 	}
 	
 	@OpMethod(op = net.imagej.ops.logic.IItoRAIRealLogicComputers.And.class)
-	public <I, O extends RealType<O>> void and(final IterableInterval<I> a, final RandomAccessibleInterval<O> b) {
-		ops().run(net.imagej.ops.logic.IItoRAIRealLogicComputers.And.class, a, b);
+	public <I extends RealType<I>, O extends RealType<O>> RandomAccessibleInterval<O> and(final RandomAccessibleInterval<O> b, final IterableInterval<I> a) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<O> result = 
+			(RandomAccessibleInterval<O>) ops().run(net.imagej.ops.logic.IItoRAIRealLogicComputers.And.class, b, a);
+		return result;
+	}
+	
+	@OpMethod(op = net.imagej.ops.logic.IItoRAIRealLogicComputers.LogicalEqual.class)
+	public <I extends RealType<I>, O extends RealType<O>> RandomAccessibleInterval<O> logicalEqual(final RandomAccessibleInterval<O> b, final IterableInterval<I> a) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<O> result = 
+			(RandomAccessibleInterval<O>) ops().run(net.imagej.ops.logic.IItoRAIRealLogicComputers.LogicalEqual.class, b, a);
+		return result;
+	}
+	
+	@OpMethod(op = net.imagej.ops.logic.IItoRAIRealLogicComputers.Or.class)
+	public <I extends RealType<I>, O extends RealType<O>> RandomAccessibleInterval<O> or(final RandomAccessibleInterval<O> b, final IterableInterval<I> a) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<O> result = 
+			(RandomAccessibleInterval<O>) ops().run(net.imagej.ops.logic.IItoRAIRealLogicComputers.Or.class, b, a);
+		return result;
+	}
+	
+	@OpMethod(op = net.imagej.ops.logic.IItoRAIRealLogicComputers.Xor.class)
+	public <I extends RealType<I>, O extends RealType<O>> RandomAccessibleInterval<O> xor(final RandomAccessibleInterval<O> b, final IterableInterval<I> a) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<O> result = 
+			(RandomAccessibleInterval<O>) ops().run(net.imagej.ops.logic.IItoRAIRealLogicComputers.Xor.class, b, a);
+		return result;
+	}
+	
+	@OpMethod(op = net.imagej.ops.logic.IItoRAIRealLogicComputers.LessThan.class)
+	public <I extends RealType<I>, O extends RealType<O>> RandomAccessibleInterval<O> lessThan(final RandomAccessibleInterval<O> b, final IterableInterval<I> a) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<O> result = 
+			(RandomAccessibleInterval<O>) ops().run(net.imagej.ops.logic.IItoRAIRealLogicComputers.LessThan.class, b, a);
+		return result;
+	}
+	
+	@OpMethod(op = net.imagej.ops.logic.IItoRAIRealLogicComputers.GreaterThan.class)
+	public <I extends RealType<I>, O extends RealType<O>> RandomAccessibleInterval<O> greaterThan(final RandomAccessibleInterval<O> b, final IterableInterval<I> a) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<O> result = 
+			(RandomAccessibleInterval<O>) ops().run(net.imagej.ops.logic.IItoRAIRealLogicComputers.GreaterThan.class, b, a);
+		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.logic.AndCondition.class)
@@ -137,11 +190,12 @@ public class LogicNamespace extends AbstractNamespace {
 		return result;
 	}
 	
-	@OpMethod(op = net.imagej.ops.logic.PrimitiveLogic.BooleanEqual.class)
-	public <A extends RealType<A>, B extends RealType<B>> BoolType equal(final A a, B b) {
-		final BoolType result =
-			(BoolType) ops().run(
-				net.imagej.ops.logic.PrimitiveLogic.BooleanEqual.class, a, b);
+	@OpMethod(op = net.imagej.ops.logic.RealLogic.Equal.class)
+	public <A extends RealType<A>, B extends RealType<B>> B equal(final A a, B b) {
+		@SuppressWarnings("unchecked")
+		final B result =
+			((B) ops().run(
+				net.imagej.ops.logic.RealLogic.Equal.class, a, b));
 		return result;
 	}
 
@@ -194,10 +248,11 @@ public class LogicNamespace extends AbstractNamespace {
 	// -- greaterThan --
 	
 	@OpMethod(op = net.imagej.ops.logic.RealLogic.GreaterThan.class)
-	public <A extends RealType<A>, B extends RealType<B>> BoolType greaterThan(final A a, final B b) {
-		final BoolType result =
-			(BoolType) ops().run(net.imagej.ops.logic.RealLogic.GreaterThan.class,
-				a, b);
+	public <A extends RealType<A>, B extends RealType<B>> B greaterThan(final B b, final A a) {
+		@SuppressWarnings("unchecked")
+		final B result =
+			(B) ops().run(net.imagej.ops.logic.RealLogic.GreaterThan.class,
+				b, a);
 		return result;
 	}
 
@@ -315,10 +370,11 @@ public class LogicNamespace extends AbstractNamespace {
 	// -- lessThan --
 	
 	@OpMethod(op = net.imagej.ops.logic.RealLogic.LessThan.class)
-	public <A extends RealType<A>, B extends RealType<B>> BoolType lessThan(final A a, final B b) {
-		final BoolType result =
-			(BoolType) ops().run(net.imagej.ops.logic.RealLogic.LessThan.class,
-				a, b);
+	public <A extends RealType<A>, B extends RealType<B>> B lessThan(final B b, final A a) {
+		@SuppressWarnings("unchecked")
+		final B result =
+			(B) ops().run(net.imagej.ops.logic.RealLogic.LessThan.class,
+				b, a);
 		return result;
 	}
 
@@ -525,10 +581,11 @@ public class LogicNamespace extends AbstractNamespace {
 	}
 	
 	@OpMethod(op = net.imagej.ops.logic.RealLogic.Or.class)
-	public <A extends RealType<A>, B extends RealType<B>> BoolType or(final A a, final B b) {
-		final BoolType result =
-			(BoolType) ops().run(net.imagej.ops.logic.RealLogic.Or.class,
-				a, b);
+	public <A extends RealType<A>, B extends RealType<B>> B or(final B b, final A a) {
+		@SuppressWarnings("unchecked")
+		final B result =
+			(B) ops().run(net.imagej.ops.logic.RealLogic.Or.class,
+				b, a);
 		return result;
 	}
 
@@ -580,10 +637,11 @@ public class LogicNamespace extends AbstractNamespace {
 	}
 	
 	@OpMethod(op = net.imagej.ops.logic.RealLogic.XOr.class)
-	public <A extends RealType<A>, B extends RealType<B>> BoolType xor(final A a, final B b) {
-		final BoolType result =
-			(BoolType) ops().run(net.imagej.ops.logic.RealLogic.XOr.class,
-				a, b);
+	public <A extends RealType<A>, B extends RealType<B>> B xor(final B b, final A a) {
+		@SuppressWarnings("unchecked")
+		final B result =
+			(B) ops().run(net.imagej.ops.logic.RealLogic.XOr.class,
+				b, a);
 		return result;
 	}
 
