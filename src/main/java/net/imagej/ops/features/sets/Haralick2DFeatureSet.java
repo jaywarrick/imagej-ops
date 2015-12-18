@@ -52,6 +52,7 @@ import net.imagej.ops.featuresets.DimensionBoundFeatureSet;
 import net.imagej.ops.featuresets.FeatureSet;
 import net.imagej.ops.featuresets.NamedFeature;
 import net.imagej.ops.image.cooccurrencematrix.MatrixOrientation2D;
+import net.imagej.ops.special.Functions;
 import net.imagej.ops.special.UnaryFunctionOp;
 import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
@@ -214,8 +215,7 @@ public class Haralick2DFeatureSet<T, O extends RealType<O>> extends AbstractOpRe
 						}
 					}
 
-					namedFeatureMap.put(new NamedFeature(ref), (UnaryFunctionOp<Object, ? extends O>) ops()
-							.op(ref.getType(), outType, in(), newArgs));
+					namedFeatureMap.put(new NamedFeature(ref), Functions.unary(ops(), ref.getType(), outType, in(), newArgs));
 				}
 			}
 		} catch (final ClassNotFoundException e) {
