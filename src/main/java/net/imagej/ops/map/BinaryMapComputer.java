@@ -28,68 +28,22 @@
  * #L%
  */
 
-package net.imagej.ops.featuresets;
+package net.imagej.ops.map;
 
-import org.scijava.Named;
-
-import net.imagej.ops.OpRef;
+import net.imagej.ops.special.BinaryComputerOp;
+import net.imagej.ops.special.UnaryComputerOp;
 
 /**
- * Simple semantic description of an arbitrary feature
+ * Typed interface for "map" {@link UnaryComputerOp}s.
  * 
- * @author Christian Dietz, University of Konstanz
+ * @author Christian Dietz (University of Konstanz)
+ * @param <EI1> element type of inputs in input1
+ * @param <EI2> element type of inputs in input2
+ * @param <EO> element type of outputs
+ * @param <OP> type of {@link UnaryComputerOp} which processes each element
  */
-public class NamedFeature implements Named {
-
-	private final String name;
-	private OpRef<?> ref;
-
-	public NamedFeature(String name) {
-		this.name = name;
-	}
-
-	public NamedFeature(OpRef<?> ref) {
-		this(ref.getLabel());
-		this.ref = ref;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public void setName(String name) {
-		throw new UnsupportedOperationException("Can't change name of NamedFeature");
-	}
-	// NB: Marker interface
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		NamedFeature other = (NamedFeature) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
-	}
-
-	public OpRef<?> getOp() {
-		return ref;
-	}
+public interface BinaryMapComputer<EI1, EI2, EO, OP extends BinaryComputerOp<EI1, EI2, EO>> extends
+	MapOp<OP>
+{
+	// NB: Marker interface.
 }

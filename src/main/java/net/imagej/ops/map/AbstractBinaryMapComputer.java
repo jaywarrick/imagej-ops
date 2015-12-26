@@ -28,31 +28,43 @@
  * #L%
  */
 
-package net.imagej.ops.featuresets;
+package net.imagej.ops.map;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.scijava.plugin.Parameter;
 
-import net.imagej.ops.OpRef;
-import net.imagej.ops.special.UnaryFunctionOp;
-import net.imglib2.type.numeric.RealType;
+import net.imagej.ops.special.AbstractBinaryComputerOp;
+import net.imagej.ops.special.BinaryComputerOp;
 
 /**
- * A {@link Set} of features which are calculated in combination.
- * {@link FeatureSet}s can provide optimized computations for the calculated
- * {@link OpRef}s.
+ * Abstract base class for {@link MapComputer} implementations.
  * 
- * @author Christian Dietz, University of Konstanz
- * @param <I>
- * @param <O>
+ * @author Jay Warrick (University of Wisconsin)
+ * @author Christian Dietz (University of Konstanz)
+ * @param <EI1> element type of inputs in input 1
+ * @param <EI2> element type of inputs in input 2
+ * @param <EO> element type of outputs
+ * @param <PI1> producer of inputs (input 1)
+ * @param <PI2> producer of inputs (input 2)
+ * @param <PO> producer of outputs
  */
-public interface FeatureSet<I, O extends RealType<O>> extends UnaryFunctionOp<I, Map<NamedFeature, O>> {
+public abstract class AbstractBinaryMapComputer<EI1, EI2, EO, PI1, PI2, PO> extends
+	AbstractBinaryComputerOp<PI1, PI2, PO> implements
+	BinaryMapComputer<EI1, EI2, EO, BinaryComputerOp<EI1, EI2, EO>>
+{
 
-	/**
-	 * @return all {@link NamedFeature}s which are supported by this feature
-	 *         set.
-	 */
-	List<NamedFeature> getFeatures();
+	@Parameter
+	private BinaryComputerOp<EI1, EI2, EO> op;
+
+	// -- MapOp methods --
+
+	@Override
+	public BinaryComputerOp<EI1, EI2, EO> getOp() {
+		return op;
+	}
+
+	@Override
+	public void setOp(final BinaryComputerOp<EI1, EI2, EO> op) {
+		this.op = op;
+	}
 
 }
