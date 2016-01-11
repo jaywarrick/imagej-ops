@@ -93,6 +93,34 @@ public class ImageMomentsFeatureSet<T, O extends RealType<O>> extends AbstractOp
 			@Attr(name = ATTR_TYPE, value = PKG + "CentralMoment30") })
 	private boolean isCentralMoment30Active = true;
 	
+	@Parameter(required = false, label = "NormalizedCentralMoment02", attrs = { @Attr(name = ATTR_FEATURE),
+			@Attr(name = ATTR_TYPE, value = PKG + "NormalizedCentralMoment02") })
+	private boolean isNormalizedCentralMoment02Active = true;
+	
+	@Parameter(required = false, label = "NormalizedCentralMoment03", attrs = { @Attr(name = ATTR_FEATURE),
+			@Attr(name = ATTR_TYPE, value = PKG + "NormalizedCentralMoment03") })
+	private boolean isNormalizedCentralMoment03Active = true;
+	
+	@Parameter(required = false, label = "NormalizedCentralMoment11", attrs = { @Attr(name = ATTR_FEATURE),
+			@Attr(name = ATTR_TYPE, value = PKG + "NormalizedCentralMoment11") })
+	private boolean isNormalizedCentralMoment11Active = true;
+	
+	@Parameter(required = false, label = "NormalizedCentralMoment12", attrs = { @Attr(name = ATTR_FEATURE),
+			@Attr(name = ATTR_TYPE, value = PKG + "NormalizedCentralMoment12") })
+	private boolean isNormalizedCentralMoment12Active = true;
+	
+	@Parameter(required = false, label = "NormalizedCentralMoment20", attrs = { @Attr(name = ATTR_FEATURE),
+			@Attr(name = ATTR_TYPE, value = PKG + "NormalizedCentralMoment20") })
+	private boolean isNormalizedCentralMoment20Active = true;
+	
+	@Parameter(required = false, label = "NormalizedCentralMoment21", attrs = { @Attr(name = ATTR_FEATURE),
+			@Attr(name = ATTR_TYPE, value = PKG + "NormalizedCentralMoment21") })
+	private boolean isNormalizedCentralMoment21Active = true;
+	
+	@Parameter(required = false, label = "NormalizedCentralMoment30", attrs = { @Attr(name = ATTR_FEATURE),
+			@Attr(name = ATTR_TYPE, value = PKG + "NormalizedCentralMoment30") })
+	private boolean isNormalizedCentralMoment30Active = true;
+	
 	@Parameter(required = false, label = "HuMoment1", attrs = { @Attr(name = ATTR_FEATURE),
 			@Attr(name = ATTR_TYPE, value = PKG + "HuMoment1") })
 	private boolean isHuMoment1Active = true;
