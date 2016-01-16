@@ -102,6 +102,7 @@ namespaces = ```
 		[name: "centroid",                    iface: "Centroid"],
 		[name: "boundingbox",                 iface: "BoundingBox"],
 		[name: "smallestenclosingboundingbox",iface: "SmallestEnclosingBoundingBox"],
+		[name: "smallestenclosingboundingcircle",iface: "SmallestEnclosingCircle"],
 		[name: "feret",                       iface: "Feret"],
 		[name: "feretsangle",                 iface: "FeretsAngle"],
 		[name: "feretsdiameter",              iface: "FeretsDiameter"],
