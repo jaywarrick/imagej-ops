@@ -1,8 +1,10 @@
 package net.imagej.ops.geom.geom2d;
 
+import miscellaneous.Copiable;
 import net.imglib2.RealLocalizable;
+import net.imglib2.RealPoint;
 
-public class Circle
+public class Circle implements Copiable<Circle>
 {
 	RealLocalizable center;
 
@@ -23,9 +25,10 @@ public class Circle
 	{
 		return this.radius;
 	}
-	
+
 	public boolean contains(RealLocalizable testPoint)
-	{
+	{		
+				
 		double[] p  = new double[testPoint.numDimensions()];
 		double[] p0 = new double[testPoint.numDimensions()];
 		
@@ -53,6 +56,12 @@ public class Circle
 		}
 		sb.append(radius);
 		return sb.toString();
+	}
+	
+	public Circle copy()
+	{
+		Circle ret = new Circle(new RealPoint(this.center), this.radius);
+		return ret;
 	}
 	
 }
