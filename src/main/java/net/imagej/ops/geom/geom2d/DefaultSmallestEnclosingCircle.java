@@ -40,13 +40,17 @@ implements Ops.Geometric.SmallestEnclosingCircle {
 
 		List<RealLocalizable> points = getInitialPointList(input);
 		List<RealLocalizable> boundary = new Vector<RealLocalizable>(3);
+		
+		SS ss = new SS();
+		ss.p = points;
+		ss.b = boundary;
 
 		if(randomizePointRemoval)
 		{
-			Collections.shuffle(points, new Random(rndSeed));
+			Collections.shuffle(ss.p, new Random(rndSeed));
 		}
 
-		Circle D = miniDisk(points, boundary);
+		Circle D = miniDisk(ss);
 
 		if(paddingRatio != 1.0)
 		{
@@ -80,24 +84,24 @@ implements Ops.Geometric.SmallestEnclosingCircle {
 		return points;
 	}
 	
-	public Circle makeNextCircle(List<RealLocalizable> boundary, List<RealLocalizable> points)
+	public Circle makeNextCircle(SS ss)
 	{
 		Circle D;
-		if (boundary.size() == 3) {
-			D = makeCircle3(boundary);
+		if (ss.b.size() == 3) {
+			D = makeCircle3(ss.b);
 			return D;
 			//			System.out.println("A " + D + " p:" + points + " b:" + boundary);
-		} else if (points.size() == 1 && boundary.size() == 0) {
-			D = makeCircle1(points);
+		} else if (ss.p.size() == 1 && ss.b.size() == 0) {
+			D = makeCircle1(ss.p);
 			return D;
 			//			System.out.println("B " + D + " p:" + points + " b:" + boundary);
-		} else if (points.size() == 0 && boundary.size() == 2) {
-			D = makeCircle2(boundary);
+		} else if (ss.p.size() == 0 && ss.b.size() == 2) {
+			D = makeCircle2(ss.b);
 			return D;
 			//			System.out.println("C " + D + " p:" + points + " b:" + boundary);
-		} else if (points.size() == 1 && boundary.size() == 1) {
-			RealLocalizable p1 = points.get(0);
-			RealLocalizable p2 = boundary.get(0);
+		} else if (ss.p.size() == 1 && ss.b.size() == 1) {
+			RealLocalizable p1 = ss.p.get(0);
+			RealLocalizable p2 = ss.b.get(0);
 			List<RealLocalizable> pl = new Vector<>();
 			pl.add(p1);
 			pl.add(p2);
@@ -108,51 +112,25 @@ implements Ops.Geometric.SmallestEnclosingCircle {
 		return null;
 	}
 
-	private Circle miniDisk(List<RealLocalizable> points, List<RealLocalizable> boundary) {
+	private Circle miniDisk(SS ss) {
 
-		Circle D;
-
-		if(boundary.size() == 4)
+		// Make a circle if you can and return
+		Circle D =  makeNextCircle(ss);
+		if(D != null)
 		{
-			System.out.println("Wahooooo! ------------");
+			return D;
 		}
-		
-		Circle temp = makeNextCircle(boundary, points);
-		
-		if(temp != null)
+		else
 		{
-			return temp;
-		}
-
-		// Special cases
-		else {
-			//			System.out.println("Top - " + points);
-			// Recursively check points
-			List<RealLocalizable> trimmed = getTrimmedList(points);
-
-			D = miniDisk(trimmed, new Vector<RealLocalizable>(boundary));
-			RealLocalizable testPoint = points.get(trimmed.size());
-			//			System.out.println("Testing point " + testPoint + " in " + D);
-			if (!D.contains(testPoint)) {
-				boundary.add(testPoint);
-				//				System.out.println("Added point to Boundary " + testPoint + " - " + boundary);
-				D = miniDisk(trimmed, new Vector<RealLocalizable>(boundary));
+			// Trim and call
+			D = miniDisk(ss.getTrimmed());
+			if (!D.contains(ss.getTestPoint())) {
+				ss.next();
+				D = miniDisk(ss);
 				return D;
 			}
-			System.out.println("b:" + boundary + " ---- Trimmed " + testPoint + " ---- p:" + trimmed);
 			return D;
-			
 		}
-
-		//		System.out.println("E " + D); 
-//		return D;
-	}
-
-	private List<RealLocalizable> getTrimmedList(List<RealLocalizable> list) {
-
-		//System.out.println(list.size());
-		return list.subList(0, list.size()-1);
-
 	}
 
 	private Circle makeCircle1(List<RealLocalizable> points) {
@@ -236,6 +214,73 @@ implements Ops.Geometric.SmallestEnclosingCircle {
 		return Math.sqrt(Math.pow(xb - xa, 2) + Math.pow(yb - ya, 2));
 	}
 	
-	
+	class SS
+	{
+		public List<RealLocalizable> p, b;
+		int stage = 0;
+		RealLocalizable test = null;
+		Circle c = null;
+
+		public SS getTrimmed()
+		{
+			SS ret = this.copy();
+			ret.p = ret.p.subList(0, ret.p.size()-1);
+			return ret;
+		}
+		
+		public RealLocalizable getTestPoint()
+		{
+			return this.p.get(this.p.size()-1);
+		}
+		
+		public SS getNext()
+		{
+			SS ret = this.copy();
+			ret.b.add(ret.p.remove(ret.p.size()-1));
+			return ret;
+		}
+		
+		public void next()
+		{
+			b.add(p.remove(p.size()-1));
+		}
+
+		public void add(RealLocalizable test)
+		{
+			b.add(test);
+		}
+
+		public void setCircle()
+		{
+			this.c = makeNextCircle(this);
+		}
+
+		public SS copy()
+		{
+			SS ret = new SS();
+			ret.p = new Vector<RealLocalizable>(this.p);
+			ret.b = new Vector<RealLocalizable>(this.b);
+			ret.stage = this.stage;
+			if(this.test == null)
+			{
+				ret.test = null;
+			}
+			else
+			{
+				ret.test = new RealPoint(this.test);
+			}
+			return ret;
+		}
+
+		public void print()
+		{
+			System.out.println("---- SnapShot ----");
+			System.out.println(p);
+			System.out.println(b);
+			System.out.println(stage);
+			System.out.println(test);
+			System.out.println(c);
+		}
+	}
 
 }
