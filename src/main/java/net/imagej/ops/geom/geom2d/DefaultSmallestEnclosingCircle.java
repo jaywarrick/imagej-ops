@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -15,19 +16,19 @@ import net.imglib2.IterableInterval;
 import net.imglib2.RealLocalizable;
 import net.imglib2.RealPoint;
 
-@Plugin(type = Ops.Geometric.SmallestEnclosingCircle.class)
+@Plugin(type = Ops.Geometric.SmallestEnclosingCircle.class, priority = Priority.FIRST_PRIORITY)
 public class DefaultSmallestEnclosingCircle extends AbstractUnaryFunctionOp<IterableInterval<?>, Circle>
-		implements Ops.Geometric.SmallestEnclosingCircle {
+implements Ops.Geometric.SmallestEnclosingCircle {
 
 	@Parameter(required = false)
 	RealLocalizable center = null;
 
 	@Parameter(required = false)
 	double paddingRatio = 1.0;
-	
+
 	@Parameter(required = false)
 	boolean randomizePointRemoval = true;
-	
+
 	@Parameter(required = false)
 	int rndSeed = 1234;
 
@@ -39,14 +40,14 @@ public class DefaultSmallestEnclosingCircle extends AbstractUnaryFunctionOp<Iter
 
 		List<RealLocalizable> points = getInitialPointList(input);
 		List<RealLocalizable> boundary = new Vector<RealLocalizable>(3);
-		
+
 		if(randomizePointRemoval)
 		{
 			Collections.shuffle(points, new Random(rndSeed));
 		}
 
 		Circle D = miniDisk(points, boundary);
-		
+
 		if(paddingRatio != 1.0)
 		{
 			D = new Circle(D.getCenter(), D.getRadius()*paddingRatio);
@@ -78,18 +79,22 @@ public class DefaultSmallestEnclosingCircle extends AbstractUnaryFunctionOp<Iter
 		}
 		return points;
 	}
-
-	private Circle miniDisk(List<RealLocalizable> points, List<RealLocalizable> boundary) {
-
+	
+	public Circle makeNextCircle(List<RealLocalizable> boundary, List<RealLocalizable> points)
+	{
 		Circle D;
-
-		// Special cases
 		if (boundary.size() == 3) {
 			D = makeCircle3(boundary);
+			return D;
+			//			System.out.println("A " + D + " p:" + points + " b:" + boundary);
 		} else if (points.size() == 1 && boundary.size() == 0) {
 			D = makeCircle1(points);
+			return D;
+			//			System.out.println("B " + D + " p:" + points + " b:" + boundary);
 		} else if (points.size() == 0 && boundary.size() == 2) {
 			D = makeCircle2(boundary);
+			return D;
+			//			System.out.println("C " + D + " p:" + points + " b:" + boundary);
 		} else if (points.size() == 1 && boundary.size() == 1) {
 			RealLocalizable p1 = points.get(0);
 			RealLocalizable p2 = boundary.get(0);
@@ -97,25 +102,57 @@ public class DefaultSmallestEnclosingCircle extends AbstractUnaryFunctionOp<Iter
 			pl.add(p1);
 			pl.add(p2);
 			D = makeCircle2(pl); // pointList and boundary
-		} else {
-			// Recursively check points
-			List<RealLocalizable> trimmed = getTrimmedList(points);
-			D = miniDisk(trimmed, new Vector<RealLocalizable>(boundary));
-			RealLocalizable testPoint = points.get(trimmed.size());
-			if (!D.contains(testPoint)) {
-				boundary.add(testPoint);
-				D = miniDisk(trimmed, new Vector<RealLocalizable>(boundary));
-			}
+			return D;
+			//			System.out.println("D " + D + " p:" + points + " b:" + boundary);
+		} 
+		return null;
+	}
+
+	private Circle miniDisk(List<RealLocalizable> points, List<RealLocalizable> boundary) {
+
+		Circle D;
+
+		if(boundary.size() == 4)
+		{
+			System.out.println("Wahooooo! ------------");
+		}
+		
+		Circle temp = makeNextCircle(boundary, points);
+		
+		if(temp != null)
+		{
+			return temp;
 		}
 
-		return D;
+		// Special cases
+		else {
+			//			System.out.println("Top - " + points);
+			// Recursively check points
+			List<RealLocalizable> trimmed = getTrimmedList(points);
+
+			D = miniDisk(trimmed, new Vector<RealLocalizable>(boundary));
+			RealLocalizable testPoint = points.get(trimmed.size());
+			//			System.out.println("Testing point " + testPoint + " in " + D);
+			if (!D.contains(testPoint)) {
+				boundary.add(testPoint);
+				//				System.out.println("Added point to Boundary " + testPoint + " - " + boundary);
+				D = miniDisk(trimmed, new Vector<RealLocalizable>(boundary));
+				return D;
+			}
+			System.out.println("b:" + boundary + " ---- Trimmed " + testPoint + " ---- p:" + trimmed);
+			return D;
+			
+		}
+
+		//		System.out.println("E " + D); 
+//		return D;
 	}
 
 	private List<RealLocalizable> getTrimmedList(List<RealLocalizable> list) {
 
 		//System.out.println(list.size());
 		return list.subList(0, list.size()-1);
-		
+
 	}
 
 	private Circle makeCircle1(List<RealLocalizable> points) {
@@ -198,5 +235,7 @@ public class DefaultSmallestEnclosingCircle extends AbstractUnaryFunctionOp<Iter
 	private double calcDistance(double xa, double ya, double xb, double yb) {
 		return Math.sqrt(Math.pow(xb - xa, 2) + Math.pow(yb - ya, 2));
 	}
+	
+	
 
 }
