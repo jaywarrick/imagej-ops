@@ -1,10 +1,9 @@
 package net.imagej.ops.geom.geom2d;
 
-import miscellaneous.Copiable;
 import net.imglib2.RealLocalizable;
 import net.imglib2.RealPoint;
 
-public class Circle implements Copiable<Circle>
+public class Circle
 {
 	RealLocalizable center;
 
