@@ -55,8 +55,7 @@ import net.imglib2.type.numeric.RealType;
 @Plugin(type = Op.class)
 public class ZernikeComputer<T extends RealType<T>> extends
 	AbstractUnaryFunctionOp<IterableInterval<T>, ZernikeMoment>
-{
-
+{	
 	@Parameter
 	private int order;
 
@@ -64,33 +63,25 @@ public class ZernikeComputer<T extends RealType<T>> extends
 	private int repetition;
 	
 	@Parameter(required = false)
-	private RealLocalizable center = null;
-	
-	@Parameter(required = false)
-	private double radialPaddingRatio = 1.0;
-	
-	private double radius;
+	private Circle enclosingCircle = null;
 	
 	@Override
 	public void initialize() {
 		super.initialize();
-		
-		if(this.center == null)
-		{
-			UnaryFunctionOp<IterableInterval<T>,RealLocalizable> comOp = Functions.unary(ops(), Ops.Geometric.CenterOfGravity.class, RealLocalizable.class, in());
-			this.center = comOp.compute1(in());
-			UnaryFunctionOp<IterableInterval<T>,Circle> cirOp = Functions.unary(ops(), Ops.Geometric.SmallestEnclosingCircle.class, Circle.class, in(), this.center, this.radialPaddingRatio);
-			Circle smallestEnclosingCircle = cirOp.compute1(in());
-			this.center = smallestEnclosingCircle.getCenter();
-			this.radius = smallestEnclosingCircle.getRadius();
-		}
 	}
 
 	@Override
 	public ZernikeMoment compute1(IterableInterval<T> ii) {
 		
-		final double centerX = this.center.getDoublePosition(0);
-		final double centerY = this.center.getDoublePosition(1);
+		Circle circle = enclosingCircle;
+		if(circle == null)
+		{
+			UnaryFunctionOp<RealCursor<T>,Circle> cirOp = Functions.unary(ops(), Ops.Geometric.SmallestEnclosingCircle.class, Circle.class, in().cursor(), (RealLocalizable) null);
+			circle = cirOp.compute1(ii.cursor());
+		}
+		
+		final double centerX = circle.getCenter().getDoublePosition(0);
+		final double centerY = circle.getCenter().getDoublePosition(1);
 
 		// Compute pascal's triangle for binomal coefficients: d[x][y] equals (x
 		// over y)
@@ -113,8 +104,8 @@ public class ZernikeComputer<T extends RealType<T>> extends
 			final double x = cur.getDoublePosition(0);
 			final double y = cur.getDoublePosition(1);
 
-			final double xm = (x - centerX) / this.radius;
-			final double ym = (y - centerY) / this.radius;
+			final double xm = (x - centerX) / circle.getRadius();
+			final double ym = (y - centerY) / circle.getRadius();
 
 			final double r = Math.sqrt(xm * xm + ym * ym);
 
@@ -145,7 +136,7 @@ public class ZernikeComputer<T extends RealType<T>> extends
 		}
 
 		// normalization
-		normalize(moment.getZm(), moment.getN(), count);
+		//normalize(moment.getZm(), moment.getN(), count);
 
 		return moment;
 	}
@@ -297,14 +288,8 @@ public class ZernikeComputer<T extends RealType<T>> extends
 		this.repetition = repetition;
 	}
 	
-	public void setCenter(RealLocalizable center)
-	{
-		this.center = center;
-	}
-	
-	public void setRadius(double radius)
-	{
-		this.radius = radius;
+	public void setEnclosingCircle(Circle circle) {
+		this.enclosingCircle = circle;
 	}
 
 	/**

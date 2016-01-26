@@ -35,18 +35,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.scijava.ItemIO;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+
 import net.imagej.ops.features.zernike.helper.ZernikeComputer;
 import net.imagej.ops.features.zernike.helper.ZernikeMoment;
 import net.imagej.ops.featuresets.AbstractFeatureSet;
 import net.imagej.ops.featuresets.FeatureSet;
 import net.imagej.ops.featuresets.NamedFeature;
+import net.imagej.ops.geom.geom2d.Circle;
 import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
-
-import org.scijava.ItemIO;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
 /**
  * {@link FeatureSet} to calculate {@link StatOp}s.
@@ -65,6 +66,9 @@ public class ZernikeFeatureSet<I extends RealType<I>>
 
 	@Parameter(type = ItemIO.INPUT, label = "Maximum Order of Zernike Moment", description = "The maximum order of the zernike moment to be calculated.", min = "1", max = "2147483647", stepSize = "1")
 	private int orderMax = 4;
+	
+	@Parameter(required = false)
+	private Circle enclosingCircle = null;
 
 	private ZernikeComputer<I> zernikeComputer;
 
@@ -100,6 +104,7 @@ public class ZernikeFeatureSet<I extends RealType<I>>
 				if (Math.abs(order - repetition) % 2 == 0) {
 					zernikeComputer.setOrder(order);
 					zernikeComputer.setRepetition(repetition);
+					zernikeComputer.setEnclosingCircle(this.enclosingCircle);
 
 					ZernikeMoment results = zernikeComputer.compute1(input);
 
@@ -112,6 +117,11 @@ public class ZernikeFeatureSet<I extends RealType<I>>
 		}
 
 		return map;
+	}
+	
+	public void setEnclosingCircle(Circle c)
+	{
+		this.enclosingCircle = c;
 	}
 
 }
