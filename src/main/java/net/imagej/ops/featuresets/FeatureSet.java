@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.imagej.ops.OpRef;
-import net.imagej.ops.special.UnaryFunctionOp;
+import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imglib2.type.numeric.RealType;
 
 /**

@@ -40,7 +40,7 @@ import org.scijava.plugin.PluginService;
 
 import net.imagej.ops.Op;
 import net.imagej.ops.cached.CachedOpEnvironment;
-import net.imagej.ops.special.AbstractUnaryFunctionOp;
+import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imglib2.type.numeric.RealType;
 
 /**

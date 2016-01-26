@@ -163,5 +163,49 @@ public class RealBinaryMath {
 				.getRealDouble());
 		}
 	}
+	
+	/**
+	 * Sets the real component of an output real number to the logical XOR of the
+	 * real component of two input real numbers.
+	 */
+	@Plugin(type = Ops.Math.Min.class)
+	public static class Min<I1 extends RealType<I1>, I2 extends RealType<I2>, O extends RealType<O>>
+		extends AbstractBinaryComputerOp<I1, I2, O> implements Ops.Math.Min
+	{
 
+		@Override
+		public void compute2(final I1 input1, final I2 input2, final O output) {
+			output.setReal(Math.min(input1.getRealDouble(), input2.getRealDouble()));
+		}
+	}
+	
+	/**
+	 * Sets the real component of an output real number to the logical XOR of the
+	 * real component of two input real numbers.
+	 */
+	@Plugin(type = Ops.Math.Max.class)
+	public static class Max<I1 extends RealType<I1>, I2 extends RealType<I2>, O extends RealType<O>>
+		extends AbstractBinaryComputerOp<I1, I2, O> implements Ops.Math.Max
+	{
+
+		@Override
+		public void compute2(final I1 input1, final I2 input2, final O output) {
+			output.setReal(Math.max(input1.getRealDouble(), input2.getRealDouble()));
+		}
+	}
+	
+	/**
+	 * Sets the real component of an output real number to the logical XOR of the
+	 * real component of two input real numbers.
+	 */
+	@Plugin(type = Ops.Math.Power.class)
+	public static class Power<I1 extends RealType<I1>, I2 extends RealType<I2>, O extends RealType<O>>
+		extends AbstractBinaryComputerOp<I1, I2, O> implements Ops.Math.Power
+	{
+
+		@Override
+		public void compute2(final I1 input1, final I2 input2, final O output) {
+			output.setReal(Math.pow(input1.getRealDouble(), input2.getRealDouble()));
+		}
+	}
 }

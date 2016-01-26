@@ -44,8 +44,8 @@ import org.scijava.plugin.Parameter;
 
 import net.imagej.ops.Op;
 import net.imagej.ops.OpRef;
-import net.imagej.ops.special.Functions;
-import net.imagej.ops.special.UnaryFunctionOp;
+import net.imagej.ops.special.function.Functions;
+import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imglib2.type.numeric.RealType;
 
 /**

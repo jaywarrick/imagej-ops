@@ -57,13 +57,7 @@ import net.imagej.ops.labeling.LabelingNamespace;
 import net.imagej.ops.logic.LogicNamespace;
 import net.imagej.ops.map.neighborhood.CenterAwareComputerOp;
 import net.imagej.ops.math.MathNamespace;
-<<<<<<< HEAD
-import net.imagej.ops.special.BinaryComputerOp;
-import net.imagej.ops.special.InplaceOp;
-import net.imagej.ops.special.UnaryComputerOp;
-=======
 import net.imagej.ops.special.SpecialOp;
->>>>>>> imagej/master
 import net.imagej.ops.special.UnaryOutputFactory;
 import net.imagej.ops.special.computer.BinaryComputerOp;
 import net.imagej.ops.special.computer.UnaryComputerOp;
@@ -763,24 +757,6 @@ public interface OpEnvironment extends Contextual {
 			(RandomAccessibleInterval<O>) run(
 				net.imagej.ops.slicewise.SlicewiseRAI2RAI.class, out, in, op,
 				axisIndices, dropSingleDimensions);
-		return result;
-	}
-	
-	// -- BinaryMapComputers --
-	
-	/** Executes the "map" operation on the given arguments. */
-	@OpMethod(ops = { net.imagej.ops.map.BinaryMapIIAndRAIToRAI.class })
-	default <EI1, EI2, EO> RandomAccessibleInterval<EO> map(
-		final RandomAccessibleInterval<EO> out, final IterableInterval<EI1> in1,
-		final RandomAccessibleInterval<EI2> in2,
-		final BinaryComputerOp<EI1, EI2, EO> op)
-	{
-		// net.imagej.ops.map.MapIterableIntervalToRAIParallel.class
-		// net.imagej.ops.map.MapIterableIntervalToRAI.class
-		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<EO> result =
-			(RandomAccessibleInterval<EO>) run(net.imagej.ops.Ops.Map.class, out, in1, in2,
-				op);
 		return result;
 	}
 
