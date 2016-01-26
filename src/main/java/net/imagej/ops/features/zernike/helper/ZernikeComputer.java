@@ -31,15 +31,20 @@ package net.imagej.ops.features.zernike.helper;
 
 import java.util.List;
 
-import net.imagej.ops.Op;
-import net.imagej.ops.special.AbstractUnaryFunctionOp;
-import net.imagej.types.BigComplex;
-import net.imglib2.Cursor;
-import net.imglib2.IterableInterval;
-import net.imglib2.type.numeric.RealType;
-
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.Op;
+import net.imagej.ops.Ops;
+import net.imagej.ops.geom.geom2d.Circle;
+import net.imagej.ops.special.AbstractUnaryFunctionOp;
+import net.imagej.ops.special.Functions;
+import net.imagej.ops.special.UnaryFunctionOp;
+import net.imagej.types.BigComplex;
+import net.imglib2.IterableInterval;
+import net.imglib2.RealCursor;
+import net.imglib2.RealLocalizable;
+import net.imglib2.type.numeric.RealType;
 
 /**
  * 
@@ -58,23 +63,34 @@ public class ZernikeComputer<T extends RealType<T>> extends
 	@Parameter
 	private int repetition;
 	
+	@Parameter(required = false)
+	private RealLocalizable center = null;
+	
+	@Parameter(required = false)
+	private double radialPaddingRatio = 1.0;
+	
+	private double radius;
+	
 	@Override
 	public void initialize() {
 		super.initialize();
+		
+		if(this.center == null)
+		{
+			UnaryFunctionOp<IterableInterval<T>,RealLocalizable> comOp = Functions.unary(ops(), Ops.Geometric.CenterOfGravity.class, RealLocalizable.class, in());
+			this.center = comOp.compute1(in());
+			UnaryFunctionOp<IterableInterval<T>,Circle> cirOp = Functions.unary(ops(), Ops.Geometric.SmallestEnclosingCircle.class, Circle.class, in(), this.center, this.radialPaddingRatio);
+			Circle smallestEnclosingCircle = cirOp.compute1(in());
+			this.center = smallestEnclosingCircle.getCenter();
+			this.radius = smallestEnclosingCircle.getRadius();
+		}
 	}
 
 	@Override
 	public ZernikeMoment compute1(IterableInterval<T> ii) {
-
-		// what is the acutal N
-		final double width = ii.dimension(0);
-		final double height = ii.dimension(1);
-
-		double size = (width > height) ? width : height;
-		final double centerX = width / 2.0d + ii.min(0);
-		final double centerY = height / 2.0d + ii.min(1);
 		
-		double radius = Math.sqrt((size + size) * size) / 2;
+		final double centerX = this.center.getDoublePosition(0);
+		final double centerY = this.center.getDoublePosition(1);
 
 		// Compute pascal's triangle for binomal coefficients: d[x][y] equals (x
 		// over y)
@@ -84,7 +100,7 @@ public class ZernikeComputer<T extends RealType<T>> extends
 		ZernikeMoment moment = initZernikeMoment(order, repetition, d);
 
 		// get the cursor of the iterable interval
-		final Cursor<? extends RealType<?>> cur = ii.localizingCursor();
+		final RealCursor<? extends RealType<?>> cur = ii.localizingCursor();
 
 		// count number of pixel inside the unit circle
 		int count = 0;
@@ -94,11 +110,11 @@ public class ZernikeComputer<T extends RealType<T>> extends
 			cur.fwd();
 
 			// get 2d centered coordinates
-			final int x = (int) (cur.getIntPosition(0) - ii.min(0));
-			final int y = (int) (cur.getIntPosition(1) - ii.min(1));
+			final double x = cur.getDoublePosition(0);
+			final double y = cur.getDoublePosition(1);
 
-			final double xm = (x - centerX) / radius;
-			final double ym = (y - centerY) / radius;
+			final double xm = (x - centerX) / this.radius;
+			final double ym = (y - centerY) / this.radius;
 
 			final double r = Math.sqrt(xm * xm + ym * ym);
 
@@ -279,6 +295,16 @@ public class ZernikeComputer<T extends RealType<T>> extends
 
 	public void setRepetition(int repetition) {
 		this.repetition = repetition;
+	}
+	
+	public void setCenter(RealLocalizable center)
+	{
+		this.center = center;
+	}
+	
+	public void setRadius(double radius)
+	{
+		this.radius = radius;
 	}
 
 	/**
