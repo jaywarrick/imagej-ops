@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@ package net.imagej.ops.map;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.Parallel;
-import net.imagej.ops.special.InplaceOp;
+import net.imagej.ops.special.inplace.UnaryInplaceOp;
 import net.imagej.ops.thread.chunker.ChunkerOp;
 import net.imagej.ops.thread.chunker.CursorBasedChunk;
 import net.imglib2.Cursor;
@@ -60,7 +60,7 @@ public class MapIterableIntervalInplaceParallel<A> extends
 			public void execute(final int startIndex, final int stepSize,
 				final int numSteps)
 			{
-				final InplaceOp<A> safe = getOp().getIndependentInstance();
+				final UnaryInplaceOp<A> safe = getOp().getIndependentInstance();
 				final Cursor<A> inCursor = arg.cursor();
 
 				setToStart(inCursor, startIndex);

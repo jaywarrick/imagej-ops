@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ import net.imagej.ops.Namespace;
 import net.imagej.ops.OpMethod;
 import net.imagej.ops.Ops;
 import net.imagej.ops.image.cooccurrencematrix.MatrixOrientation;
-import net.imagej.ops.special.UnaryComputerOp;
+import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.Interval;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessible;
@@ -239,7 +239,7 @@ public class ImageNamespace extends AbstractNamespace {
 		return ops().run(Ops.Image.Normalize.NAME, args);
 	}
 
-	@OpMethod(op = net.imagej.ops.image.normalize.NormalizeIterableComputer.class)
+	@OpMethod(op = net.imagej.ops.image.normalize.NormalizeIterableIntervalComputer.class)
 	public
 		<T extends RealType<T>> IterableInterval<T> normalize(
 			final IterableInterval<T> out, final IterableInterval<T> in)
@@ -247,12 +247,12 @@ public class ImageNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<T> result =
 			(IterableInterval<T>) ops()
-				.run(net.imagej.ops.image.normalize.NormalizeIterableComputer.class,
+				.run(net.imagej.ops.image.normalize.NormalizeIterableIntervalComputer.class,
 					out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.image.normalize.NormalizeIterableComputer.class)
+	@OpMethod(op = net.imagej.ops.image.normalize.NormalizeIterableIntervalComputer.class)
 	public
 		<T extends RealType<T>> IterableInterval<T> normalize(
 			final IterableInterval<T> out, final IterableInterval<T> in,
@@ -261,12 +261,12 @@ public class ImageNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<T> result =
 			(IterableInterval<T>) ops().run(
-				net.imagej.ops.image.normalize.NormalizeIterableComputer.class, out,
+				net.imagej.ops.image.normalize.NormalizeIterableIntervalComputer.class, out,
 				in, sourceMin);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.image.normalize.NormalizeIterableComputer.class)
+	@OpMethod(op = net.imagej.ops.image.normalize.NormalizeIterableIntervalComputer.class)
 	public
 		<T extends RealType<T>> IterableInterval<T> normalize(
 			final IterableInterval<T> out, final IterableInterval<T> in,
@@ -275,12 +275,12 @@ public class ImageNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<T> result =
 			(IterableInterval<T>) ops().run(
-				net.imagej.ops.image.normalize.NormalizeIterableComputer.class, out,
+				net.imagej.ops.image.normalize.NormalizeIterableIntervalComputer.class, out,
 				in, sourceMin, sourceMax);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.image.normalize.NormalizeIterableComputer.class)
+	@OpMethod(op = net.imagej.ops.image.normalize.NormalizeIterableIntervalComputer.class)
 	public
 		<T extends RealType<T>> IterableInterval<T> normalize(
 			final IterableInterval<T> out, final IterableInterval<T> in,
@@ -289,12 +289,12 @@ public class ImageNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<T> result =
 			(IterableInterval<T>) ops().run(
-				net.imagej.ops.image.normalize.NormalizeIterableComputer.class, out,
+				net.imagej.ops.image.normalize.NormalizeIterableIntervalComputer.class, out,
 				in, sourceMin, sourceMax, targetMin);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.image.normalize.NormalizeIterableComputer.class)
+	@OpMethod(op = net.imagej.ops.image.normalize.NormalizeIterableIntervalComputer.class)
 	public
 		<T extends RealType<T>>
 		IterableInterval<T>
@@ -304,7 +304,7 @@ public class ImageNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<T> result =
 			(IterableInterval<T>) ops().run(
-				net.imagej.ops.image.normalize.NormalizeIterableComputer.class, out,
+				net.imagej.ops.image.normalize.NormalizeIterableIntervalComputer.class, out,
 				in, sourceMin, sourceMax, targetMin, targetMax);
 		return result;
 	}

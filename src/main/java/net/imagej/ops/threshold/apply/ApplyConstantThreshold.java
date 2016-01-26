@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,9 @@
 package net.imagej.ops.threshold.apply;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.special.AbstractUnaryComputerOp;
-import net.imagej.ops.special.Computers;
-import net.imagej.ops.special.UnaryComputerOp;
+import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
+import net.imagej.ops.special.computer.Computers;
+import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 
@@ -57,6 +57,7 @@ public class ApplyConstantThreshold<T extends RealType<T>> extends
 	@Parameter
 	private T threshold;
 	private UnaryComputerOp<T, BitType> applyThreshold;
+	private UnaryComputerOp<Iterable<T>, Iterable<BitType>> mapper;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -64,12 +65,12 @@ public class ApplyConstantThreshold<T extends RealType<T>> extends
 		applyThreshold = (UnaryComputerOp<T, BitType>) Computers.unary(ops(),
 			ApplyThresholdComparable.class, BitType.class, threshold.getClass(),
 			threshold);
+		mapper = Computers.unary(ops(), Ops.Map.class, out(), in(), applyThreshold);
 	}
 
 	@Override
 	public void compute1(final Iterable<T> input, final Iterable<BitType> output) {
-		// TODO: Use ops.map(...) once multithreading of BitTypes is fixed.
-		ops().map(output, input, applyThreshold);
+		mapper.compute1(input, output);
 	}
 
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,8 @@ import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops.AbstractOpTest;
 import net.imagej.ops.Op;
-import net.imagej.ops.special.AbstractInplaceOp;
-import net.imagej.ops.special.AbstractUnaryComputerOp;
+import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
+import net.imagej.ops.special.inplace.AbstractUnaryInplaceOp;
 import net.imglib2.Cursor;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
@@ -130,7 +130,7 @@ public class ThreadedMapTest extends AbstractOpTest {
 	}
 
 	// Helper classes
-	private static class AddOneInplace extends AbstractInplaceOp<ByteType> {
+	private static class AddOneInplace extends AbstractUnaryInplaceOp<ByteType> {
 
 		@Override
 		public void mutate(final ByteType arg) {

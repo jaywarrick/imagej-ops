@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,8 @@ import org.scijava.plugin.Plugin;
 import net.imagej.ops.AbstractNamespace;
 import net.imagej.ops.Namespace;
 import net.imagej.ops.OpMethod;
+import net.imglib2.type.BooleanType;
+import net.imglib2.type.Type;
 import net.imglib2.type.logic.BoolType;
 import net.imglib2.type.numeric.RealType;
 
@@ -119,7 +121,39 @@ public class LogicNamespace extends AbstractNamespace {
 				out, in);
 		return result;
 	}
-	
+
+	// -- conditional --
+
+	@OpMethod(op = net.imagej.ops.logic.If.class)
+	public <I extends BooleanType<I>, O extends Type<O>> O conditional(
+		final O out, final I in, final O ifTrueVal, final O ifFalseVal)
+	{
+		@SuppressWarnings("unchecked")
+		final O result = (O) ops().run(net.imagej.ops.logic.If.class, out, in,
+			ifTrueVal, ifFalseVal);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.logic.If.class)
+	public <I extends BooleanType<I>, O extends Type<O>> O conditional(final I in,
+		final O ifTrueVal, final O ifFalseVal)
+	{
+		@SuppressWarnings("unchecked")
+		final O result = (O) ops().run(net.imagej.ops.logic.If.class, in, ifTrueVal,
+			ifFalseVal);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.logic.Default.class)
+	public <I extends BooleanType<I>, O extends Type<O>> O conditional(
+		final O out, final I in, final O defaultVal)
+	{
+		@SuppressWarnings("unchecked")
+		final O result = (O) ops().run(net.imagej.ops.logic.Default.class, out, in,
+			defaultVal);
+		return result;
+	}
+
 	// -- equal --
 
 	@OpMethod(op = net.imagej.ops.logic.PrimitiveLogic.BooleanEqual.class)

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -38,8 +38,8 @@ import net.imagej.ops.convert.clip.ClipRealTypes;
 import net.imagej.ops.convert.copy.CopyRealTypes;
 import net.imagej.ops.convert.imageType.ConvertIterableIntervals;
 import net.imagej.ops.convert.scale.ScaleRealTypes;
-import net.imagej.ops.special.Computers;
-import net.imagej.ops.special.UnaryComputerOp;
+import net.imagej.ops.special.inplace.Inplaces;
+import net.imagej.ops.special.inplace.UnaryInplaceOp;
 import net.imglib2.Cursor;
 import net.imglib2.FinalDimensions;
 import net.imglib2.IterableInterval;
@@ -54,7 +54,7 @@ import org.junit.Test;
 /**
  * Tests {@link ConvertIterableIntervals} + {@link RealTypeConverter} ops.
  * 
- * @author Curtis Rueden.
+ * @author Curtis Rueden
  */
 public class ConvertIterableIntervalsTest extends AbstractOpTest {
 
@@ -116,10 +116,9 @@ public class ConvertIterableIntervalsTest extends AbstractOpTest {
 	}
 
 	private void addNoise(final Iterable<ShortType> image) {
-		final UnaryComputerOp<ShortType, ShortType> noiseOp =
-			Computers.unary(ops, Ops.Filter.AddNoise.class, ShortType.class, ShortType.class,
-				-32768, 32767, 10000);
-		ops.map(image, image, noiseOp);
+		final UnaryInplaceOp<ShortType> noiseOp = Inplaces.unary(ops,
+			Ops.Filter.AddNoise.class, ShortType.class, -32768, 32767, 10000);
+		ops.map(image, noiseOp);
 	}
 
 	private byte clip(final short value) {

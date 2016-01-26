@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,9 @@
 package net.imagej.ops.image.invert;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.special.AbstractUnaryComputerOp;
-import net.imagej.ops.special.UnaryComputerOp;
+import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
+import net.imagej.ops.special.computer.Computers;
+import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
 
@@ -48,19 +49,22 @@ public class InvertIterableInterval<I extends RealType<I>, O extends RealType<O>
 	implements Ops.Image.Invert
 {
 
+	private UnaryComputerOp<IterableInterval<I>, IterableInterval<O>> mapper;
+
+	@Override
+	public void initialize() {
+		final I inType = in().firstElement().createVariable();
+		final double minVal = inType.getMinValue();
+		final UnaryComputerOp<I, O> invert = minVal < 0 ? new SignedRealInvert<>()
+			: new UnsignedRealInvert<>(inType.getMaxValue());
+		mapper = Computers.unary(ops(), Ops.Map.class, out(), in(), invert);
+	}
+
 	@Override
 	public void compute1(final IterableInterval<I> input,
 		final IterableInterval<O> output)
 	{
-		I inType = input.firstElement().createVariable();
-		UnaryComputerOp<I, O> invert;
-		if (inType.getMinValue() < 0) {
-			invert = new SignedRealInvert<>();
-		}
-		else {
-			invert = new UnsignedRealInvert<>(inType.getMaxValue());
-		}
-		ops().map(output, input, invert);
+		mapper.compute1(input, output);
 	}
 
 	private class SignedRealInvert<II extends RealType<II>, OO extends RealType<OO>>
