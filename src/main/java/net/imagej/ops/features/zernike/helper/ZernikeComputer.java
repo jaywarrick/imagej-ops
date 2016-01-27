@@ -136,7 +136,7 @@ public class ZernikeComputer<T extends RealType<T>> extends
 		}
 
 		// normalization
-		//normalize(moment.getZm(), moment.getN(), count);
+		normalize(moment.getZm(), moment.getN(), count);
 
 		return moment;
 	}
