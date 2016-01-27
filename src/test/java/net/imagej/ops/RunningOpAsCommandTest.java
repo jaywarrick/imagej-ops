@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -28,72 +28,56 @@
  * #L%
  */
 
-package net.imagej.ops.math;
+package net.imagej.ops;
 
-import net.imagej.ops.AbstractOp;
-import net.imagej.ops.Contingent;
-import net.imagej.ops.Ops;
-import net.imglib2.Cursor;
-import net.imglib2.IterableInterval;
-import net.imglib2.RandomAccess;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.type.numeric.NumericType;
+import static org.junit.Assert.assertEquals;
 
+import java.util.concurrent.ExecutionException;
+
+import org.junit.Test;
 import org.scijava.ItemIO;
+import org.scijava.command.Command;
+import org.scijava.command.CommandModule;
+import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
- * Wrapper class for binary math operations between {@link RandomAccessibleInterval}
- * and {@link IterableInterval}s.
+ * Tests that {@link Op}s can be executed directly as {@link Command}s.
  *
- * @author Leon Yang
+ * @author Curtis Rueden
  */
-public final class RandomAccessibleIntervalToIterableInterval {
-	
-	private RandomAccessibleIntervalToIterableInterval() {
-		// NB: Prevent instantiation of utility class.
+public class RunningOpAsCommandTest extends AbstractOpTest {
+
+	@Test
+	public void testRunCommand() throws InterruptedException, ExecutionException {
+		final CommandService cs = context.service(CommandService.class);
+		final CommandModule module = cs.run(Fibonacci.class, true, "n", 7).get();
+		final int result = (Integer) module.getOutput("result");
+		assertEquals(13, result);
 	}
-#foreach ($op in $ops)
-#set ($iface = "Ops.Math.$op.name")
 
-	@Plugin(type = ${iface}.class)
-	public static class ${op.name}<T extends NumericType<T>> extends AbstractOp
-		implements $iface, Contingent
-	{
+	// -- Helper classes --
 
-		@Parameter(type = ItemIO.BOTH)
-		private IterableInterval<T> a;
+	@Plugin(type = Op.class)
+	public static class Fibonacci extends AbstractOp {
 
 		@Parameter
-		private RandomAccessibleInterval<T> b;
+		private int n;
+
+		@Parameter(type = ItemIO.OUTPUT)
+		private int result;
 
 		@Override
 		public void run() {
-			final long[] pos = new long[a.numDimensions()];
-			final Cursor<T> cursor = a.cursor();
-			final RandomAccess<T> access = b.randomAccess();
-			while (cursor.hasNext()) {
-				cursor.fwd();
-				cursor.localize(pos);
-				access.setPosition(pos);
-				cursor.get().${op.function}(access.get());
-			}
+			result = fibonacci(n);
 		}
 
-		@Override
-		public boolean conforms() {
-			int n = a.numDimensions();
-			if (n != b.numDimensions()) return false;
-			long[] dimsA = new long[n], dimsB = new long[n];
-			a.dimensions(dimsA);
-			b.dimensions(dimsB);
-			for (int i = 0; i < n; i++) {
-				if (dimsA[i] != dimsB[i]) return false;
-			}
-			return true;
+		private int fibonacci(final int k) {
+			if (k == 1 || k == 2) return 1;
+			// NB: Gratuitous use of math.add ensures the OpEnvironment is non-null!
+			return ops().math().add(fibonacci(k - 1), fibonacci(k - 2));
 		}
-
 	}
-#end
+
 }

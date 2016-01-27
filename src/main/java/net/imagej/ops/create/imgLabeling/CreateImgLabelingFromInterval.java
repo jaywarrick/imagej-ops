@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,15 +30,13 @@
 
 package net.imagej.ops.create.imgLabeling;
 
-import net.imagej.ops.AbstractOp;
 import net.imagej.ops.Ops;
-import net.imagej.ops.special.Output;
+import net.imagej.ops.special.AbstractUnaryFunctionOp;
 import net.imglib2.Interval;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.roi.labeling.ImgLabeling;
 import net.imglib2.type.numeric.IntegerType;
 
-import org.scijava.ItemIO;
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -53,14 +51,9 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Ops.Create.ImgLabeling.class, priority = Priority.HIGH_PRIORITY)
 public class CreateImgLabelingFromInterval<L, T extends IntegerType<T>> extends
-	AbstractOp implements Ops.Create.ImgLabeling, Output<ImgLabeling<L, T>>
+	AbstractUnaryFunctionOp<Interval, ImgLabeling<L, T>> implements
+	Ops.Create.ImgLabeling
 {
-
-	@Parameter(type = ItemIO.OUTPUT)
-	private ImgLabeling<L, T> output;
-
-	@Parameter
-	private Interval interval;
 
 	@Parameter(required = false)
 	private T outType;
@@ -73,18 +66,13 @@ public class CreateImgLabelingFromInterval<L, T extends IntegerType<T>> extends
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void run() {
+	public ImgLabeling<L, T> compute1(final Interval input) {
 
 		if (outType == null) {
 			outType = (T) ops().create().integerType(maxNumLabelSets);
 		}
 
-		output = new ImgLabeling<>(ops().create().img(interval, outType, fac));
-	}
-
-	@Override
-	public ImgLabeling<L, T> out() {
-		return output;
+		return new ImgLabeling<>(ops().create().img(input, outType, fac));
 	}
 
 }

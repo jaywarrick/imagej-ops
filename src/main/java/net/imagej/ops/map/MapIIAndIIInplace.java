@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -28,49 +28,48 @@
  * #L%
  */
 
-package net.imagej.ops.math;
+package net.imagej.ops.map;
 
-import net.imagej.ops.AbstractOp;
-import net.imagej.ops.Ops;
-import net.imglib2.IterableRealInterval;
-import net.imglib2.type.numeric.NumericType;
-
-import org.scijava.ItemIO;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
+import net.imagej.ops.special.InplaceOp;
+import net.imglib2.Cursor;
+import net.imglib2.IterableInterval;
 
 /**
- * Wrapper class for in-place binary math operations between constant values 
- * and images in format of (@link IterableRealInterval}.
- *
+ * {@link MapBinaryInplace} over 2 {@link IterableInterval}s
+ * 
  * @author Leon Yang
+ * @param <EI1> element type of first inputs
+ * @param <EI2> element type of second inputs
+ * @param <EO> element type of outputs
  */
-public final class ConstantToImageInPlace {
-	
-	private ConstantToImageInPlace() {
-		// NB: Prevent instantiation of utility class.
+public class MapIIAndIIInplace<EI1, EI2, EO> extends
+	AbstractMapBinaryInplace<EI1, EI2, EO, IterableInterval<EI1>, IterableInterval<EI2>, IterableInterval<EO>>
+{
+
+	@Override
+	public boolean conforms() {
+		if (!super.conforms()) return false;
+		return in1().iterationOrder().equals(in2().iterationOrder());
 	}
-#foreach ($op in $ops)
-#set ($iface = "Ops.Math.$op.name")
 
-	@Plugin(type = ${iface}.class)
-	public static class ${op.name}<T extends NumericType<T>> extends AbstractOp implements
-		$iface
-	{
-
-		@Parameter(type = ItemIO.BOTH)
-		private IterableRealInterval<T> image;
-
-		@Parameter
-		private T value;
-
-		@Override
-		public void run() {
-			for (final T t : image) {
-				t.${op.function}(value);
-			}
+	@Override
+	public void mutate(IterableInterval<EO> arg) {
+		@SuppressWarnings("unchecked")
+		final InplaceOp<EO> inplace = (InplaceOp<EO>) getOp();
+		final EI1 tmpIn1 = getOp().in1();
+		final EI2 tmpIn2 = getOp().in2();
+		final Cursor<EI1> in1Cursor = in1().cursor();
+		final Cursor<EI2> in2Cursor = in2().cursor();
+		final Cursor<EO> argCursor = arg().cursor();
+		while (in1Cursor.hasNext()) {
+			in1Cursor.fwd();
+			in2Cursor.fwd();
+			getOp().setInput1(in1Cursor.get());
+			getOp().setInput2(in2Cursor.get());
+			inplace.mutate(argCursor.get());
 		}
-
+		getOp().setInput1(tmpIn1);
+		getOp().setInput2(tmpIn2);
 	}
-#end
+
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@
 
 package net.imagej.ops.map;
 
+import net.imagej.ops.Contingent;
 import net.imagej.ops.Ops;
 import net.imagej.ops.Parallel;
 import net.imagej.ops.special.UnaryComputerOp;
@@ -39,6 +40,7 @@ import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.util.Intervals;
 
 import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
@@ -54,7 +56,7 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Ops.Map.class, priority = Priority.LOW_PRIORITY + 2)
 public class MapIterableIntervalToRAIParallel<EI, EO> extends
 	AbstractMapComputer<EI, EO, IterableInterval<EI>, RandomAccessibleInterval<EO>>
-	implements Parallel
+	implements Contingent, Parallel
 {
 
 	@Override
@@ -83,6 +85,11 @@ public class MapIterableIntervalToRAIParallel<EI, EO> extends
 				}
 			}
 		}, input.size());
+	}
+
+	@Override
+	public boolean conforms() {
+		return out() == null || Intervals.equalDimensions(out(), in());
 	}
 
 }
