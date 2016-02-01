@@ -40,7 +40,6 @@ import net.imagej.ops.OpMethod;
 import net.imglib2.type.BooleanType;
 import net.imglib2.type.Type;
 import net.imglib2.type.logic.BoolType;
-import net.imglib2.type.numeric.RealType;
 
 /**
  * The logic namespace contains logical (i.e., boolean) operations.
@@ -94,14 +93,6 @@ public class LogicNamespace extends AbstractNamespace {
 		final BoolType result =
 			(BoolType) ops().run(net.imagej.ops.logic.IntersectionCondition.class,
 				out, in, conditions);
-		return result;
-	}
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.And.class)
-	public <I extends RealType<I>, O extends RealType<O>> O and(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.And.class, out, in);
 		return result;
 	}
 
@@ -209,24 +200,6 @@ public class LogicNamespace extends AbstractNamespace {
 			(BoolType) ops().run(net.imagej.ops.logic.ObjectsEqual.class, out, in, o);
 		return result;
 	}
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.Equal.class)
-	public <I extends RealType<I>, O extends RealType<O>> O equal(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.Equal.class, out, in);
-		return result;
-	}
-	
-	// -- logicalEqual --
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.LogicalEqual.class)
-	public <I extends RealType<I>, O extends RealType<O>> O logicalEqual(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.LogicalEqual.class, out, in);
-		return result;
-	}
 
 	// -- greaterThan --
 
@@ -277,14 +250,6 @@ public class LogicNamespace extends AbstractNamespace {
 		final BoolType result =
 			(BoolType) ops().run(net.imagej.ops.logic.ComparableGreaterThan.class,
 				out, in, c);
-		return result;
-	}
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.GreaterThan.class)
-	public <I extends RealType<I>, O extends RealType<O>> O greaterThan(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.GreaterThan.class, out, in);
 		return result;
 	}
 
@@ -348,14 +313,6 @@ public class LogicNamespace extends AbstractNamespace {
 				net.imagej.ops.logic.ComparableGreaterThanOrEqual.class, out, in, c);
 		return result;
 	}
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.GreaterThanOrEqual.class)
-	public <I extends RealType<I>, O extends RealType<O>> O greaterThanOrEqual(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.GreaterThanOrEqual.class, out, in);
-		return result;
-	}
 
 	// -- lessThan --
 
@@ -406,14 +363,6 @@ public class LogicNamespace extends AbstractNamespace {
 		final BoolType result =
 			(BoolType) ops().run(net.imagej.ops.logic.ComparableLessThan.class, out,
 				in, c);
-		return result;
-	}
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.LessThan.class)
-	public <I extends RealType<I>, O extends RealType<O>> O lessThan(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.LessThan.class, out, in);
 		return result;
 	}
 
@@ -471,14 +420,6 @@ public class LogicNamespace extends AbstractNamespace {
 		final BoolType result =
 			(BoolType) ops().run(
 				net.imagej.ops.logic.ComparableLessThanOrEqual.class, out, in, c);
-		return result;
-	}
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.LessThanOrEqual.class)
-	public <I extends RealType<I>, O extends RealType<O>> O lessThanOrEqual(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.LessThanOrEqual.class, out, in);
 		return result;
 	}
 
@@ -566,24 +507,6 @@ public class LogicNamespace extends AbstractNamespace {
 				o);
 		return result;
 	}
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.NotEqual.class)
-	public <I extends RealType<I>, O extends RealType<O>> O notEqual(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.NotEqual.class, out, in);
-		return result;
-	}
-	
-	// -- logicalNotEqual --
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.LogicalNotEqual.class)
-	public <I extends RealType<I>, O extends RealType<O>> O logicalNotEqual(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.LogicalNotEqual.class, out, in);
-		return result;
-	}
 
 	// -- or --
 
@@ -631,14 +554,6 @@ public class LogicNamespace extends AbstractNamespace {
 				conditions);
 		return result;
 	}
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.Or.class)
-	public <I extends RealType<I>, O extends RealType<O>> O or(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.Or.class, out, in);
-		return result;
-	}
 
 	// -- xor --
 
@@ -666,14 +581,6 @@ public class LogicNamespace extends AbstractNamespace {
 		final BoolType result =
 			(BoolType) ops().run(net.imagej.ops.logic.XorCondition.class, out, in,
 				c1, c2);
-		return result;
-	}
-	
-	@OpMethod(op = net.imagej.ops.logic.RealLogic.XOr.class)
-	public <I extends RealType<I>, O extends RealType<O>> O xor(final O out, final I in) {
-		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.logic.RealLogic.XOr.class, out, in);
 		return result;
 	}
 
