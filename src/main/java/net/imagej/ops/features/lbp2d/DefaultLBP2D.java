@@ -93,6 +93,7 @@ public class DefaultLBP2D<I extends RealType<I>> extends AbstractLBP2DFeature<I>
 
 		while (cInput.hasNext()) {
 			cInput.next();
+			raInput.setPosition(cInput);
 			double centerValue = cInput.get().getRealDouble();
 
 			int resultBinaryValue = 0;
@@ -100,7 +101,7 @@ public class DefaultLBP2D<I extends RealType<I>> extends AbstractLBP2DFeature<I>
 			cNeigh.reset();
 			while (cNeigh.hasNext()) {
 				double nValue = cNeigh.next().getRealDouble();
-				int pos = cNeigh.getIndex();
+				int pos = cNeigh.getIndex()-1;
 				if (nValue >= centerValue) {
 					resultBinaryValue |= (1 << pos);
 				}

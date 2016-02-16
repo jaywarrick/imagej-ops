@@ -33,10 +33,8 @@ package net.imagej.ops.create.kernelGauss;
 import net.imagej.ops.Ops;
 import net.imagej.ops.create.AbstractCreateGaussianKernel;
 import net.imglib2.Cursor;
-import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.ComplexType;
-import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.util.Util;
 
 import org.scijava.plugin.Plugin;
@@ -71,8 +69,7 @@ public class CreateKernelGauss<T extends ComplexType<T> & NativeType<T>>
 			kernelArrays[d] = Util.createGaussianKernel1DDouble(sigmaPixels[d], true);
 		}
 
-		createOutputImg(dims, getFac(), getOutType(),
-			new ArrayImgFactory<DoubleType>(), new DoubleType());
+		createOutputImg(dims);
 
 		final Cursor<T> cursor = getOutput().cursor();
 		while (cursor.hasNext()) {
