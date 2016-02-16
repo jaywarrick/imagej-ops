@@ -33,11 +33,14 @@ package net.imagej.ops.filter.gauss;
 import java.util.Arrays;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.special.AbstractUnaryHybridOp;
+import net.imagej.ops.Ops.Filter.Gauss;
+import net.imagej.ops.special.chain.RAIs;
+import net.imagej.ops.special.computer.UnaryComputerOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
+import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
-import net.imglib2.util.Util;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -48,13 +51,10 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Christian Dietz, University of Konstanz
  * @param <T> type of input
- * @param <V> type of output
  */
-@SuppressWarnings({ "unchecked" })
 @Plugin(type = Ops.Filter.Gauss.class)
-public class GaussRAISingleSigma<T extends RealType<T>, V extends RealType<V>>
-	extends
-	AbstractUnaryHybridOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<V>>
+public class GaussRAISingleSigma<T extends RealType<T> & NativeType<T>> extends
+	AbstractUnaryHybridCF<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>>
 	implements Ops.Filter.Gauss
 {
 
@@ -64,22 +64,27 @@ public class GaussRAISingleSigma<T extends RealType<T>, V extends RealType<V>>
 	@Parameter(required = false)
 	private OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds;
 
+	private UnaryComputerOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>> gaussOp;
+
+	@Override
+	public void initialize() {
+		final double[] sigmas = new double[in().numDimensions()];
+		Arrays.fill(sigmas, sigma);
+		gaussOp = RAIs.computer(ops(), Gauss.class, in(), sigmas, outOfBounds);
+	}
+	
 	@Override
 	public void compute1(final RandomAccessibleInterval<T> input,
-		final RandomAccessibleInterval<V> output)
+		final RandomAccessibleInterval<T> output)
 	{
-		final double[] sigmas = new double[input.numDimensions()];
-		Arrays.fill(sigmas, sigma);
-
-		ops().filter().gauss(output, input, sigmas, outOfBounds);
+		gaussOp.compute1(input, output);
 	}
 
 	@Override
-	public RandomAccessibleInterval<V> createOutput(
+	public RandomAccessibleInterval<T> createOutput(
 		final RandomAccessibleInterval<T> input)
 	{
-		return (RandomAccessibleInterval<V>) ops().create().img(input,
-			Util.getTypeFromInterval(input));
+		return ops().create().img(input);
 	}
 
 }

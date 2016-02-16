@@ -31,7 +31,7 @@
 package net.imagej.ops.create.imgFactory;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.special.AbstractNullaryFunctionOp;
+import net.imagej.ops.special.function.AbstractNullaryFunctionOp;
 import net.imglib2.Dimensions;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.img.array.ArrayImgFactory;
@@ -57,15 +57,8 @@ public class DefaultCreateImgFactory<T extends NativeType<T>> extends
 	@Parameter(required = false)
 	private Dimensions dims;
 
-	@Parameter(required = false)
-	private T outType;
-
 	@Override
 	public ImgFactory<T> compute0() {
-		if (outType == null) {
-			outType = ops().create().<T> nativeType();
-		}
-
 		return (dims == null || Intervals.numElements(dims) <= Integer.MAX_VALUE)
 			? new ArrayImgFactory<>() : new CellImgFactory<>();
 	}

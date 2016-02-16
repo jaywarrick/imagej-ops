@@ -30,53 +30,20 @@
 
 package net.imagej.ops.threshold.apply;
 
-import net.imagej.ops.Ops;
-import net.imagej.ops.special.AbstractUnaryComputerOp;
-import net.imagej.ops.threshold.LocalThresholdMethod;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.algorithm.neighborhood.Shape;
-import net.imglib2.outofbounds.OutOfBoundsFactory;
+import net.imagej.ops.filter.AbstractCenterAwareNeighborhoodBasedFilter;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
-import net.imglib2.view.Views;
-
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
 /**
  * Apply a local thresholding method to an image, optionally using a out of
  * bounds strategy.
- * 
+ *
  * @author Jonathan Hale (University of Konstanz)
  * @author Martin Horn (University of Konstanz)
+ * @author Stefan Helfrich (University of Konstanz)
  */
-@Plugin(type = Ops.Threshold.Apply.class)
-public class LocalThreshold<T extends RealType<T>>
-	extends
-	AbstractUnaryComputerOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<BitType>>
-	implements Ops.Threshold.Apply
+public abstract class LocalThreshold<T extends RealType<T>> extends
+	AbstractCenterAwareNeighborhoodBasedFilter<T, BitType>
 {
-
-	@Parameter
-	private LocalThresholdMethod<T> method;
-
-	@Parameter
-	private Shape shape;
-
-	@Parameter(required = false)
-	private OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds;
-
-	@Override
-	public void compute1(final RandomAccessibleInterval<T> input,
-		final RandomAccessibleInterval<BitType> output)
-	{
-		RandomAccessibleInterval<T> extendedInput = input;
-
-		if (outOfBounds != null) {
-			extendedInput = Views.interval(Views.extend(input, outOfBounds), input);
-		}
-
-		ops().map(output, extendedInput, method, shape);
-	}
-
+	// NB
 }

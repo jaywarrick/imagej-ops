@@ -30,69 +30,62 @@
 
 package net.imagej.ops.map;
 
-import net.imagej.ops.special.BinaryOp;
-import net.imagej.ops.special.InplaceOp;
+import net.imagej.ops.Contingent;
+import net.imagej.ops.Ops;
+import net.imagej.ops.Parallel;
+import net.imagej.ops.special.inplace.BinaryInplace1Op;
 import net.imagej.ops.thread.chunker.ChunkerOp;
 import net.imagej.ops.thread.chunker.CursorBasedChunk;
-import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
+
+import org.scijava.Priority;
+import org.scijava.plugin.Plugin;
 
 /**
  * {@link MapBinaryInplace} over 2 {@link IterableInterval}s
  * 
  * @author Leon Yang
- * @param <EI1> element type of first inputs
- * @param <EI2> element type of second inputs
- * @param <EO> element type of outputs
+ * @param <EA> element type of inputs + outputs
  */
-public class MapIIAndIIInplaceParallel<EI1, EI2, EO> extends
-	AbstractMapBinaryInplace<EI1, EI2, EO, IterableInterval<EI1>, IterableInterval<EI2>, IterableInterval<EO>>
+@Plugin(type = Ops.Map.class, priority = Priority.HIGH_PRIORITY + 3)
+public class MapIIAndIIInplaceParallel<EA> extends
+	AbstractMapBinaryInplace<EA, IterableInterval<EA>> implements Contingent,
+	Parallel
 {
 
 	@Override
 	public boolean conforms() {
-		if (!super.conforms()) return false;
-		return in1().iterationOrder().equals(in2().iterationOrder());
+		return Maps.compatible(in1(), in2());
 	}
 
 	@Override
-	public void mutate(IterableInterval<EO> arg) {
+	public void mutate1(final IterableInterval<EA> arg,
+		final IterableInterval<EA> in)
+	{
 		ops().run(ChunkerOp.class, new CursorBasedChunk() {
 
 			@Override
 			public void execute(final int startIndex, final int stepSize,
 				final int numSteps)
 			{
-				final BinaryOp<EI1, EI2, EO> safe = getOp().getIndependentInstance();
-				@SuppressWarnings("unchecked")
-				final InplaceOp<EO> inplace = (InplaceOp<EO>) safe;
-				final EI1 tmpIn1 = safe.in1();
-				final EI2 tmpIn2 = safe.in2();
-				final Cursor<EI1> in1Cursor = in1().cursor();
-				final Cursor<EI2> in2Cursor = in2().cursor();
-				final Cursor<EO> argCursor = arg().cursor();
-
-				setToStart(in1Cursor, startIndex);
-				setToStart(in2Cursor, startIndex);
-				setToStart(argCursor, startIndex);
-
-				int ctr = 0;
-				while (ctr < numSteps) {
-					final EI1 i1 = in1Cursor.get();
-					final EI2 i2 = in2Cursor.get();
-					final EO a = argCursor.get();
-					safe.setInput1(i1);
-					safe.setInput2(i2);
-					inplace.mutate(a);
-					in1Cursor.jumpFwd(stepSize);
-					in2Cursor.jumpFwd(stepSize);
-					argCursor.jumpFwd(stepSize);
-					ctr++;
-				}
-				safe.setInput1(tmpIn1);
-				safe.setInput2(tmpIn2);
+				Maps.inplace(arg, in, (BinaryInplace1Op<EA, EA>) getOp(),
+					startIndex, stepSize, numSteps);
 			}
 		}, arg.size());
 	}
 
+	@Override
+	public void mutate2(final IterableInterval<EA> in,
+		final IterableInterval<EA> arg)
+	{
+		ops().run(ChunkerOp.class, new CursorBasedChunk() {
+
+			@Override
+			public void execute(final int startIndex, final int stepSize,
+				final int numSteps)
+			{
+				Maps.inplace(in, arg, getOp(), startIndex, stepSize, numSteps);
+			}
+		}, in.size());
+	}
 }

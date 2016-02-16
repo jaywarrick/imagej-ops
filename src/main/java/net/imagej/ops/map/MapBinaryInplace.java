@@ -30,24 +30,17 @@
 
 package net.imagej.ops.map;
 
-import net.imagej.ops.Contingent;
-import net.imagej.ops.special.BinaryOp;
-import net.imagej.ops.special.InplaceOp;
+import net.imagej.ops.special.inplace.BinaryInplaceOp;
 
 /**
- * Typed interface for "map" binary {@link InplaceOp}s. The helper op is typed
- * on {@link BinaryOp}, but it must also implement {@link InplaceOp} to fulfill
- * the {@link Contingent} condition.
+ * Typed interface for "map" {@link BinaryInplaceOp}s.
  * 
  * @author Leon Yang
- * @author Leon Yang
- * @param <EI1> element type of first inputs
- * @param <EI2> element type of second inputs
- * @param <EO> element type of outputs
- * @param <OP> type of {@link BinaryOp} which processes each element
+ * @param <EA> element type of inputs + outputs
+ * @param <OP> type of {@link BinaryInplaceOp} which processes each element
  */
-public interface MapBinaryInplace<EI1, EI2, EO, OP extends BinaryOp<EI1, EI2, EO>>
-	extends MapOp<OP>, Contingent
+public interface MapBinaryInplace<EA, OP extends BinaryInplaceOp<EA>> extends
+	MapOp<OP>
 {
 	// NB: Marker interface.
 }

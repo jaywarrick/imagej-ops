@@ -38,8 +38,9 @@ import net.imagej.ops.OpMethod;
 import net.imagej.ops.Ops;
 import net.imagej.ops.filter.gauss.DefaultGaussRAI;
 import net.imagej.ops.filter.gauss.GaussRAISingleSigma;
-import net.imagej.ops.special.UnaryComputerOp;
-import net.imagej.ops.special.UnaryFunctionOp;
+import net.imagej.ops.special.computer.UnaryComputerOp;
+import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessible;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.neighborhood.Shape;
@@ -47,7 +48,6 @@ import net.imglib2.img.Img;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
 import net.imglib2.type.NativeType;
-import net.imglib2.type.Type;
 import net.imglib2.type.numeric.ComplexType;
 import net.imglib2.type.numeric.NumericType;
 import net.imglib2.type.numeric.RealType;
@@ -70,7 +70,8 @@ public class FilterNamespace extends AbstractNamespace {
 		return ops().run(net.imagej.ops.Ops.Filter.AddNoise.class, args);
 	}
 
-	@OpMethod(op = net.imagej.ops.filter.addNoise.AddNoiseRealType.class)
+	@OpMethod(ops = { net.imagej.ops.filter.addNoise.AddNoiseRealType.class,
+		net.imagej.ops.filter.addNoise.AddNoiseRealTypeCFI.class })
 	public <I extends RealType<I>, O extends RealType<O>> O addNoise(final O out,
 		final I in, final double rangeMin, final double rangeMax,
 		final double rangeStdDev)
@@ -82,15 +83,26 @@ public class FilterNamespace extends AbstractNamespace {
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.filter.addNoise.AddNoiseRealType.class)
+	@OpMethod(ops = { net.imagej.ops.filter.addNoise.AddNoiseRealType.class,
+		net.imagej.ops.filter.addNoise.AddNoiseRealTypeCFI.class })
 	public <I extends RealType<I>, O extends RealType<O>> O addNoise(final O out,
 		final I in, final double rangeMin, final double rangeMax,
 		final double rangeStdDev, final long seed)
 	{
 		@SuppressWarnings("unchecked")
-		final O result =
-			(O) ops().run(net.imagej.ops.filter.addNoise.AddNoiseRealType.class, out,
-				in, rangeMin, rangeMax, rangeStdDev, seed);
+		final O result = (O) ops().run(Ops.Filter.AddNoise.class, out, in, rangeMin,
+			rangeMax, rangeStdDev, seed);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.filter.addNoise.AddNoiseRealTypeCFI.class)
+	public <T extends RealType<T>> T addNoise(final T in, final double rangeMin,
+		final double rangeMax, final double rangeStdDev)
+	{
+		@SuppressWarnings("unchecked")
+		final T result = (T) ops().run(
+			net.imagej.ops.filter.addNoise.AddNoiseRealTypeCFI.class, in, rangeMin,
+			rangeMax, rangeStdDev);
 		return result;
 	}
 
@@ -208,7 +220,7 @@ public class FilterNamespace extends AbstractNamespace {
 			final RandomAccessibleInterval<K> kernel, final long[] borderSize,
 			final OutOfBoundsFactory<I, RandomAccessibleInterval<I>> obfInput,
 			final OutOfBoundsFactory<K, RandomAccessibleInterval<K>> obfKernel,
-			final Type<O> outType)
+			final O outType)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<O> result =
@@ -225,7 +237,7 @@ public class FilterNamespace extends AbstractNamespace {
 			final RandomAccessibleInterval<K> kernel, final long[] borderSize,
 			final OutOfBoundsFactory<I, RandomAccessibleInterval<I>> obfInput,
 			final OutOfBoundsFactory<K, RandomAccessibleInterval<K>> obfKernel,
-			final Type<O> outType, final ImgFactory<O> outFactory)
+			final O outType, final ImgFactory<O> outFactory)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<O> result =
@@ -242,8 +254,8 @@ public class FilterNamespace extends AbstractNamespace {
 			final RandomAccessibleInterval<K> kernel, final long[] borderSize,
 			final OutOfBoundsFactory<I, RandomAccessibleInterval<I>> obfInput,
 			final OutOfBoundsFactory<K, RandomAccessibleInterval<K>> obfKernel,
-			final Type<O> outType, final ImgFactory<O> outFactory,
-			final ComplexType<C> fftType)
+			final O outType, final ImgFactory<O> outFactory,
+			final C fftType)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<O> result =
@@ -261,8 +273,8 @@ public class FilterNamespace extends AbstractNamespace {
 			final RandomAccessibleInterval<K> kernel, final long[] borderSize,
 			final OutOfBoundsFactory<I, RandomAccessibleInterval<I>> obfInput,
 			final OutOfBoundsFactory<K, RandomAccessibleInterval<K>> obfKernel,
-			final Type<O> outType, final ImgFactory<O> outFactory,
-			final ComplexType<C> fftType, final ImgFactory<C> fftFactory)
+			final O outType, final ImgFactory<O> outFactory,
+			final C fftType, final ImgFactory<C> fftFactory)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<O> result =
@@ -460,7 +472,7 @@ public class FilterNamespace extends AbstractNamespace {
 			final RandomAccessibleInterval<K> kernel, final long[] borderSize,
 			final OutOfBoundsFactory<I, RandomAccessibleInterval<I>> obfInput,
 			final OutOfBoundsFactory<K, RandomAccessibleInterval<K>> obfKernel,
-			final Type<O> outType)
+			final O outType)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<O> result =
@@ -477,7 +489,7 @@ public class FilterNamespace extends AbstractNamespace {
 			final RandomAccessibleInterval<K> kernel, final long[] borderSize,
 			final OutOfBoundsFactory<I, RandomAccessibleInterval<I>> obfInput,
 			final OutOfBoundsFactory<K, RandomAccessibleInterval<K>> obfKernel,
-			final Type<O> outType, final ImgFactory<O> outFactory)
+			final O outType, final ImgFactory<O> outFactory)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<O> result =
@@ -494,8 +506,8 @@ public class FilterNamespace extends AbstractNamespace {
 			final RandomAccessibleInterval<K> kernel, final long[] borderSize,
 			final OutOfBoundsFactory<I, RandomAccessibleInterval<I>> obfInput,
 			final OutOfBoundsFactory<K, RandomAccessibleInterval<K>> obfKernel,
-			final Type<O> outType, final ImgFactory<O> outFactory,
-			final ComplexType<C> fftType)
+			final O outType, final ImgFactory<O> outFactory,
+			final C fftType)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<O> result =
@@ -513,8 +525,8 @@ public class FilterNamespace extends AbstractNamespace {
 			final RandomAccessibleInterval<K> kernel, final long[] borderSize,
 			final OutOfBoundsFactory<I, RandomAccessibleInterval<I>> obfInput,
 			final OutOfBoundsFactory<K, RandomAccessibleInterval<K>> obfKernel,
-			final Type<O> outType, final ImgFactory<O> outFactory,
-			final ComplexType<C> fftType, final ImgFactory<C> fftFactory)
+			final O outType, final ImgFactory<O> outFactory,
+			final C fftType, final ImgFactory<C> fftFactory)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<O> result =
@@ -1017,27 +1029,27 @@ public class FilterNamespace extends AbstractNamespace {
 	
 	/** Executes the "mean" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.mean.DefaultMeanFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> mean(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> mean(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.mean.DefaultMeanFilter.class, out, in, shape);
 		return result;
 	}
 
 	/** Executes the "mean" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.mean.DefaultMeanFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> mean(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> mean(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape,
 		final OutOfBoundsFactory<T, T> outOfBoundsFactory)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.mean.DefaultMeanFilter.class, out, in, shape,
 				outOfBoundsFactory);
 		return result;
@@ -1047,27 +1059,27 @@ public class FilterNamespace extends AbstractNamespace {
 
 	/** Executes the "max" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.max.DefaultMaxFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> max(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>, V extends RealType<V>> IterableInterval<T> max(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.max.DefaultMaxFilter.class, out, in, shape);
 		return result;
 	}
 
 	/** Executes the "max" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.max.DefaultMaxFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> max(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> max(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape,
 		final OutOfBoundsFactory<T, T> outOfBoundsFactory)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.max.DefaultMaxFilter.class, out, in, shape,
 				outOfBoundsFactory);
 		return result;
@@ -1075,27 +1087,27 @@ public class FilterNamespace extends AbstractNamespace {
 
 	/** Executes the "median" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.median.DefaultMedianFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> median(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> median(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.median.DefaultMedianFilter.class, out, in, shape);
 		return result;
 	}
 
 	/** Executes the "median" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.median.DefaultMedianFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> median(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> median(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape,
 		final OutOfBoundsFactory<T, T> outOfBoundsFactory)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.median.DefaultMedianFilter.class, out, in, shape,
 				outOfBoundsFactory);
 		return result;
@@ -1103,27 +1115,27 @@ public class FilterNamespace extends AbstractNamespace {
 
 	/** Executes the "min" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.min.DefaultMinFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> min(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> min(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.min.DefaultMinFilter.class, out, in, shape);
 		return result;
 	}
 
 	/** Executes the "min" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.min.DefaultMinFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> min(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> min(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape,
 		final OutOfBoundsFactory<T, T> outOfBoundsFactory)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.min.DefaultMinFilter.class, out, in, shape,
 				outOfBoundsFactory);
 		return result;
@@ -1131,14 +1143,14 @@ public class FilterNamespace extends AbstractNamespace {
 
 	/** Executes the "sigma" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.sigma.DefaultSigmaFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> sigma(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> sigma(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape,
 		final Double range, final Double minPixelFraction)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.sigma.DefaultSigmaFilter.class, out, in, shape,
 				range, minPixelFraction);
 		return result;
@@ -1146,15 +1158,15 @@ public class FilterNamespace extends AbstractNamespace {
 
 	/** Executes the "sigma" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.sigma.DefaultSigmaFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> sigma(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> sigma(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape,
 		final OutOfBoundsFactory<T, T> outOfBoundsFactory, final Double range,
 		final Double minPixelFraction)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.sigma.DefaultSigmaFilter.class, out, in, shape,
 				outOfBoundsFactory, range, minPixelFraction);
 		return result;
@@ -1162,13 +1174,13 @@ public class FilterNamespace extends AbstractNamespace {
 
 	/** Executes the "variance" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.variance.DefaultVarianceFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> variance(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> variance(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.variance.DefaultVarianceFilter.class, out, in,
 				shape);
 		return result;
@@ -1176,14 +1188,14 @@ public class FilterNamespace extends AbstractNamespace {
 
 	/** Executes the "variance" filter operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.filter.variance.DefaultVarianceFilter.class)
-	public <T extends RealType<T>> RandomAccessibleInterval<T> variance(
-		final RandomAccessibleInterval<T> out,
+	public <T extends RealType<T>> IterableInterval<T> variance(
+		final IterableInterval<T> out,
 		final RandomAccessibleInterval<T> in, final Shape shape,
 		final OutOfBoundsFactory<T, T> outOfBoundsFactory)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<T> result =
-			(RandomAccessibleInterval<T>) ops().run(
+		final IterableInterval<T> result =
+			(IterableInterval<T>) ops().run(
 				net.imagej.ops.filter.variance.DefaultVarianceFilter.class, out, in,
 				shape, outOfBoundsFactory);
 		return result;

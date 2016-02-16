@@ -37,7 +37,10 @@ import net.imagej.ops.Namespace;
 import net.imagej.ops.OpMethod;
 import net.imagej.ops.Ops;
 import net.imglib2.Dimensions;
+import net.imglib2.FinalDimensions;
 import net.imglib2.Interval;
+import net.imglib2.IterableInterval;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.roi.labeling.ImgLabeling;
@@ -46,6 +49,7 @@ import net.imglib2.type.NativeType;
 import net.imglib2.type.Type;
 import net.imglib2.type.numeric.ComplexType;
 import net.imglib2.type.numeric.IntegerType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.plugin.Plugin;
 
@@ -64,99 +68,96 @@ public class CreateNamespace extends AbstractNamespace {
 
 	// -- img --
 
-	@OpMethod(op = net.imagej.ops.Ops.Create.Img.class)
-	public Object img(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Create.Img.class, args);
-	}
-
 	/**
-	 * Helper method for {@link #img(Object...)} to ensure {@code int} varargs are
-	 * not expanded. Necessary because a {@code Long[]} is also an
-	 * {@code Object[]}. See https://github.com/imagej/imagej-ops/pull/115
+	 * Creates an {@link Img} of type {@link DoubleType} with the given
+	 * dimensions.
 	 */
-	public Object img(final Integer... dims) {
+	public Img<DoubleType> img(final Integer[] dims) {
 		int[] ints = new int[dims.length];
 		for (int i=0; i<ints.length; i++) ints[i] = dims[i];
 		return img(ints);
 	}
 
 	/**
-	 * Helper method for {@link #img(Object...)} to ensure {@code long} varargs
-	 * are not expanded. Necessary because a {@code Long[]} is also an
-	 * {@code Object[]}. See https://github.com/imagej/imagej-ops/pull/115
+	 * Creates an {@link Img} of type {@link DoubleType} with the given
+	 * dimensions.
 	 */
-	public Object img(final Long... dims) {
+	public Img<DoubleType> img(final Long[] dims) {
 		long[] longs = new long[dims.length];
 		for (int i=0; i<longs.length; i++) longs[i] = dims[i];
 		return img(longs);
 	}
 
+	/**
+	 * Creates an {@link Img} of type {@link DoubleType} with the given
+	 * dimensions.
+	 */
+	public Img<DoubleType> img(final int[] dims) {
+		return img(new FinalDimensions(dims), new DoubleType());
+	}
+
+	/**
+	 * Creates an {@link Img} of type {@link DoubleType} with the given
+	 * dimensions.
+	 */
+	public Img<DoubleType> img(final long[] dims) {
+		return img(new FinalDimensions(dims), new DoubleType());
+	}
+
+	@OpMethod(op = net.imagej.ops.create.img.CreateImgFromDimsAndType.class)
+	public <T extends NativeType<T>> Img<T> img(final Dimensions in1,
+		final T in2)
+	{
+		@SuppressWarnings("unchecked")
+		final Img<T> result = (Img<T>) ops().run(
+			net.imagej.ops.create.img.CreateImgFromDimsAndType.class, in1, in2);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.create.img.CreateImgFromDimsAndType.class)
+	public <T extends NativeType<T>> Img<T> img(final Dimensions in1, final T in2,
+		final ImgFactory<T> factory)
+	{
+		@SuppressWarnings("unchecked")
+		final Img<T> result = (Img<T>) ops().run(
+			net.imagej.ops.create.img.CreateImgFromDimsAndType.class, in1, in2,
+			factory);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.create.img.CreateImgFromII.class)
+	public <T extends NativeType<T>> Img<T> img(final IterableInterval<T> in) {
+		@SuppressWarnings("unchecked")
+		final Img<T> result = (Img<T>) ops().run(
+			net.imagej.ops.create.img.CreateImgFromII.class, in);
+		return result;
+	}
+
+	// NB: Should be "T extends Type<T>" but then the Java compiler considers
+	// it ambiguous with img(IterableInterval) and img(RandomAccessibleInterval).
 	@OpMethod(op = net.imagej.ops.create.img.CreateImgFromImg.class)
-	public <T extends NativeType<T>> Img<T> img(final Img<T> input) {
+	public <T extends NativeType<T>> Img<T> img(final Img<T> in) {
 		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(net.imagej.ops.create.img.CreateImgFromImg.class,
-				input);
-		return result;
-	}
-
-	@OpMethod(op = net.imagej.ops.create.img.DefaultCreateImg.class)
-	public <T> Img<T> img(final Dimensions dims) {
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops()
-				.run(net.imagej.ops.create.img.DefaultCreateImg.class, dims);
-		return result;
-	}
-
-	@OpMethod(op = net.imagej.ops.create.img.DefaultCreateImg.class)
-	public <T> Img<T> img(final Dimensions dims, final T outType) {
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(net.imagej.ops.create.img.DefaultCreateImg.class,
-				dims, outType);
-		return result;
-	}
-
-	@OpMethod(op = net.imagej.ops.create.img.DefaultCreateImg.class)
-	public <T> Img<T> img(final Dimensions dims, final T outType,
-		final ImgFactory<T> fac)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(net.imagej.ops.create.img.DefaultCreateImg.class,
-				dims, outType, fac);
+		final Img<T> result = (Img<T>) ops().run(
+			net.imagej.ops.create.img.CreateImgFromImg.class, in);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.create.img.CreateImgFromInterval.class)
-	public <T extends Type<T>> Img<T> img(final Interval interval) {
+	public Img<DoubleType> img(final Interval interval) {
 		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(net.imagej.ops.create.img.CreateImgFromInterval.class,
-				interval);
+		final Img<DoubleType> result = (Img<DoubleType>) ops().run(
+			net.imagej.ops.create.img.CreateImgFromInterval.class, interval);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.create.img.CreateImgFromInterval.class)
-	public <T extends Type<T>> Img<T>
-		img(final Interval interval, final T outType)
+	@OpMethod(op = net.imagej.ops.create.img.CreateImgFromRAI.class)
+	public <T extends NativeType<T>> Img<T> img(
+		final RandomAccessibleInterval<T> in)
 	{
 		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(net.imagej.ops.create.img.CreateImgFromInterval.class,
-				interval, outType);
-		return result;
-	}
-
-	@OpMethod(op = net.imagej.ops.create.img.CreateImgFromInterval.class)
-	public <T extends Type<T>> Img<T> img(final Interval interval,
-		final T outType, final ImgFactory<T> fac)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(net.imagej.ops.create.img.CreateImgFromInterval.class,
-				interval, outType, fac);
+		final Img<T> result = (Img<T>) ops().run(
+			net.imagej.ops.create.img.CreateImgFromRAI.class, in);
 		return result;
 	}
 
@@ -168,35 +169,34 @@ public class CreateNamespace extends AbstractNamespace {
 	}
 
 	@OpMethod(op = net.imagej.ops.create.imgFactory.DefaultCreateImgFactory.class)
-	public
-		<T extends NativeType<T>> ImgFactory<T> imgFactory() {
+	public <T extends NativeType<T>> ImgFactory<T> imgFactory() {
+		// NB: The generic typing of ImgFactory is broken; see:
+		// https://github.com/imglib/imglib2/issues/91
 		@SuppressWarnings("unchecked")
-		final ImgFactory<T> result =
-			(ImgFactory<T>) ops().run(
-				net.imagej.ops.create.imgFactory.DefaultCreateImgFactory.class);
+		final ImgFactory<T> result = (ImgFactory<T>) ops().run(
+			net.imagej.ops.create.imgFactory.DefaultCreateImgFactory.class);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.create.imgFactory.DefaultCreateImgFactory.class)
-	public
-		<T extends NativeType<T>> ImgFactory<T> imgFactory(final Dimensions dims) {
-		@SuppressWarnings("unchecked")
-		final ImgFactory<T> result =
-			(ImgFactory<T>) ops().run(
-				net.imagej.ops.create.imgFactory.DefaultCreateImgFactory.class, dims);
-		return result;
-	}
-
-	@OpMethod(op = net.imagej.ops.create.imgFactory.DefaultCreateImgFactory.class)
-	public
-		<T extends NativeType<T>> ImgFactory<T> imgFactory(final Dimensions dims,
-			final T outType)
+	@OpMethod(
+		ops = net.imagej.ops.create.imgFactory.DefaultCreateImgFactory.class)
+	public <T extends NativeType<T>> ImgFactory<T> imgFactory(
+		final Dimensions dims)
 	{
+		// NB: The generic typing of ImgFactory is broken; see:
+		// https://github.com/imglib/imglib2/issues/91
 		@SuppressWarnings("unchecked")
-		final ImgFactory<T> result =
-			(ImgFactory<T>) ops().run(
-				net.imagej.ops.create.imgFactory.DefaultCreateImgFactory.class, dims,
-				outType);
+		final ImgFactory<T> result = (ImgFactory<T>) ops().run(
+			net.imagej.ops.Ops.Create.ImgFactory.class, dims);
+		return result;
+	}
+
+	@OpMethod(
+		ops = net.imagej.ops.create.imgFactory.CreateImgFactoryFromImg.class)
+	public <T extends NativeType<T>> ImgFactory<T> imgFactory(final Img<T> in) {
+		@SuppressWarnings("unchecked")
+		final ImgFactory<T> result = (ImgFactory<T>) ops().run(
+			net.imagej.ops.Ops.Create.ImgFactory.class, in);
 		return result;
 	}
 
@@ -366,6 +366,40 @@ public class CreateNamespace extends AbstractNamespace {
 		return result;
 	}
 
+	// -- kernel --
+
+	/** Executes the "kernel" operation on the given arguments. */
+	@OpMethod(op = Ops.Create.Kernel.class)
+	public Object kernel(final Object... args) {
+		return ops().run(Ops.Create.Kernel.NAME, args);
+	}
+
+	/** Executes the "kernel" operation on the given arguments. */
+	@OpMethod(op = net.imagej.ops.create.kernel.CreateKernel.class)
+	public <T extends ComplexType<T>> Img<T> kernel(final double[]... values) {
+		@SuppressWarnings("unchecked")
+		final Img<T> result = (Img<T>) ops().run(net.imagej.ops.create.kernel.CreateKernel.class,
+				new Object[] { values });
+		return result;
+	}
+
+	/** Executes the "kernel" operation on the given arguments. */
+	@OpMethod(op = net.imagej.ops.create.kernel.CreateKernel.class)
+	public <T extends ComplexType<T>> Img<T> kernel(final T outType, final double[]... values) {
+		@SuppressWarnings("unchecked")
+		final Img<T> result = (Img<T>) ops().run(net.imagej.ops.create.kernel.CreateKernel.class, outType, values);
+		return result;
+	}
+
+	/** Executes the "kernel" operation on the given arguments. */
+	@OpMethod(op = net.imagej.ops.create.kernel.CreateKernel.class)
+	public <T extends ComplexType<T>> Img<T> kernel(final T outType, final ImgFactory<T> fac,
+			final double[]... values) {
+		@SuppressWarnings("unchecked")
+		final Img<T> result = (Img<T>) ops().run(net.imagej.ops.create.kernel.CreateKernel.class, outType, fac, values);
+		return result;
+	}
+
 	// -- kernelGauss --
 
 	/** Executes the "kernelGauss" operation on the given arguments. */
@@ -391,7 +425,7 @@ public class CreateNamespace extends AbstractNamespace {
 	/** Executes the "kernelGauss" operation on the given arguments. */
 	@OpMethod(
 		op = net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class)
-	public <T extends ComplexType<T>> Img<T> kernelGauss(final Type<T> outType,
+	public <T extends ComplexType<T>> Img<T> kernelGauss(final T outType,
 		final int numDimensions, final double sigma)
 	{
 		@SuppressWarnings("unchecked")
@@ -405,7 +439,7 @@ public class CreateNamespace extends AbstractNamespace {
 	/** Executes the "kernelGauss" operation on the given arguments. */
 	@OpMethod(
 		op = net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class)
-	public <T extends ComplexType<T>> Img<T> kernelGauss(final Type<T> outType,
+	public <T extends ComplexType<T>> Img<T> kernelGauss(final T outType,
 		final ImgFactory<T> fac, final int numDimensions, final double sigma)
 	{
 		@SuppressWarnings("unchecked")
@@ -416,20 +450,6 @@ public class CreateNamespace extends AbstractNamespace {
 		return result;
 	}
 
-	/** Executes the "kernelGauss" operation on the given arguments. */
-	@OpMethod(
-		op = net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class)
-	public <T extends ComplexType<T>> Img<T> kernelGauss(final Type<T> outType,
-		final ImgFactory<T> fac, final int numDimensions, final double sigma,
-		final double... calibration)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class,
-				outType, fac, numDimensions, sigma, calibration);
-		return result;
-	}
 
 	/** Executes the "kernelGauss" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.create.kernelGauss.CreateKernelGauss.class)
@@ -446,7 +466,7 @@ public class CreateNamespace extends AbstractNamespace {
 	/** Executes the "kernelGauss" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.create.kernelGauss.CreateKernelGauss.class)
 	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelGauss(
-		final Type<T> outType, final double... sigma)
+		final T outType, final double... sigma)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<T> result =
@@ -459,7 +479,7 @@ public class CreateNamespace extends AbstractNamespace {
 	/** Executes the "kernelGauss" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.create.kernelGauss.CreateKernelGauss.class)
 	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelGauss(
-		final Type<T> outType, final ImgFactory<T> fac, final double... sigma)
+		final T outType, final ImgFactory<T> fac, final double... sigma)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<T> result =
@@ -469,19 +489,7 @@ public class CreateNamespace extends AbstractNamespace {
 		return result;
 	}
 
-	/** Executes the "kernelGauss" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelGauss.CreateKernelGauss.class)
-	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelGauss(
-		final Type<T> outType, final ImgFactory<T> fac, final double[] sigma,
-		final double... calibration)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelGauss.CreateKernelGauss.class, outType,
-				fac, sigma, calibration);
-		return result;
-	}
+
 
 	// -- kernelLog --
 
@@ -508,7 +516,7 @@ public class CreateNamespace extends AbstractNamespace {
 	/** Executes the "kernelLog" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class)
 	public
-		<T extends ComplexType<T>> Img<T> kernelLog(final Type<T> outType,
+		<T extends ComplexType<T>> Img<T> kernelLog(final T outType,
 			final int numDimensions, final double sigma)
 	{
 		@SuppressWarnings("unchecked")
@@ -522,7 +530,7 @@ public class CreateNamespace extends AbstractNamespace {
 	/** Executes the "kernelLog" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class)
 	public
-		<T extends ComplexType<T>> Img<T> kernelLog(final Type<T> outType,
+		<T extends ComplexType<T>> Img<T> kernelLog(final T outType,
 			final ImgFactory<T> fac, final int numDimensions, final double sigma)
 	{
 		@SuppressWarnings("unchecked")
@@ -530,21 +538,6 @@ public class CreateNamespace extends AbstractNamespace {
 			(Img<T>) ops().run(
 				net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class,
 				outType, fac, numDimensions, sigma);
-		return result;
-	}
-
-	/** Executes the "kernelLog" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class)
-	public
-		<T extends ComplexType<T>> Img<T> kernelLog(final Type<T> outType,
-			final ImgFactory<T> fac, final int numDimensions, final double sigma,
-			final double... calibration)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class,
-				outType, fac, numDimensions, sigma, calibration);
 		return result;
 	}
 
@@ -563,7 +556,7 @@ public class CreateNamespace extends AbstractNamespace {
 	/** Executes the "kernelLog" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLog.class)
 	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelLog(
-		final Type<T> outType, final double... sigma)
+		final T outType, final double... sigma)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<T> result =
@@ -575,7 +568,7 @@ public class CreateNamespace extends AbstractNamespace {
 	/** Executes the "kernelLog" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLog.class)
 	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelLog(
-		final Type<T> outType, final ImgFactory<T> fac, final double... sigma)
+		final T outType, final ImgFactory<T> fac, final double... sigma)
 	{
 		@SuppressWarnings("unchecked")
 		final Img<T> result =
@@ -584,18 +577,6 @@ public class CreateNamespace extends AbstractNamespace {
 		return result;
 	}
 
-	/** Executes the "kernelLog" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLog.class)
-	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelLog(
-		final Type<T> outType, final ImgFactory<T> fac, final double[] sigma,
-		final double... calibration)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(net.imagej.ops.create.kernelLog.CreateKernelLog.class,
-				outType, fac, sigma, calibration);
-		return result;
-	}
 
 	// -- labelingMapping --
 
@@ -631,28 +612,29 @@ public class CreateNamespace extends AbstractNamespace {
 
 	// -- nativeType --
 
-	@OpMethod(op = net.imagej.ops.Ops.Create.NativeType.class)
-	public Object nativeType(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Create.NativeType.class, args);
-	}
-
 	@OpMethod(op = net.imagej.ops.create.nativeType.DefaultCreateNativeType.class)
-	public
-		<T extends NativeType<T>> T nativeType() {
-		@SuppressWarnings("unchecked")
-		final T result =
-			(T) ops().run(
-				net.imagej.ops.create.nativeType.DefaultCreateNativeType.class);
+	public DoubleType nativeType() {
+		final DoubleType result = (DoubleType) ops().run(
+			net.imagej.ops.create.nativeType.DefaultCreateNativeType.class);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.create.nativeType.DefaultCreateNativeType.class)
-	public
-		<T extends NativeType<T>> T nativeType(final Class<T> type) {
+	@OpMethod(
+		op = net.imagej.ops.create.nativeType.CreateNativeTypeFromClass.class)
+	public <T extends NativeType<T>> T nativeType(final Class<T> type) {
 		@SuppressWarnings("unchecked")
-		final T result =
-			(T) ops().run(
-				net.imagej.ops.create.nativeType.DefaultCreateNativeType.class, type);
+		final T result = (T) ops().run(
+			net.imagej.ops.create.nativeType.CreateNativeTypeFromClass.class, type);
+		return result;
+	}
+
+	// -- object --
+
+	@OpMethod(op = net.imagej.ops.create.object.CreateObjectFromClass.class)
+	public <T> T object(final Class<T> in) {
+		@SuppressWarnings("unchecked")
+		final T result = (T) ops().run(
+			net.imagej.ops.create.object.CreateObjectFromClass.class, in);
 		return result;
 	}
 

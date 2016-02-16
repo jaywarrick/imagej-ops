@@ -31,12 +31,10 @@
 package net.imagej.ops.create.kernelGauss;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.create.AbstractCreateKernel;
+import net.imagej.ops.create.AbstractCreateGaussianKernel;
 import net.imglib2.Cursor;
-import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.ComplexType;
-import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.util.Util;
 
 import org.scijava.plugin.Plugin;
@@ -54,7 +52,7 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Ops.Create.KernelGauss.class)
 public class CreateKernelGauss<T extends ComplexType<T> & NativeType<T>>
-	extends AbstractCreateKernel<T> implements Ops.Create.KernelGauss
+	extends AbstractCreateGaussianKernel<T> implements Ops.Create.KernelGauss
 {
 
 	@Override
@@ -65,14 +63,13 @@ public class CreateKernelGauss<T extends ComplexType<T> & NativeType<T>>
 		final double[][] kernelArrays = new double[numDimensions][];
 
 		for (int d = 0; d < numDimensions; d++) {
-			sigmaPixels[d] = sigma[d] / calibration[d];
+			sigmaPixels[d] = sigma[d];
 
 			dims[d] = Math.max(3, (2 * (int) (3 * sigmaPixels[d] + 0.5) + 1));
 			kernelArrays[d] = Util.createGaussianKernel1DDouble(sigmaPixels[d], true);
 		}
 
-		createOutputImg(dims, getFac(), getOutType(),
-			new ArrayImgFactory<DoubleType>(), new DoubleType());
+		createOutputImg(dims);
 
 		final Cursor<T> cursor = getOutput().cursor();
 		while (cursor.hasNext()) {

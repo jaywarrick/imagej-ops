@@ -30,46 +30,41 @@
 
 package net.imagej.ops.map;
 
-import net.imagej.ops.special.InplaceOp;
-import net.imglib2.Cursor;
+import net.imagej.ops.Contingent;
+import net.imagej.ops.Ops;
+import net.imagej.ops.special.inplace.BinaryInplace1Op;
 import net.imglib2.IterableInterval;
+
+import org.scijava.Priority;
+import org.scijava.plugin.Plugin;
 
 /**
  * {@link MapBinaryInplace} over 2 {@link IterableInterval}s
  * 
  * @author Leon Yang
- * @param <EI1> element type of first inputs
- * @param <EI2> element type of second inputs
- * @param <EO> element type of outputs
+ * @param <EA> element type of inputs + outputs
  */
-public class MapIIAndIIInplace<EI1, EI2, EO> extends
-	AbstractMapBinaryInplace<EI1, EI2, EO, IterableInterval<EI1>, IterableInterval<EI2>, IterableInterval<EO>>
+@Plugin(type = Ops.Map.class, priority = Priority.HIGH_PRIORITY + 1)
+public class MapIIAndIIInplace<EA> extends
+	AbstractMapBinaryInplace<EA, IterableInterval<EA>> implements Contingent
 {
 
 	@Override
 	public boolean conforms() {
-		if (!super.conforms()) return false;
-		return in1().iterationOrder().equals(in2().iterationOrder());
+		return Maps.compatible(in1(), in2());
 	}
 
 	@Override
-	public void mutate(IterableInterval<EO> arg) {
-		@SuppressWarnings("unchecked")
-		final InplaceOp<EO> inplace = (InplaceOp<EO>) getOp();
-		final EI1 tmpIn1 = getOp().in1();
-		final EI2 tmpIn2 = getOp().in2();
-		final Cursor<EI1> in1Cursor = in1().cursor();
-		final Cursor<EI2> in2Cursor = in2().cursor();
-		final Cursor<EO> argCursor = arg().cursor();
-		while (in1Cursor.hasNext()) {
-			in1Cursor.fwd();
-			in2Cursor.fwd();
-			getOp().setInput1(in1Cursor.get());
-			getOp().setInput2(in2Cursor.get());
-			inplace.mutate(argCursor.get());
-		}
-		getOp().setInput1(tmpIn1);
-		getOp().setInput2(tmpIn2);
+	public void mutate1(final IterableInterval<EA> arg,
+		final IterableInterval<EA> in)
+	{
+		Maps.inplace(arg, in, (BinaryInplace1Op<EA, EA>) getOp());
 	}
 
+	@Override
+	public void mutate2(final IterableInterval<EA> in,
+		final IterableInterval<EA> arg)
+	{
+		Maps.inplace(arg, in, getOp());
+	}
 }

@@ -39,10 +39,10 @@ import net.imagej.ops.AbstractOpTest;
 import net.imagej.ops.Op;
 import net.imagej.ops.bufferfactories.ImgImgSameTypeFactory;
 import net.imagej.ops.map.MapOp;
-import net.imagej.ops.special.AbstractInplaceOp;
-import net.imagej.ops.special.AbstractUnaryComputerOp;
-import net.imagej.ops.special.UnaryComputerOp;
 import net.imagej.ops.special.UnaryOutputFactory;
+import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
+import net.imagej.ops.special.computer.UnaryComputerOp;
+import net.imagej.ops.special.inplace.AbstractUnaryInplaceOp;
 import net.imglib2.Cursor;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
@@ -149,7 +149,7 @@ public class JoinTest extends AbstractOpTest {
 
 	// -- Helper classes --
 
-	private class AddOneInplace extends AbstractInplaceOp<ByteType> {
+	private class AddOneInplace extends AbstractUnaryInplaceOp<ByteType> {
 
 		@Override
 		public void mutate(final ByteType arg) {

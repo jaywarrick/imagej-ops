@@ -32,6 +32,7 @@ package net.imagej.ops.threshold.apply;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.threshold.AbstractApplyThresholdImg;
+import net.imglib2.IterableInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
 
@@ -45,14 +46,14 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Ops.Threshold.Apply.class)
 public class ApplyManualThreshold<T extends RealType<T>> extends
-	AbstractApplyThresholdImg<T, Img<T>>
+	AbstractApplyThresholdImg<T>
 {
 
 	@Parameter
 	private T threshold;
 
 	@Override
-	public T getThreshold(final Img<T> input) {
+	public T getThreshold(final IterableInterval<T> input) {
 		return threshold;
 	}
 

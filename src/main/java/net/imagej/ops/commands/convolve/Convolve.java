@@ -35,7 +35,7 @@ import net.imagej.axis.Axis;
 import net.imagej.ops.Op;
 import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
-import net.imagej.ops.special.UnaryComputerOp;
+import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.exception.IncompatibleTypeException;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
 import net.imglib2.outofbounds.OutOfBoundsMirrorFactory;
@@ -108,7 +108,7 @@ public class Convolve<I extends RealType<I>, K extends RealType<K>, O extends Re
 				out = (ImgPlus) in.factory().imgFactory(new FloatType())
 						.create(in, new FloatType());
 			} catch (final IncompatibleTypeException e) {
-				throw new RuntimeException(e);
+				throw new IllegalArgumentException(e);
 			}
 		} else {
 			out = (ImgPlus<O>) in.factory().create(in,

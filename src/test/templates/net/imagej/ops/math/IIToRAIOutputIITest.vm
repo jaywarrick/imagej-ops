@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import org.junit.Before;
 import org.junit.Test;
 
-public class IIToIIOutputIITest extends AbstractOpTest {
+public class IIToRAIOutputIITest extends AbstractOpTest {
 
 	private Img<FloatType> in1;
 	private Img<FloatType> in2;
@@ -64,16 +64,13 @@ public class IIToIIOutputIITest extends AbstractOpTest {
 	@Test
 	public void test${op.name}() {
 		@SuppressWarnings("unchecked")
-		final IIToIIOutputII.${op.name}<FloatType> op = ops.op(IIToIIOutputII.${op.name}.class,
+		final IIToRAIOutputII.${op.name}<FloatType> op = ops.op(IIToRAIOutputII.${op.name}.class,
 			out, in1, in2);
 		op.run();
 		final IterableInterval<FloatType> created = op.compute2(in1, in2);
 		op.mutate(in1);
-		op.setInput1(copy1);
-		op.mutate(in2);
 		final Cursor<FloatType> in1Cursor = in1.cursor();
 		final Cursor<FloatType> copy1Cursor = copy1.cursor();
-		final Cursor<FloatType> in2Cursor = in2.cursor();
 		final Cursor<FloatType> copy2Cursor = copy2.cursor();
 		final Cursor<FloatType> outCursor = out.cursor();
 		final Cursor<FloatType> crtCursor = created.cursor();
@@ -81,7 +78,6 @@ public class IIToIIOutputIITest extends AbstractOpTest {
 			copy1Cursor.next().${op.function}(copy2Cursor.next());
 			final float expected = copy1Cursor.get().get();
 			assertEquals(in1Cursor.next().get(), expected, 0.0);
-			assertEquals(in2Cursor.next().get(), expected, 0.0);
 			assertEquals(outCursor.next().get(), expected, 0.0);
 			assertEquals(crtCursor.next().get(), expected, 0.0);
 		}
