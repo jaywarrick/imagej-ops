@@ -304,6 +304,7 @@ namespaces = ```
 		[name: "moment2AboutMean",            iface: "Moment2AboutMean"],
 		[name: "moment3AboutMean",            iface: "Moment3AboutMean"],
 		[name: "moment4AboutMean",            iface: "Moment4AboutMean"],
+		[name: "pearsonscorrelationcoefficient", iface: "PearsonsCorrelationCoefficient"],
 		[name: "percentile",                  iface: "Percentile"],
 		[name: "quantile",                    iface: "Quantile"],
 		[name: "size",                        iface: "Size"],
