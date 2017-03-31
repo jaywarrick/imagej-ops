@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -42,8 +42,8 @@ import org.scijava.plugin.Plugin;
 /**
  * {@link Op} to calculate the n-th {@code stats.percentile}.
  * 
- * @author Daniel Seebacher, University of Konstanz.
- * @author Christian Dietz, University of Konstanz.
+ * @author Daniel Seebacher (University of Konstanz)
+ * @author Christian Dietz (University of Konstanz)
  * @author Jan Eglinger
  * @param <I>
  *            input type
@@ -67,7 +67,7 @@ public class DefaultPercentile<I extends RealType<I>, O extends RealType<O>> ext
 	}
 
 	@Override
-	public void compute1(final Iterable<I> input, final O output) {
-		op.compute1(input, output);
+	public void compute(final Iterable<I> input, final O output) {
+		op.compute(input, output);
 	}
 }

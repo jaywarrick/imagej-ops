@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ import net.imagej.ops.special.computer.BinaryComputerOp;
  * @param <O> type of output
  */
 public interface CenterAwareComputerOp<I, O> extends
-	BinaryComputerOp<I, Iterable<I>, O>
+	BinaryComputerOp<Iterable<I>, I, O>
 {
 	// NB: Marker interface.
 }

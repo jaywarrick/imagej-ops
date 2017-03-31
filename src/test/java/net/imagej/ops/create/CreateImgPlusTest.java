@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 
 import net.imagej.ImgPlus;
 import net.imagej.ops.AbstractOpTest;
+import net.imagej.ops.create.imgPlus.DefaultCreateImgPlus;
 
 import org.junit.Test;
 
@@ -48,7 +49,7 @@ public class CreateImgPlusTest extends AbstractOpTest {
 
 	@Test
 	public void createImgPlusTest() {
-		assertEquals(ops.create().imgPlus(
+		assertEquals(ops.run(DefaultCreateImgPlus.class,
 			ops.create().img(new long[] { 10, 9, 8 })).getClass(), ImgPlus.class);
 	}
 }

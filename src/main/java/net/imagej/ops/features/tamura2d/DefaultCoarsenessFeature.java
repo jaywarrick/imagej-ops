@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ import org.scijava.plugin.Plugin;
  * 
  * Implementation of Tamura's Coarseness feature
  * 
- * @author Andreas Graumann, University of Konstanz
+ * @author Andreas Graumann (University of Konstanz)
  *
  * @param <I>
  * @param <O>
@@ -65,7 +65,7 @@ public class DefaultCoarsenessFeature<I extends RealType<I>, O extends RealType<
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void compute1(final RandomAccessibleInterval<I> input, final O output) {
+	public void compute(final RandomAccessibleInterval<I> input, final O output) {
 		HashMap<Integer, Img<I>> meanImages = new HashMap<>();
 
 		// get mean images
@@ -112,7 +112,8 @@ public class DefaultCoarsenessFeature<I extends RealType<I>, O extends RealType<
 
 			cursor.next();
 
-			double max = Double.MIN_VALUE;
+			// NB: the smallest possible value for maxDiff is 0
+			double maxDiff = 0;
 
 			for (int i = 1; i <= 5; i++) {
 
@@ -133,12 +134,12 @@ public class DefaultCoarsenessFeature<I extends RealType<I>, O extends RealType<
 						double val2 = ra2.get().getRealDouble();
 
 						double diff = Math.abs(val2 - val1);
-						max = diff >= max ? diff : max;
+						maxDiff = diff >= maxDiff ? diff : maxDiff;
 					}
 				}
 			}
 
-			maxDifferences.add(max);
+			maxDifferences.add(maxDiff);
 		}
 		return maxDifferences;
 	}

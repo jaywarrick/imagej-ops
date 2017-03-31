@@ -1,4 +1,4 @@
-[![](http://jenkins.imagej.net/job/ImageJ-Ops/lastBuild/badge/icon)](http://jenkins.imagej.net/job/ImageJ-Ops/)
+[![](https://travis-ci.org/imagej/imagej-ops.svg?branch=master)](https://travis-ci.org/imagej/imagej-ops)
 [![Join the chat at https://gitter.im/imagej/imagej-ops](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imagej/imagej-ops?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ImageJ Ops
@@ -16,13 +16,13 @@ Getting started
 Each op has a list of typed input and output parameters on which it operates.
 You can think of an op as a (potentially multi-variable) function:
 ```
-c = math.add(a, b)
+sum = math.add(a, b)
 (phase, amplitude) = fft(image)
 ```
 
 In many cases you can also pass a pre-allocated output which will be populated:
 ```
-math.add(c, a, b)
+math.add(sum, a, b)
 ```
 
 Some ops take other ops as inputs, which allows for things like "execute this
@@ -34,8 +34,8 @@ output_image = map(input_image, add_op)
 
 For more details, see these tutorials:
 * [Using Ops](https://github.com/imagej/imagej-tutorials/tree/master/using-ops)
-* [Developing external Op namespaces](http://imagej.net/Adding_new_ops)
 * [Create a new Op](https://github.com/imagej/imagej-tutorials/tree/master/create-a-new-op)
+* [Developing external Op namespaces](http://imagej.net/Adding_new_ops)
 
 Working example
 ---------------

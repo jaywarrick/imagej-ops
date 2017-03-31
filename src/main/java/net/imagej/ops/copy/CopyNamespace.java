@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ import org.scijava.plugin.Plugin;
 /**
  * The copy namespace contains ops that copy data.
  *
- * @author Christian Dietz, University of Konstanz
+ * @author Christian Dietz (University of Konstanz)
  */
 @Plugin(type = Namespace.class)
 public class CopyNamespace extends AbstractNamespace {
@@ -117,7 +117,7 @@ public class CopyNamespace extends AbstractNamespace {
 	public <T> IterableInterval<T> iterableInterval(final IterableInterval<T> in) {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<T> result = (IterableInterval<T>) ops().run(
-				net.imagej.ops.copy.CopyII.class, in);
+				net.imagej.ops.Ops.Copy.IterableInterval.class, in);
 		return result;
 	}
 
@@ -128,7 +128,7 @@ public class CopyNamespace extends AbstractNamespace {
 			final IterableInterval<T> out, final IterableInterval<T> in) {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<T> result = (IterableInterval<T>) ops().run(
-				net.imagej.ops.copy.CopyII.class, out, in);
+				net.imagej.ops.Ops.Copy.IterableInterval.class, out, in);
 		return result;
 	}
 

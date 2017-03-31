@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ import org.scijava.plugin.Plugin;
 /**
  * This {@link Op} computes the centroid of a {@link IterableRegion} (Label).
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz.
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.Centroid.class, priority = 1)
 public class CentroidII
@@ -53,13 +53,13 @@ public class CentroidII
 			Ops.Geometric.Centroid {
 
 	@Override
-	public RealLocalizable compute1(final IterableInterval<?> input) {
+	public RealLocalizable calculate(final IterableInterval<?> input) {
 		int numDimensions = input.numDimensions();
 		double[] output = new double[numDimensions];
 		Cursor<?> c = input.localizingCursor();
+		double[] pos = new double[numDimensions];
 		while (c.hasNext()) {
 			c.fwd();
-			double[] pos = new double[numDimensions];
 			c.localize(pos);
 			for (int i = 0; i < output.length; i++) {
 				output[i] += pos[i];

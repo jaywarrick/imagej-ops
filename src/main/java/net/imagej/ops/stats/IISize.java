@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -41,8 +41,8 @@ import org.scijava.plugin.Plugin;
 /**
  * {@link Op} to calculate the {@code stats.size} directly.
  * 
- * @author Daniel Seebacher, University of Konstanz.
- * @author Christian Dietz, University of Konstanz.
+ * @author Daniel Seebacher (University of Konstanz)
+ * @author Christian Dietz (University of Konstanz)
  * @param <I> input type
  * @param <O> output type
  */
@@ -53,7 +53,7 @@ public class IISize<I extends RealType<I>, O extends RealType<O>>
 {
 
 	@Override
-	public void compute1(final IterableInterval<I> input, final O output) {
+	public void compute(final IterableInterval<I> input, final O output) {
 		output.setReal(input.size());
 	}
 

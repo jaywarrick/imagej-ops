@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -36,12 +36,13 @@ import java.util.List;
 import net.imagej.ops.AbstractNamespace;
 import net.imagej.ops.Namespace;
 import net.imagej.ops.OpMethod;
-import net.imagej.ops.Ops;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
+import net.imglib2.type.BooleanType;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 
@@ -59,11 +60,6 @@ public class ThresholdNamespace extends AbstractNamespace {
 
 	// -- apply --
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Apply.class)
-	public Object apply(final Object... args) {
-		return ops().run(Ops.Threshold.Apply.NAME, args);
-	}
-
 	@OpMethod(
 		op = net.imagej.ops.threshold.apply.ApplyConstantThreshold.class)
 	public <T extends RealType<T>> Iterable<BitType> apply(
@@ -72,7 +68,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final Iterable<BitType> result =
 			(Iterable<BitType>) ops().run(
-				net.imagej.ops.threshold.apply.ApplyConstantThreshold.class,
+				net.imagej.ops.Ops.Threshold.Apply.class,
 				out, in, threshold);
 		return result;
 	}
@@ -85,7 +81,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.apply.ApplyManualThreshold.class, in,
+				net.imagej.ops.Ops.Threshold.Apply.class, in,
 				threshold);
 		return result;
 	}
@@ -98,7 +94,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.apply.ApplyManualThreshold.class, out,
+				net.imagej.ops.Ops.Threshold.Apply.class, out,
 				in, threshold);
 		return result;
 	}
@@ -110,7 +106,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 	{
 		final BitType result =
 			(BitType) ops().run(
-				net.imagej.ops.threshold.apply.ApplyThresholdComparable.class,
+				net.imagej.ops.Ops.Threshold.Apply.class,
 				out, in, threshold);
 		return result;
 	}
@@ -122,17 +118,12 @@ public class ThresholdNamespace extends AbstractNamespace {
 	{
 		final BitType result =
 			(BitType) ops().run(
-				net.imagej.ops.threshold.apply.ApplyThresholdComparator.class,
+				net.imagej.ops.Ops.Threshold.Apply.class,
 				out, in, threshold, comparator);
 		return result;
 	}
 
 	// -- huang --
-
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Huang.class)
-	public Object huang(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Huang.class, args);
-	}
 
 	@OpMethod(
 		op = net.imagej.ops.threshold.huang.ComputeHuangThreshold.class)
@@ -141,7 +132,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final T result =
 			(T) ops()
 				.run(
-					net.imagej.ops.threshold.huang.ComputeHuangThreshold.class,
+					net.imagej.ops.Ops.Threshold.Huang.class,
 					in);
 		return result;
 	}
@@ -152,7 +143,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.huang.ComputeHuangThreshold.class,
+				net.imagej.ops.Ops.Threshold.Huang.class,
 				out, in);
 		return result;
 	}
@@ -163,7 +154,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Huang.class, in);
+				net.imagej.ops.Ops.Threshold.Huang.class, in);
 		return result;
 	}
 
@@ -175,14 +166,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Huang.class, out,
+				net.imagej.ops.Ops.Threshold.Huang.class, out,
 				in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.IJ1.class)
-	public Object ij1(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.IJ1.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalHuangThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		huang(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalHuangThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalHuangThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		huang(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalHuangThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -191,7 +204,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.ij1.ComputeIJ1Threshold.class, in);
+				net.imagej.ops.Ops.Threshold.IJ1.class, in);
 		return result;
 	}
 
@@ -201,7 +214,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.ij1.ComputeIJ1Threshold.class, out,
+				net.imagej.ops.Ops.Threshold.IJ1.class, out,
 				in);
 		return result;
 	}
@@ -213,7 +226,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.IJ1.class,
+				net.imagej.ops.Ops.Threshold.IJ1.class,
 				in);
 		return result;
 	}
@@ -227,14 +240,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.IJ1.class,
+				net.imagej.ops.Ops.Threshold.IJ1.class,
 				out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Intermodes.class)
-	public Object intermodes(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Intermodes.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIJ1Threshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		ij1(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIJ1Threshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIJ1Threshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		ij1(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIJ1Threshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -245,7 +280,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final List<Object> result =
 			(List<Object>) ops()
 				.run(
-					net.imagej.ops.threshold.intermodes.ComputeIntermodesThreshold.class,
+					net.imagej.ops.Ops.Threshold.Intermodes.class,
 					in);
 		return result;
 	}
@@ -260,7 +295,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final List<Object> result =
 			(List<Object>) ops()
 				.run(
-					net.imagej.ops.threshold.intermodes.ComputeIntermodesThreshold.class,
+					net.imagej.ops.Ops.Threshold.Intermodes.class,
 					out, in);
 		return result;
 	}
@@ -272,7 +307,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Intermodes.class,
+				net.imagej.ops.Ops.Threshold.Intermodes.class,
 				in);
 		return result;
 	}
@@ -286,14 +321,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Intermodes.class,
+				net.imagej.ops.Ops.Threshold.Intermodes.class,
 				out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.IsoData.class)
-	public Object isoData(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.IsoData.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIntermodesThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		intermodes(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIntermodesThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIntermodesThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		intermodes(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIntermodesThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -303,7 +360,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops()
 				.run(
-					net.imagej.ops.threshold.ApplyThresholdMethod.IsoData.class,
+					net.imagej.ops.Ops.Threshold.IsoData.class,
 					in);
 		return result;
 	}
@@ -316,7 +373,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.IsoData.class,
+				net.imagej.ops.Ops.Threshold.IsoData.class,
 				out, in);
 		return result;
 	}
@@ -327,7 +384,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final List<Object> result =
 			(List<Object>) ops().run(
-				net.imagej.ops.threshold.isoData.ComputeIsoDataThreshold.class,
+				net.imagej.ops.Ops.Threshold.IsoData.class,
 				in);
 		return result;
 	}
@@ -340,14 +397,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final List<Object> result =
 			(List<Object>) ops().run(
-				net.imagej.ops.threshold.isoData.ComputeIsoDataThreshold.class,
+				net.imagej.ops.Ops.Threshold.IsoData.class,
 				out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Li.class)
-	public Object li(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Li.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIsoDataThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		isoData(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIsoDataThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIsoDataThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		isoData(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalIsoDataThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.threshold.ApplyThresholdMethod.Li.class)
@@ -356,7 +435,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Li.class, in);
+				net.imagej.ops.Ops.Threshold.Li.class, in);
 		return result;
 	}
 
@@ -368,7 +447,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops()
-				.run(net.imagej.ops.threshold.ApplyThresholdMethod.Li.class,
+				.run(net.imagej.ops.Ops.Threshold.Li.class,
 					out, in);
 		return result;
 	}
@@ -379,7 +458,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.li.ComputeLiThreshold.class, in);
+				net.imagej.ops.Ops.Threshold.Li.class, in);
 		return result;
 	}
 
@@ -389,8 +468,35 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.li.ComputeLiThreshold.class, out,
+				net.imagej.ops.Ops.Threshold.Li.class, out,
 				in);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalLiThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		li(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalLiThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalLiThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		li(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalLiThreshold.class,
+			out, in, shape, outOfBoundsFactory);
 		return result;
 	}
 
@@ -403,7 +509,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
-			.run(net.imagej.ops.threshold.localContrast.LocalContrastThreshold.class,
+			.run(net.imagej.ops.Ops.Threshold.LocalContrastThreshold.class,
 				out, in, shape, outOfBounds);
 		return result;
 	}
@@ -416,7 +522,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
-			.run(net.imagej.ops.threshold.localContrast.LocalContrastThreshold.class,
+			.run(net.imagej.ops.Ops.Threshold.LocalContrastThreshold.class,
 				out, in, shape);
 		return result;
 	}
@@ -431,7 +537,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.localMean.LocalMeanThreshold.class, out, in, shape,
+				net.imagej.ops.Ops.Threshold.LocalMeanThreshold.class, out, in, shape,
 				outOfBounds, c);
 		return result;
 	}
@@ -442,10 +548,37 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final RandomAccessibleInterval<T> in, final Shape shape, final double c)
 	{
 		@SuppressWarnings("unchecked")
-		final IterableInterval<BitType> result =
-			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.localMean.LocalMeanThreshold.class, out, in, shape,
-				c);
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalMeanThreshold.class, out, in,
+				shape, c);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localMean.LocalMeanThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType> localMeanThreshold(
+		final IterableInterval<BitType> out, final RandomAccessibleInterval<T> in,
+		final RectangleShape shape,
+		final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds,
+		final double c)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalMeanThreshold.class, out, in,
+				shape, outOfBounds, c);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localMean.LocalMeanThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType> localMeanThreshold(
+		final IterableInterval<BitType> out, final RandomAccessibleInterval<T> in,
+		final RectangleShape shape, final double c)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalMeanThreshold.class, out, in,
+				shape, c);
 		return result;
 	}
 
@@ -459,7 +592,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
-			.run(net.imagej.ops.threshold.localMedian.LocalMedianThreshold.class, out,
+			.run(net.imagej.ops.Ops.Threshold.LocalMedianThreshold.class, out,
 				in, shape, outOfBounds, c);
 		return result;
 	}
@@ -472,7 +605,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
-			.run(net.imagej.ops.threshold.localMedian.LocalMedianThreshold.class, out,
+			.run(net.imagej.ops.Ops.Threshold.LocalMedianThreshold.class, out,
 				in, shape, c);
 		return result;
 	}
@@ -487,7 +620,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
-			.run(net.imagej.ops.threshold.localMidGrey.LocalMidGreyThreshold.class, out,
+			.run(net.imagej.ops.Ops.Threshold.LocalMidGreyThreshold.class, out,
 				in, shape, outOfBounds, c);
 		return result;
 	}
@@ -501,7 +634,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
-			.run(net.imagej.ops.threshold.localMidGrey.LocalMidGreyThreshold.class, out,
+			.run(net.imagej.ops.Ops.Threshold.LocalMidGreyThreshold.class, out,
 				in, shape, c);
 		return result;
 	}
@@ -516,7 +649,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
-			.run(net.imagej.ops.threshold.localNiblack.LocalNiblackThreshold.class, out,
+			.run(net.imagej.ops.Ops.Threshold.LocalNiblackThreshold.class, out,
 				in, shape, outOfBounds, c, k);
 		return result;
 	}
@@ -530,8 +663,37 @@ public class ThresholdNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
-			.run(net.imagej.ops.threshold.localNiblack.LocalNiblackThreshold.class, out,
+			.run(net.imagej.ops.Ops.Threshold.LocalNiblackThreshold.class, out,
 				in, shape, c, k);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localNiblack.LocalNiblackThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType>
+		localNiblackThreshold(final IterableInterval<BitType> out,
+			final RandomAccessibleInterval<T> in, final RectangleShape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds,
+			final double c, final double k)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalNiblackThreshold.class, out, in,
+				shape, outOfBounds, c, k);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localNiblack.LocalNiblackThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType>
+		localNiblackThreshold(final IterableInterval<BitType> out,
+			final RandomAccessibleInterval<T> in, final RectangleShape shape,
+			final double c, final double k)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalNiblackThreshold.class, out, in,
+				shape, c, k);
 		return result;
 	}
 
@@ -546,7 +708,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.localBernsen.LocalBernsenThreshold.class, out, in, shape,
+				net.imagej.ops.Ops.Threshold.LocalBernsenThreshold.class, out, in, shape,
 				outOfBounds, contrastThreshold, halfMaxValue);
 		return result;
 	}
@@ -561,7 +723,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.localBernsen.LocalBernsenThreshold.class, out, in, shape,
+				net.imagej.ops.Ops.Threshold.LocalBernsenThreshold.class, out, in, shape,
 				contrastThreshold, halfMaxValue);
 		return result;
 	}
@@ -577,7 +739,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
 			.run(
-				net.imagej.ops.threshold.localPhansalkar.LocalPhansalkarThreshold.class,
+				net.imagej.ops.Ops.Threshold.LocalPhansalkarThreshold.class,
 				out, in, shape, outOfBounds, k, r);
 		return result;
 	}
@@ -593,7 +755,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
 			.run(
-				net.imagej.ops.threshold.localPhansalkar.LocalPhansalkarThreshold.class,
+				net.imagej.ops.Ops.Threshold.LocalPhansalkarThreshold.class,
 				out, in, shape, outOfBounds, k);
 		return result;
 	}
@@ -608,7 +770,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
 			.run(
-				net.imagej.ops.threshold.localPhansalkar.LocalPhansalkarThreshold.class,
+				net.imagej.ops.Ops.Threshold.LocalPhansalkarThreshold.class,
 				out, in, shape, outOfBounds);
 		return result;
 	}
@@ -622,8 +784,65 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
 			.run(
-				net.imagej.ops.threshold.localPhansalkar.LocalPhansalkarThreshold.class,
+				net.imagej.ops.Ops.Threshold.LocalPhansalkarThreshold.class,
 				out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localPhansalkar.LocalPhansalkarThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType>
+		localPhansalkarThreshold(final IterableInterval<BitType> out,
+			final RandomAccessibleInterval<T> in, final RectangleShape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds,
+			final double k, final double r)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalPhansalkarThreshold.class, out, in,
+				shape, outOfBounds, k, r);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localPhansalkar.LocalPhansalkarThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType>
+		localPhansalkarThreshold(final IterableInterval<BitType> out,
+			final RandomAccessibleInterval<T> in, final RectangleShape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds,
+			final double k)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalPhansalkarThreshold.class, out, in,
+				shape, outOfBounds, k);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localPhansalkar.LocalPhansalkarThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType>
+		localPhansalkarThreshold(final IterableInterval<BitType> out,
+			final RandomAccessibleInterval<T> in, final RectangleShape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalPhansalkarThreshold.class, out, in,
+				shape, outOfBounds);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localPhansalkar.LocalPhansalkarThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType>
+		localPhansalkarThreshold(final IterableInterval<BitType> out,
+			final RandomAccessibleInterval<T> in, final RectangleShape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalPhansalkarThreshold.class, out, in,
+				shape);
 		return result;
 	}
 
@@ -637,7 +856,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.localSauvola.LocalSauvolaThreshold.class, out, in, shape,
+				net.imagej.ops.Ops.Threshold.LocalSauvolaThreshold.class, out, in, shape,
 				outOfBounds, k, r);
 		return result;
 	}
@@ -652,7 +871,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.localSauvola.LocalSauvolaThreshold.class, out, in, shape,
+				net.imagej.ops.Ops.Threshold.LocalSauvolaThreshold.class, out, in, shape,
 				outOfBounds, k);
 		return result;
 	}
@@ -666,7 +885,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.localSauvola.LocalSauvolaThreshold.class, out, in, shape,
+				net.imagej.ops.Ops.Threshold.LocalSauvolaThreshold.class, out, in, shape,
 				outOfBounds);
 		return result;
 	}
@@ -679,13 +898,65 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.localSauvola.LocalSauvolaThreshold.class, out, in, shape);
+				net.imagej.ops.Ops.Threshold.LocalSauvolaThreshold.class, out, in, shape);
 		return result;
 	}
-	
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.MaxEntropy.class)
-	public Object maxEntropy(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.MaxEntropy.class, args);
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localSauvola.LocalSauvolaThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType>
+		localSauvolaThreshold(final IterableInterval<BitType> out,
+			final RandomAccessibleInterval<T> in, final RectangleShape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds,
+			final double k, final double r)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalSauvolaThreshold.class, out, in,
+				shape, outOfBounds, k, r);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localSauvola.LocalSauvolaThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType>
+		localSauvolaThreshold(final IterableInterval<BitType> out,
+			final RandomAccessibleInterval<T> in, final RectangleShape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds,
+			final double k)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalSauvolaThreshold.class, out, in,
+				shape, outOfBounds, k);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localSauvola.LocalSauvolaThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType>
+		localSauvolaThreshold(final IterableInterval<BitType> out,
+			final RandomAccessibleInterval<T> in, final RectangleShape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalSauvolaThreshold.class, out, in,
+				shape, outOfBounds);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.localSauvola.LocalSauvolaThresholdIntegral.class)
+	public <T extends RealType<T>> IterableInterval<BitType>
+		localSauvolaThreshold(final IterableInterval<BitType> out,
+			final RandomAccessibleInterval<T> in, final RectangleShape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result = (IterableInterval<BitType>) ops()
+			.run(net.imagej.ops.Ops.Threshold.LocalSauvolaThreshold.class, out, in,
+				shape);
+		return result;
 	}
 
 	@OpMethod(
@@ -695,7 +966,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.MaxEntropy.class,
+				net.imagej.ops.Ops.Threshold.MaxEntropy.class,
 				in);
 		return result;
 	}
@@ -709,7 +980,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.MaxEntropy.class,
+				net.imagej.ops.Ops.Threshold.MaxEntropy.class,
 				out, in);
 		return result;
 	}
@@ -722,7 +993,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final T result =
 			(T) ops()
 				.run(
-					net.imagej.ops.threshold.maxEntropy.ComputeMaxEntropyThreshold.class,
+					net.imagej.ops.Ops.Threshold.MaxEntropy.class,
 					in);
 		return result;
 	}
@@ -735,14 +1006,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final T result =
 			(T) ops()
 				.run(
-					net.imagej.ops.threshold.maxEntropy.ComputeMaxEntropyThreshold.class,
+					net.imagej.ops.Ops.Threshold.MaxEntropy.class,
 					out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.MaxLikelihood.class)
-	public Object maxLikelihood(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.MaxLikelihood.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMaxEntropyThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		maxEntropy(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMaxEntropyThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMaxEntropyThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		maxEntropy(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMaxEntropyThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -753,7 +1046,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops()
 				.run(
-					net.imagej.ops.threshold.ApplyThresholdMethod.MaxLikelihood.class,
+					net.imagej.ops.Ops.Threshold.MaxLikelihood.class,
 					in);
 		return result;
 	}
@@ -768,7 +1061,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops()
 				.run(
-					net.imagej.ops.threshold.ApplyThresholdMethod.MaxLikelihood.class,
+					net.imagej.ops.Ops.Threshold.MaxLikelihood.class,
 					out, in);
 		return result;
 	}
@@ -782,7 +1075,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final List<Object> result =
 			(List<Object>) ops()
 				.run(
-					net.imagej.ops.threshold.maxLikelihood.ComputeMaxLikelihoodThreshold.class,
+					net.imagej.ops.Ops.Threshold.MaxLikelihood.class,
 					in);
 		return result;
 	}
@@ -797,14 +1090,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final List<Object> result =
 			(List<Object>) ops()
 				.run(
-					net.imagej.ops.threshold.maxLikelihood.ComputeMaxLikelihoodThreshold.class,
+					net.imagej.ops.Ops.Threshold.MaxLikelihood.class,
 					out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Mean.class)
-	public Object mean(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Mean.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMaxLikelihoodThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		maxLikelihood(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMaxLikelihoodThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMaxLikelihoodThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		maxLikelihood(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMaxLikelihoodThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -813,7 +1128,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Mean.class, in);
+				net.imagej.ops.Ops.Threshold.Mean.class, in);
 		return result;
 	}
 
@@ -825,7 +1140,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Mean.class, out,
+				net.imagej.ops.Ops.Threshold.Mean.class, out,
 				in);
 		return result;
 	}
@@ -836,7 +1151,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.mean.ComputeMeanThreshold.class, in);
+				net.imagej.ops.Ops.Threshold.Mean.class, in);
 		return result;
 	}
 
@@ -846,14 +1161,9 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.mean.ComputeMeanThreshold.class,
+				net.imagej.ops.Ops.Threshold.Mean.class,
 				out, in);
 		return result;
-	}
-
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.MinError.class)
-	public Object minError(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.MinError.class, args);
 	}
 
 	@OpMethod(
@@ -862,7 +1172,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.MinError.class,
+				net.imagej.ops.Ops.Threshold.MinError.class,
 				in);
 		return result;
 	}
@@ -875,7 +1185,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.MinError.class,
+				net.imagej.ops.Ops.Threshold.MinError.class,
 				out, in);
 		return result;
 	}
@@ -887,7 +1197,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final List<Object> result =
 			(List<Object>) ops().run(
-				net.imagej.ops.threshold.minError.ComputeMinErrorThreshold.class,
+				net.imagej.ops.Ops.Threshold.MinError.class,
 				in);
 		return result;
 	}
@@ -901,14 +1211,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final List<Object> result =
 			(List<Object>) ops().run(
-				net.imagej.ops.threshold.minError.ComputeMinErrorThreshold.class,
+				net.imagej.ops.Ops.Threshold.MinError.class,
 				out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Minimum.class)
-	public Object minimum(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Minimum.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMinErrorThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		minError(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMinErrorThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMinErrorThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		minError(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMinErrorThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -918,7 +1250,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops()
 				.run(
-					net.imagej.ops.threshold.ApplyThresholdMethod.Minimum.class,
+					net.imagej.ops.Ops.Threshold.Minimum.class,
 					in);
 		return result;
 	}
@@ -931,7 +1263,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Minimum.class,
+				net.imagej.ops.Ops.Threshold.Minimum.class,
 				out, in);
 		return result;
 	}
@@ -942,7 +1274,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final List<Object> result =
 			(List<Object>) ops().run(
-				net.imagej.ops.threshold.minimum.ComputeMinimumThreshold.class,
+				net.imagej.ops.Ops.Threshold.Minimum.class,
 				in);
 		return result;
 	}
@@ -955,14 +1287,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final List<Object> result =
 			(List<Object>) ops().run(
-				net.imagej.ops.threshold.minimum.ComputeMinimumThreshold.class,
+				net.imagej.ops.Ops.Threshold.Minimum.class,
 				out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Moments.class)
-	public Object moments(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Moments.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMinimumThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		minimum(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMinimumThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMinimumThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		minimum(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMinimumThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -971,7 +1325,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.moments.ComputeMomentsThreshold.class,
+				net.imagej.ops.Ops.Threshold.Moments.class,
 				in);
 		return result;
 	}
@@ -984,7 +1338,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.moments.ComputeMomentsThreshold.class,
+				net.imagej.ops.Ops.Threshold.Moments.class,
 				out, in);
 		return result;
 	}
@@ -996,7 +1350,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops()
 				.run(
-					net.imagej.ops.threshold.ApplyThresholdMethod.Moments.class,
+					net.imagej.ops.Ops.Threshold.Moments.class,
 					in);
 		return result;
 	}
@@ -1009,14 +1363,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Moments.class,
+				net.imagej.ops.Ops.Threshold.Moments.class,
 				out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Otsu.class)
-	public Object otsu(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Otsu.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMomentsThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		moments(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMomentsThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMomentsThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		moments(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalMomentsThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -1025,7 +1401,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.otsu.ComputeOtsuThreshold.class, in);
+				net.imagej.ops.Ops.Threshold.Otsu.class, in);
 		return result;
 	}
 
@@ -1035,7 +1411,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.otsu.ComputeOtsuThreshold.class,
+				net.imagej.ops.Ops.Threshold.Otsu.class,
 				out, in);
 		return result;
 	}
@@ -1046,7 +1422,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Otsu.class, in);
+				net.imagej.ops.Ops.Threshold.Otsu.class, in);
 		return result;
 	}
 
@@ -1058,14 +1434,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Otsu.class, out,
+				net.imagej.ops.Ops.Threshold.Otsu.class, out,
 				in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Percentile.class)
-	public Object percentile(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Percentile.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalOtsuThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		otsu(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalOtsuThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalOtsuThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		otsu(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalOtsuThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -1075,7 +1473,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Percentile.class,
+				net.imagej.ops.Ops.Threshold.Percentile.class,
 				in);
 		return result;
 	}
@@ -1089,7 +1487,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Percentile.class,
+				net.imagej.ops.Ops.Threshold.Percentile.class,
 				out, in);
 		return result;
 	}
@@ -1102,7 +1500,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final T result =
 			(T) ops()
 				.run(
-					net.imagej.ops.threshold.percentile.ComputePercentileThreshold.class,
+					net.imagej.ops.Ops.Threshold.Percentile.class,
 					in);
 		return result;
 	}
@@ -1115,14 +1513,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final T result =
 			(T) ops()
 				.run(
-					net.imagej.ops.threshold.percentile.ComputePercentileThreshold.class,
+					net.imagej.ops.Ops.Threshold.Percentile.class,
 					out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.RenyiEntropy.class)
-	public Object renyiEntropy(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.RenyiEntropy.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalPercentileThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		percentile(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalPercentileThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalPercentileThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		percentile(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalPercentileThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -1133,7 +1553,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops()
 				.run(
-					net.imagej.ops.threshold.ApplyThresholdMethod.RenyiEntropy.class,
+					net.imagej.ops.Ops.Threshold.RenyiEntropy.class,
 					in);
 		return result;
 	}
@@ -1148,7 +1568,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops()
 				.run(
-					net.imagej.ops.threshold.ApplyThresholdMethod.RenyiEntropy.class,
+					net.imagej.ops.Ops.Threshold.RenyiEntropy.class,
 					out, in);
 		return result;
 	}
@@ -1161,7 +1581,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final T result =
 			(T) ops()
 				.run(
-					net.imagej.ops.threshold.renyiEntropy.ComputeRenyiEntropyThreshold.class,
+					net.imagej.ops.Ops.Threshold.RenyiEntropy.class,
 					in);
 		return result;
 	}
@@ -1177,14 +1597,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		final T result =
 			(T) ops()
 				.run(
-					net.imagej.ops.threshold.renyiEntropy.ComputeRenyiEntropyThreshold.class,
+					net.imagej.ops.Ops.Threshold.RenyiEntropy.class,
 					out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Shanbhag.class)
-	public Object shanbhag(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Shanbhag.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalRenyiEntropyThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		renyiEntropy(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalRenyiEntropyThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalRenyiEntropyThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		renyiEntropy(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalRenyiEntropyThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -1193,7 +1635,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Shanbhag.class,
+				net.imagej.ops.Ops.Threshold.Shanbhag.class,
 				in);
 		return result;
 	}
@@ -1206,7 +1648,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Shanbhag.class,
+				net.imagej.ops.Ops.Threshold.Shanbhag.class,
 				out, in);
 		return result;
 	}
@@ -1218,7 +1660,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.shanbhag.ComputeShanbhagThreshold.class,
+				net.imagej.ops.Ops.Threshold.Shanbhag.class,
 				in);
 		return result;
 	}
@@ -1230,14 +1672,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.shanbhag.ComputeShanbhagThreshold.class,
+				net.imagej.ops.Ops.Threshold.Shanbhag.class,
 				out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Triangle.class)
-	public Object triangle(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Triangle.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalShanbhagThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		shanbhag(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalShanbhagThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalShanbhagThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		shanbhag(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalShanbhagThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -1246,7 +1710,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Triangle.class,
+				net.imagej.ops.Ops.Threshold.Triangle.class,
 				in);
 		return result;
 	}
@@ -1259,7 +1723,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Triangle.class,
+				net.imagej.ops.Ops.Threshold.Triangle.class,
 				out, in);
 		return result;
 	}
@@ -1271,7 +1735,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.triangle.ComputeTriangleThreshold.class,
+				net.imagej.ops.Ops.Threshold.Triangle.class,
 				in);
 		return result;
 	}
@@ -1283,14 +1747,36 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.triangle.ComputeTriangleThreshold.class,
+				net.imagej.ops.Ops.Threshold.Triangle.class,
 				out, in);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.Ops.Threshold.Yen.class)
-	public Object yen(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Threshold.Yen.class, args);
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalTriangleThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		triangle(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalTriangleThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalTriangleThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		triangle(final IterableInterval<B> out,
+			final RandomAccessibleInterval<T> in, final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalTriangleThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
 	}
 
 	@OpMethod(
@@ -1299,7 +1785,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.yen.ComputeYenThreshold.class, in);
+				net.imagej.ops.Ops.Threshold.Yen.class, in);
 		return result;
 	}
 
@@ -1309,7 +1795,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final T result =
 			(T) ops().run(
-				net.imagej.ops.threshold.yen.ComputeYenThreshold.class, out,
+				net.imagej.ops.Ops.Threshold.Yen.class, out,
 				in);
 		return result;
 	}
@@ -1320,7 +1806,7 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Yen.class, in);
+				net.imagej.ops.Ops.Threshold.Yen.class, in);
 		return result;
 	}
 
@@ -1332,11 +1818,109 @@ public class ThresholdNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<BitType> result =
 			(IterableInterval<BitType>) ops().run(
-				net.imagej.ops.threshold.ApplyThresholdMethod.Yen.class, out,
+				net.imagej.ops.Ops.Threshold.Yen.class, out,
 				in);
 		return result;
 	}
-	
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalYenThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		yen(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalYenThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalYenThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		yen(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalYenThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
+	}
+                
+        @OpMethod(
+		op = net.imagej.ops.threshold.rosin.ComputeRosinThreshold.class)
+	public <T extends RealType<T>> T rosin(final Histogram1d<T> in) {
+		@SuppressWarnings("unchecked")
+		final T result =
+			(T) ops().run(
+				net.imagej.ops.Ops.Threshold.Rosin.class, in);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.rosin.ComputeRosinThreshold.class)
+	public <T extends RealType<T>> T rosin(final T out, final Histogram1d<T> in) {
+		@SuppressWarnings("unchecked")
+		final T result =
+			(T) ops().run(
+				net.imagej.ops.Ops.Threshold.Rosin.class,
+				out, in);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethod.Rosin.class)
+	public <T extends RealType<T>> IterableInterval<BitType> rosin(final IterableInterval<T> in) {
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result =
+			(IterableInterval<BitType>) ops().run(
+				net.imagej.ops.Ops.Threshold.Rosin.class, in);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethod.Rosin.class)
+	public <T extends RealType<T>> IterableInterval<BitType> rosin(final IterableInterval<BitType> out,
+		final IterableInterval<T> in)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<BitType> result =
+			(IterableInterval<BitType>) ops().run(
+				net.imagej.ops.Ops.Threshold.Rosin.class, out,
+				in);
+		return result;
+	}
+        
+        @OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalRosinThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		rosin(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalRosinThreshold.class,
+			out, in, shape);
+		return result;
+	}
+
+	@OpMethod(
+		op = net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalRosinThreshold.class)
+	public <T extends RealType<T>, B extends BooleanType<B>> IterableInterval<B>
+		rosin(final IterableInterval<B> out, final RandomAccessibleInterval<T> in,
+			final Shape shape,
+			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<B> result = (IterableInterval<B>) ops().run(
+			net.imagej.ops.threshold.ApplyThresholdMethodLocal.LocalRosinThreshold.class,
+			out, in, shape, outOfBoundsFactory);
+		return result;
+	}
+
 	// -- Named methods --
 
 	@Override

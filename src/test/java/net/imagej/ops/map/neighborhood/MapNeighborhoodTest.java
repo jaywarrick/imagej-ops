@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * Test for {@link MapNeighborhood} and {@link MapNeighborhoodWithCenter}.
+ * Test for {@link DefaultMapNeighborhood} and {@link MapNeighborhoodWithCenter}.
  *
  * @author Jonathan Hale (University of Konstanz)
  */
@@ -65,13 +65,13 @@ public class MapNeighborhoodTest extends AbstractOpTest {
 	 * Test if every neighborhood pixel of the image was really accessed during
 	 * the map operation.
 	 *
-	 * @see MapNeighborhood
+	 * @see DefaultMapNeighborhood
 	 */
 	@Test
 	public void testMapNeighborhoodsAccess() {
 		final Op mapOp =
-			ops.op(MapNeighborhood.class, out, in, new CountNeighbors(),
-				new RectangleShape(1, false));
+			ops.op(DefaultMapNeighborhood.class, out, in,
+				new RectangleShape(1, false), new CountNeighbors());
 		mapOp.run();
 
 		for (final ByteType t : out) {
@@ -84,8 +84,8 @@ public class MapNeighborhoodTest extends AbstractOpTest {
 	public
 		void testMapNeighoodsWrongArgs() {
 		final Op mapOp =
-			ops.op(MapNeighborhood.class, out, in, new Increment(),
-				new RectangleShape(1, false));
+			ops.op(DefaultMapNeighborhood.class, out, in,
+				new RectangleShape(1, false), new Increment());
 
 		// ClassCastException will be thrown
 		mapOp.run();
@@ -101,7 +101,7 @@ public class MapNeighborhoodTest extends AbstractOpTest {
 	public void testMapNeighborhoodsWithCenterAccess() {
 		final Op mapOp =
 			ops.op(MapNeighborhoodWithCenter.class, out, in,
-				new CountNeighborsWithCenter(), new RectangleShape(1, false));
+				new RectangleShape(1, false), new CountNeighborsWithCenter());
 		mapOp.run();
 
 		for (final ByteType t : out) {
@@ -124,7 +124,7 @@ public class MapNeighborhoodTest extends AbstractOpTest {
 	{
 
 		@Override
-		public void compute1(final Iterable<ByteType> input, final ByteType output) {
+		public void compute(final Iterable<ByteType> input, final ByteType output) {
 			for (Iterator<ByteType> iter = input.iterator(); iter.hasNext(); iter
 				.next())
 			{
@@ -144,7 +144,7 @@ public class MapNeighborhoodTest extends AbstractOpTest {
 	{
 
 		@Override
-		public void compute2(final ByteType center, final Iterable<ByteType> neighborhood,
+		public void compute(final Iterable<ByteType> neighborhood, final ByteType center,
 			final ByteType output)
 		{
 			ByteType a = center;
@@ -171,7 +171,7 @@ public class MapNeighborhoodTest extends AbstractOpTest {
 	{
 
 		@Override
-		public void compute1(final ByteType input, final ByteType output) {
+		public void compute(final ByteType input, final ByteType output) {
 			output.set((byte) (input.get() + 1));
 		}
 	}

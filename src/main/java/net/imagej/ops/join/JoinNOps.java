@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -45,9 +45,6 @@ import net.imagej.ops.special.computer.UnaryComputerOp;
  * @author Christian Dietz (University of Konstanz)
  */
 public interface JoinNOps<OP extends Op> extends Ops.Join {
-
-	// TODO: Change to Collection<? extends OP> once
-	// imagej-ops depends on scijava-common 2.50.1 or later.
 
 	/**
 	 * @return {@link Op}s which are joined by this op

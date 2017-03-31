@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -44,9 +44,9 @@ import org.scijava.plugin.Plugin;
  * @author Leon Yang
  * @param <EA> element type of inputs + outputs
  */
-@Plugin(type = Ops.Map.class, priority = Priority.HIGH_PRIORITY + 1)
+@Plugin(type = Ops.Map.class, priority = Priority.LOW_PRIORITY)
 public class MapIIAndIIInplace<EA> extends
-	AbstractMapBinaryInplace<EA, IterableInterval<EA>> implements Contingent
+	AbstractMapBinaryInplace<EA, EA, IterableInterval<EA>> implements Contingent
 {
 
 	@Override
@@ -58,7 +58,7 @@ public class MapIIAndIIInplace<EA> extends
 	public void mutate1(final IterableInterval<EA> arg,
 		final IterableInterval<EA> in)
 	{
-		Maps.inplace(arg, in, (BinaryInplace1Op<EA, EA>) getOp());
+		Maps.inplace(arg, in, (BinaryInplace1Op<EA, EA, EA>) getOp());
 	}
 
 	@Override

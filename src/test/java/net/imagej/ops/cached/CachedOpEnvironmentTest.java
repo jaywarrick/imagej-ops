@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ import org.junit.Test;
  * 
  * Overriding with customOps is tested implicitly
  * 
- * @author Christian Dietz, University of Konstanz
+ * @author Christian Dietz (University of Konstanz)
  */
 public class CachedOpEnvironmentTest extends AbstractOpTest {
 
@@ -87,11 +87,11 @@ public class CachedOpEnvironmentTest extends AbstractOpTest {
 		ctr = 0;
 
 		// Calling it twice should result in the same result
-		assertEquals(1.0, func.compute1(imgA).get(), 0.0);
-		assertEquals(1.0, func.compute1(imgA).get(), 0.0);
+		assertEquals(1.0, func.calculate(imgA).get(), 0.0);
+		assertEquals(1.0, func.calculate(imgA).get(), 0.0);
 
 		// Should be increased
-		assertEquals(2.0, func.compute1(imgB).getRealDouble(), 0.0);
+		assertEquals(2.0, func.calculate(imgB).getRealDouble(), 0.0);
 	}
 
 	@Test
@@ -99,11 +99,11 @@ public class CachedOpEnvironmentTest extends AbstractOpTest {
 		ctr = 0;
 
 		// Calling it twice should result in the same result
-		assertEquals(1.0, hybrid.compute1(imgA).get(), 0.0);
-		assertEquals(1.0, hybrid.compute1(imgA).get(), 0.0);
+		assertEquals(1.0, hybrid.calculate(imgA).get(), 0.0);
+		assertEquals(1.0, hybrid.calculate(imgA).get(), 0.0);
 
 		// Should be increased
-		assertEquals(2.0, hybrid.compute1(imgB).getRealDouble(), 0.0);
+		assertEquals(2.0, hybrid.calculate(imgB).getRealDouble(), 0.0);
 	}
 
 	// some specialized ops to track number of counts
@@ -117,7 +117,7 @@ public class CachedOpEnvironmentTest extends AbstractOpTest {
 		}
 
 		@Override
-		public void compute1(final Img<ByteType> input, final DoubleType output) {
+		public void compute(final Img<ByteType> input, final DoubleType output) {
 			ctr++;
 			output.set(ctr);
 		}

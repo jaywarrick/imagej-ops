@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,8 +35,8 @@ package net.imagej.ops.special.hybrid;
  * 
  * @author Curtis Rueden
  */
-public abstract class AbstractBinaryHybridCFI1<A, I> extends
-	AbstractBinaryHybridCF<A, I, A> implements BinaryHybridCFI1<A, I>
+public abstract class AbstractBinaryHybridCFI1<I1, I2, O extends I1> extends
+	AbstractBinaryHybridCF<I1, I2, O> implements BinaryHybridCFI1<I1, I2, O>
 {
 	// NB: No implementation needed.
 }

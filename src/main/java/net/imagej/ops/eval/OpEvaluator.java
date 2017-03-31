@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,22 +30,25 @@
 
 package net.imagej.ops.eval;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.imagej.ops.Op;
 import net.imagej.ops.OpEnvironment;
 import net.imagej.ops.Ops;
 
-import org.scijava.sjep.Function;
-import org.scijava.sjep.Operator;
-import org.scijava.sjep.Operators;
-import org.scijava.sjep.Verb;
-import org.scijava.sjep.eval.AbstractStandardStackEvaluator;
-import org.scijava.sjep.eval.Evaluator;
+import org.scijava.parse.Operator;
+import org.scijava.parse.Operators;
+import org.scijava.parse.Variable;
+import org.scijava.parse.eval.AbstractStandardStackEvaluator;
+import org.scijava.parse.eval.Evaluator;
 
 /**
- * An SJEP {@link Evaluator} using available {@link Op}s.
+ * A Parsington {@link Evaluator} using available {@link Op}s.
  * 
  * @author Curtis Rueden
  */
@@ -53,18 +56,23 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 
 	private final OpEnvironment ops;
 
-	/** Map of SJEP {@link Operator}s to Ops operation names. */
+	/** Map of Parsington {@link Operator}s to Ops operation names. */
 	private final HashMap<Operator, String> opMap;
 
 	public OpEvaluator(final OpEnvironment ops) {
 		this.ops = ops;
 		opMap = new HashMap<>();
 
-		// Map each standard SJEP operator to its associated op name.
+		// Map each standard Parsington operator to its associated op name.
 		// TODO: Consider creating a plugin extension point for defining these.
 
 		// -- dot --
 		//opMap.put(Operators.DOT, "dot");
+
+		// -- groups --
+		//opMap.put(Operators.PARENS, "parens");
+		//opMap.put(Operators.BRACKETS, "brackets");
+		//opMap.put(Operators.BRACES, "braces");
 
 		// -- transpose, power --
 		//opMap.put(Operators.TRANSPOSE, "transpose");
@@ -121,10 +129,15 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 	// -- OpEvaluator methods --
 
 	/**
-	 * Executes the given {@link Verb operation} (typically an {@link Operator} or
-	 * a {@link Function}) with the specified argument list.
+	 * Executes the given {@link Operator operation} with the specified argument
+	 * list.
 	 */
-	public Object execute(final Verb verb, final Object... args) {
+	public Object execute(final Operator op, final Object... args) {
+		return execute(getOpName(op), args);
+	}
+
+	/** Executes the given op with the specified argument list. */
+	public Object execute(final String opName, final Object... args) {
 		// Unwrap the arguments.
 		final Object[] argValues = new Object[args.length];
 		for (int i=0; i<args.length; i++) {
@@ -132,21 +145,66 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 		}
 
 		// Try executing the op.
-		return ops.run(getOpName(verb), argValues);
+		return ops.run(opName, argValues);
 	}
 
-	/** Gets the op name associated with the given {@link Verb}. */
-	public String getOpName(final Verb verb) {
-		return opMap.containsKey(verb) ? opMap.get(verb) : verb.getToken();
+	/** Gets the op name associated with the given {@link Operator}. */
+	public String getOpName(final Operator op) {
+		return opMap.containsKey(op) ? opMap.get(op) : op.getToken();
+	}
+
+	/**
+	 * Gets the map of {@link Operator} to op names backing this evaluator.
+	 * <p>
+	 * Changes to this map will affect evaluation accordingly.
+	 * </p>
+	 */
+	public Map<Operator, String> getOpMap() {
+		return opMap;
 	}
 
 	// -- StandardEvaluator methods --
+
+	// -- function --
+
+	@Override
+	public Object function(final Object a, final Object b) {
+		if (a instanceof Variable) {
+			// NB: Execute the op whose name matches the given variable token.
+			return execute(((Variable) a).getToken(), list(b).toArray());
+		}
+		return null;
+	}
 
 	// -- dot --
 
 	@Override
 	public Object dot(final Object a, final Object b) {
+		if (a instanceof Variable && b instanceof Variable) {
+			// NB: Concatenate variable names, for namespace support
+			final String namespace = ((Variable) a).getToken();
+			final String opName = ((Variable) b).getToken();
+			return new Variable(namespace + "." + opName);
+		}
 		return execute(Operators.DOT, a, b);
+	}
+
+	// -- groups --
+
+	@Override
+	public Object parens(final Object[] args) {
+		if (args.length == 1) return args[0];
+		return Arrays.asList(args);
+	}
+
+	@Override
+	public Object brackets(final Object[] args) {
+		return Arrays.asList(args);
+	}
+
+	@Override
+	public Object braces(final Object[] args) {
+		return Arrays.asList(args);
 	}
 
 	// -- transpose, power --
@@ -332,9 +390,9 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 	// -- StackEvaluator methods --
 
 	@Override
-	public Object execute(final Verb verb, final Deque<Object> stack) {
+	public Object execute(final Operator op, final Deque<Object> stack) {
 		// Pop the arguments.
-		final int arity = verb.getArity();
+		final int arity = op.getArity();
 		final Object[] args = new Object[arity];
 		for (int i = args.length - 1; i >= 0; i--) {
 			args[i] = stack.pop();
@@ -345,7 +403,7 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 		for (int i = 0; i < args.length; i++) {
 			stack.push(args[i]);
 		}
-		final Object result = super.execute(verb, stack);
+		final Object result = super.execute(op, stack);
 		if (result != null) return result;
 
 		// Unwrap the arguments.
@@ -353,7 +411,14 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 			args[i] = value(args[i]);
 		}
 
-		return execute(verb, args);
+		return execute(op, args);
+	}
+
+	// -- Helper methods --
+
+	private List<?> list(final Object o) {
+		if (o instanceof List) return (List<?>) o;
+		return Collections.singletonList(o);
 	}
 
 }

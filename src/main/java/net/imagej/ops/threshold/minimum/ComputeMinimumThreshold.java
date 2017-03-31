@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@ import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ItemIO;
+import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -49,7 +50,7 @@ import org.scijava.plugin.Plugin;
  * @author Barry DeZonia
  * @author Gabriel Landini
  */
-@Plugin(type = Ops.Threshold.Minimum.class)
+@Plugin(type = Ops.Threshold.Minimum.class, priority = Priority.HIGH_PRIORITY)
 public class ComputeMinimumThreshold<T extends RealType<T>> extends
 		AbstractComputeThresholdHistogram<T> implements Ops.Threshold.Minimum {
 
@@ -88,7 +89,7 @@ public class ComputeMinimumThreshold<T extends RealType<T>> extends
 			if (histogram[i] > 0)
 				max = i;
 		}
-		double[] tHisto = iHisto;
+		double[] tHisto = new double[iHisto.length] ;
 
 		while (!Thresholds.bimodalTest(iHisto)) {
 			// smooth with a 3 point running mean filter
@@ -98,7 +99,7 @@ public class ComputeMinimumThreshold<T extends RealType<T>> extends
 			tHisto[0] = (iHisto[0] + iHisto[1]) / 3;
 			// 0 outside
 			tHisto[histogram.length - 1] = (iHisto[histogram.length - 2] + iHisto[histogram.length - 1]) / 3;
-			iHisto = tHisto;
+			System.arraycopy(tHisto, 0, iHisto, 0, iHisto.length) ;
 			iter++;
 			if (iter > 10000) {
 				errMsg = "Minimum Threshold not found after 10000 iterations.";

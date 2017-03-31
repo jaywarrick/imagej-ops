@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,6 @@
 
 package net.imagej.ops.filter;
 
-import org.scijava.plugin.Parameter;
-
 import net.imagej.ops.Ops.Map;
 import net.imagej.ops.map.neighborhood.CenterAwareComputerOp;
 import net.imagej.ops.special.chain.RAIs;
@@ -43,6 +41,9 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.outofbounds.OutOfBoundsBorderFactory;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
+import net.imglib2.view.Views;
+
+import org.scijava.plugin.Parameter;
 
 public abstract class AbstractCenterAwareNeighborhoodBasedFilter<I, O> extends
 	AbstractUnaryComputerOp<RandomAccessibleInterval<I>, IterableInterval<O>>
@@ -61,17 +62,16 @@ public abstract class AbstractCenterAwareNeighborhoodBasedFilter<I, O> extends
 
 	@Override
 	public void initialize() {
-		filterOp = unaryComputer(out().firstElement());
-		map = Computers.unary(ops(), Map.class, out(), in(),
-			filterOp, shape);
+		filterOp = unaryComputer(Views.iterable(in()).firstElement(), out().firstElement());
+		map = Computers.unary(ops(), Map.class, out(), in(), shape, filterOp);
 	}
 
 	@Override
-	public void compute1(RandomAccessibleInterval<I> input,
+	public void compute(RandomAccessibleInterval<I> input,
 		IterableInterval<O> output)
 	{
 		// map computer to neighborhoods
-		map.compute1(RAIs.extend(input, outOfBoundsFactory), output);
+		map.compute(RAIs.extend(input, outOfBoundsFactory), output);
 	}
 
 	/**
@@ -84,10 +84,13 @@ public abstract class AbstractCenterAwareNeighborhoodBasedFilter<I, O> extends
 	}
 
 	/**
-	 * @param out First element from the output {@link IterableInterval}. May be
-	 *          used for determining the class.
+	 * @param inType First element from the input {@link RandomAccessibleInterval}
+	 *          that may be used for determining the class.
+	 * @param outType First element from the output {@link IterableInterval} that
+	 *          may be used for determining the class.
 	 * @return the Computer to map to all neighborhoods of input to output.
 	 */
-	protected abstract CenterAwareComputerOp<I, O> unaryComputer(final O out);
+	protected abstract CenterAwareComputerOp<I, O> unaryComputer(final I inType,
+		final O outType);
 
 }

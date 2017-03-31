@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,19 +31,19 @@
 package net.imagej.ops.geom;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imagej.ops.special.function.Functions;
 import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Generic implementation of
  * {@link net.imagej.ops.Ops.Geometric.BoundarySizeConvexHull}.
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz.
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 public abstract class AbstractBoundarySizeConvexHull<I> extends
-	AbstractUnaryFunctionOp<I, DoubleType> implements
+	AbstractUnaryHybridCF<I, DoubleType> implements
 	Ops.Geometric.BoundarySizeConvexHull
 {
 
@@ -62,10 +62,14 @@ public abstract class AbstractBoundarySizeConvexHull<I> extends
 		convexHullFunc = Functions.unary(ops(), Ops.Geometric.ConvexHull.class, inType, in());
 		perimeterFunc = Functions.unary(ops(), Ops.Geometric.BoundarySize.class, DoubleType.class, in());
 	}
-
+	
 	@Override
-	public DoubleType compute1(I input) {
-		return perimeterFunc.compute1(convexHullFunc.compute1(input));
+	public void compute(I input, DoubleType output) {
+		output.set(perimeterFunc.calculate(convexHullFunc.calculate(input)));
 	}
-
+	
+	@Override
+	public DoubleType createOutput(I input) {
+		return new DoubleType();
+	}
 }

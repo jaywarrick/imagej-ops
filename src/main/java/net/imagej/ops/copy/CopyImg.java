@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ import org.scijava.plugin.Plugin;
  * Copying {@link Img} into another {@link Img}.
  * Exists mainly for convenience reasons. 
  * 
- * @author Christian Dietz, University of Konstanz
+ * @author Christian Dietz (University of Konstanz)
  * @param <T>
  */
 @Plugin(type = Ops.Copy.Img.class)
@@ -68,12 +68,12 @@ public class CopyImg<T extends NativeType<T>> extends
 	
 	@Override
 	public Img<T> createOutput(final Img<T> input) {
-		return createFunc.compute1(input);
+		return createFunc.calculate(input);
 	}
 
 	@Override
-	public void compute1(final Img<T> input, final Img<T> output) {
-		copyComputer.compute1(input, output);
+	public void compute(final Img<T> input, final Img<T> output) {
+		copyComputer.compute(input, output);
 	}
 
 	@Override

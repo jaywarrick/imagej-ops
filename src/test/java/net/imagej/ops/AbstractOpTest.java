@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,14 @@
 
 package net.imagej.ops;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import io.scif.img.IO;
+
+import java.net.URL;
+import java.util.Iterator;
 import java.util.Random;
 
 import net.imglib2.Cursor;
@@ -164,6 +172,35 @@ public abstract class AbstractOpTest {
 		}
 
 		return img;
+	}
+
+	public Img<FloatType> openFloatImg(final String resourcePath) {
+		return openFloatImg(getClass(), resourcePath);
+	}
+
+	public static Img<FloatType> openFloatImg(final Class<?> c,
+		final String resourcePath)
+	{
+		final URL url = c.getResource(resourcePath);
+		return IO.openFloatImgs(url.getPath()).get(0).getImg();
+	}
+
+	public static Img<UnsignedByteType> openUnsignedByteType(final Class<?> c, 
+			final String resourcePath) {
+		final URL url = c.getResource(resourcePath);
+		return IO.openUnsignedByteImgs(url.getPath()).get(0).getImg();
+	}
+	
+	public <T> void assertIterationsEqual(final Iterable<T> expected,
+		final Iterable<T> actual)
+	{
+		final Iterator<T> e = expected.iterator();
+		final Iterator<T> a = actual.iterator();
+		while (e.hasNext()) {
+			assertTrue("Fewer elements than expected", a.hasNext());
+			assertEquals(e.next(), a.next());
+		}
+		assertFalse("More elements than expected", a.hasNext());
 	}
 
 	public static class NoOp extends AbstractOp {

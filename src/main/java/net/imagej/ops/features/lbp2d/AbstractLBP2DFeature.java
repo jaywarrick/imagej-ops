@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -44,8 +44,7 @@ import net.imglib2.type.numeric.integer.LongType;
  * Abstract class for 2d local binary pattern feature
  * 
  * @author Andreas Graumann
- * @param <I>
- * @param <O>
+ * @param <I> TODO Documentation
  */
 public abstract class AbstractLBP2DFeature<I extends RealType<I>> extends
 	AbstractUnaryHybridCF<RandomAccessibleInterval<I>, ArrayList<LongType>> implements
@@ -58,8 +57,8 @@ public abstract class AbstractLBP2DFeature<I extends RealType<I>> extends
 	}
 
 	/**
-	 * @author Andreas Graumann, University of Konstanz
-	 * @author Jonathan Hale, University of Konstanz
+	 * @author Andreas Graumann (University of Konstanz)
+	 * @author Jonathan Hale (University of Konstanz)
 	 * @param <T>
 	 */
 	final class ClockwiseDistanceNeighborhoodIterator<T extends Type<T>>

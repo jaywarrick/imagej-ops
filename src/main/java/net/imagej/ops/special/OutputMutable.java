@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,12 @@
 
 package net.imagej.ops.special;
 
+import net.imagej.ops.special.computer.NullaryComputerOp;
+
 /**
- * Interface for objects with a typed output parameter that can be changed.
+ * Interface for {@link Output} objects whose typed output parameter is mutable.
+ * From an Ops perspective, this interface marks ops with a typed output which
+ * doubles as an input parameter; see e.g. {@link NullaryComputerOp}.
  * 
  * @author Curtis Rueden
  * @see Output

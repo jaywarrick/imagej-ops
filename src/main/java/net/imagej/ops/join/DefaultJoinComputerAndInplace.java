@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -45,14 +45,14 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Ops.Join.class)
 public class DefaultJoinComputerAndInplace<A, B> extends
-	AbstractUnaryComputerOp<A, B> implements JoinComputerAndInplace<A, B>
+	AbstractUnaryComputerOp<A, B> implements JoinComputerAndInplace<A, B, B>
 {
 
 	@Parameter
 	private UnaryComputerOp<A, B> first;
 
 	@Parameter
-	private UnaryInplaceOp<B> second;
+	private UnaryInplaceOp<B, B> second;
 
 	// -- Join2Ops methods --
 
@@ -67,12 +67,12 @@ public class DefaultJoinComputerAndInplace<A, B> extends
 	}
 
 	@Override
-	public UnaryInplaceOp<B> getSecond() {
+	public UnaryInplaceOp<B, B> getSecond() {
 		return second;
 	}
 
 	@Override
-	public void setSecond(final UnaryInplaceOp<B> second) {
+	public void setSecond(final UnaryInplaceOp<B, B> second) {
 		this.second = second;
 	}
 

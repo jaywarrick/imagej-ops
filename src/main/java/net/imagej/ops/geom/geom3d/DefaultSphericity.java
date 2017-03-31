@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,9 @@ package net.imagej.ops.geom.geom3d;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.geom.geom3d.mesh.Mesh;
-import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imagej.ops.special.function.Functions;
 import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.Priority;
@@ -43,24 +43,31 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@link net.imagej.ops.Ops.Geometric.Sphericity}.
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz.
+ * Based on https://en.wikipedia.org/wiki/Sphericity.
+ * 
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
-@Plugin(type = Ops.Geometric.Sphericity.class,
-	label = "Geometric (3D): Sphericity", priority = Priority.VERY_HIGH_PRIORITY)
-public class DefaultSphericity extends AbstractUnaryFunctionOp<Mesh, DoubleType>
-	implements Ops.Geometric.Sphericity
-{
+@Plugin(type = Ops.Geometric.Sphericity.class, label = "Geometric (3D): Sphericity", priority = Priority.VERY_HIGH_PRIORITY)
+public class DefaultSphericity extends AbstractUnaryHybridCF<Mesh, DoubleType> implements Ops.Geometric.Sphericity {
 
-	private UnaryFunctionOp<Mesh, DoubleType> compactness;
+	private UnaryFunctionOp<Mesh, DoubleType> volumeFunc;
+	private UnaryFunctionOp<Mesh, DoubleType> areaFunc;
 
 	@Override
 	public void initialize() {
-		compactness = Functions.unary(ops(), Ops.Geometric.Compactness.class, DoubleType.class, in());
+		volumeFunc = Functions.unary(ops(), Ops.Geometric.Size.class, DoubleType.class, in());
+		areaFunc = Functions.unary(ops(), Ops.Geometric.BoundarySize.class, DoubleType.class, in());
 	}
 
 	@Override
-	public DoubleType compute1(final Mesh input) {
-		return new DoubleType(Math.pow(compactness.compute1(input).get(), (1 / 3d)));
+	public void compute(final Mesh input, final DoubleType output) {
+		final double sphereArea = Math.pow(Math.PI, 1 / 3d) * Math.pow(6 * volumeFunc.calculate(input).get(), 2 / 3d);
+		output.set(sphereArea / areaFunc.calculate(input).get());
+	}
+
+	@Override
+	public DoubleType createOutput(Mesh input) {
+		return new DoubleType();
 	}
 
 }

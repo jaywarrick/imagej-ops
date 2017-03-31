@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,13 +34,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import net.imagej.ops.AbstractOpTest;
+import net.imagej.ops.Ops;
 import net.imagej.ops.convert.ConvertTypes.ComplexToFloat32;
 import net.imagej.ops.convert.ConvertTypes.ComplexToUint8;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
-import net.imglib2.type.numeric.ComplexType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Intervals;
@@ -58,7 +58,7 @@ public class ConvertMapTest extends AbstractOpTest {
 	private final static long[] dims = { 3, 3 };
 
 	@Test
-	public <C extends ComplexType<C>> void testLossless() {
+	public void testLossless() {
 
 		final byte[] inArray = { 12, 122, 9, -6, 56, 34, 108, 1, 73 };
 		final Img<UnsignedByteType> in = generateUnsignedByteImg(inArray);
@@ -76,7 +76,7 @@ public class ConvertMapTest extends AbstractOpTest {
 				outC1.next().getRealDouble(), 0d);
 		}
 
-		ops.map(out, in, new ComplexToFloat32<C>());
+		ops.run(Ops.Map.class, out, in, new ComplexToFloat32<UnsignedByteType>());
 
 		final Cursor<UnsignedByteType> inC2 = in.cursor();
 		final Cursor<FloatType> outC2 = out.cursor();
@@ -87,7 +87,7 @@ public class ConvertMapTest extends AbstractOpTest {
 	}
 
 	@Test
-	public <C extends ComplexType<C>> void testLossy() {
+	public void testLossy() {
 
 		final float[] inArray =
 			{ 12.7f, -13089.3208f, 78.023f, 0.04f, 12.01f, -1208.90f, 109432.109f,
@@ -97,7 +97,7 @@ public class ConvertMapTest extends AbstractOpTest {
 		final byte[] outArray = { 4, 123, 18, 64, 90, 120, 12, 17, 73 };
 		final Img<UnsignedByteType> out = generateUnsignedByteImg(outArray);
 
-		ops.map(out, in, new ComplexToUint8<C>());
+		ops.run(Ops.Map.class, out, in, new ComplexToUint8<FloatType>());
 
 		final Cursor<FloatType> inC = in.cursor();
 		final Cursor<UnsignedByteType> outC = out.cursor();
@@ -123,8 +123,7 @@ public class ConvertMapTest extends AbstractOpTest {
 			new float[(int) Intervals.numElements(new FinalInterval(dims))];
 
 		if (array.length != values.length) {
-			System.out.println("Number of values doesn't match dimmensions");
-			return null;
+			throw new RuntimeException("Number of values doesn't match dimmensions");
 		}
 
 		for (int i = 0; i < array.length; i++) {
@@ -142,8 +141,7 @@ public class ConvertMapTest extends AbstractOpTest {
 			new byte[(int) Intervals.numElements(new FinalInterval(dims))];
 
 		if (array.length != values.length) {
-			System.out.println("Number of values doesn't match dimmensions");
-			return null;
+			throw new RuntimeException("Number of values doesn't match dimmensions");
 		}
 
 		for (int i = 0; i < array.length; i++) {

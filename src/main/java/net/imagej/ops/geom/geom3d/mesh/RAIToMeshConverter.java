@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ import org.scijava.plugin.Plugin;
 /**
  * Converts a RandomAccessibleInterval to a Mesh
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @SuppressWarnings("rawtypes")
 @Plugin(type = Converter.class, priority = Priority.VERY_HIGH_PRIORITY)
@@ -57,8 +57,9 @@ public class RAIToMeshConverter extends
 	AbstractConverter<RandomAccessibleInterval, Mesh>
 {
 
-	@Parameter
+	@Parameter(required = false)
 	private OpService ops;
+
 	private UnaryFunctionOp<RandomAccessibleInterval, Mesh> marchingCubesFunc;
 
 	@SuppressWarnings("unchecked")
@@ -70,7 +71,7 @@ public class RAIToMeshConverter extends
 				(RandomAccessibleInterval) src);
 		}
 		if (src instanceof IterableInterval<?>) {
-			return (T) marchingCubesFunc.compute1((RandomAccessibleInterval) src);
+			return (T) marchingCubesFunc.calculate((RandomAccessibleInterval) src);
 		}
 		return null;
 	}
@@ -87,6 +88,7 @@ public class RAIToMeshConverter extends
 
 	@Override
 	public boolean supports(final ConversionRequest request) {
+		if (ops == null) return false;
 
 		final Object sourceObject = request.sourceObject();
 

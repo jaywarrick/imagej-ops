@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@ import net.imagej.ops.special.function.UnaryFunctionOp;
 /**
  * Simple marker interface for Geoemtric ops.
  * 
- * @author Daniel Seebacher, University of Konstanz
+ * @author Daniel Seebacher (University of Konstanz)
  */
 public interface GeometricOp<I, O> extends UnaryFunctionOp<I, O> {
 	// NB: marker interface

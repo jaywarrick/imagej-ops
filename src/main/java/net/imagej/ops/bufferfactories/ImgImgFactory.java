@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@ import net.imglib2.img.Img;
 import net.imglib2.type.Type;
 
 /**
- * {@link UnaryOutputFactory} used to create an empty output {@link Img} of type <V>
- * and the dimensionality of the input {@link Img}
+ * {@link UnaryOutputFactory} used to create an empty output {@link Img} of type
+ * {@code <V>} and the dimensionality of the input {@link Img}
  * 
  * @author Christian Dietz (University of Konstanz)
  */

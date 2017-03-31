@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -54,9 +54,11 @@ import net.imagej.ops.labeling.LabelingNamespace;
 import net.imagej.ops.logic.LogicNamespace;
 import net.imagej.ops.map.neighborhood.CenterAwareComputerOp;
 import net.imagej.ops.math.MathNamespace;
+import net.imagej.ops.morphology.MorphologyNamespace;
 import net.imagej.ops.special.SpecialOp;
 import net.imagej.ops.special.UnaryOutputFactory;
 import net.imagej.ops.special.computer.BinaryComputerOp;
+import net.imagej.ops.special.computer.NullaryComputerOp;
 import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imagej.ops.special.inplace.BinaryInplace1Op;
 import net.imagej.ops.special.inplace.BinaryInplaceOp;
@@ -64,6 +66,8 @@ import net.imagej.ops.special.inplace.UnaryInplaceOp;
 import net.imagej.ops.stats.StatsNamespace;
 import net.imagej.ops.thread.ThreadNamespace;
 import net.imagej.ops.threshold.ThresholdNamespace;
+import net.imagej.ops.topology.TopologyNamespace;
+import net.imagej.ops.transform.TransformNamespace;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessible;
 import net.imglib2.RandomAccessibleInterval;
@@ -148,9 +152,7 @@ public interface OpEnvironment extends Contextual {
 	 *         outputs will be given.
 	 */
 	@OpMethod(op = net.imagej.ops.run.RunByType.class)
-	default <OP extends Op> Object run(final Class<OP> type,
-		final Object... args)
-	{
+	default Object run(final Class<? extends Op> type, final Object... args) {
 		return run(module(type, args));
 	}
 
@@ -181,7 +183,7 @@ public interface OpEnvironment extends Contextual {
 	 */
 	@OpMethod(op = net.imagej.ops.lookup.LookupByName.class)
 	default Op op(final String name, final Object... args) {
-		return OpUtils.unwrap(module(name, args), Op.class, null);
+		return OpUtils.unwrap(module(name, args), OpRef.types(Op.class));
 	}
 
 	/**
@@ -197,7 +199,7 @@ public interface OpEnvironment extends Contextual {
 	 */
 	@OpMethod(op = net.imagej.ops.lookup.LookupByType.class)
 	default <OP extends Op> OP op(final Class<OP> type, final Object... args) {
-		return OpUtils.unwrap(module(type, args), type, null);
+		return (OP) OpUtils.unwrap(module(type, args), OpRef.types(type));
 	}
 
 	/**
@@ -214,9 +216,27 @@ public interface OpEnvironment extends Contextual {
 	 * @param ref The {@link OpRef} describing the op to match.
 	 * @return The matched op.
 	 */
-	default Op op(final OpRef<?> ref) {
-		final Module module = matcher().findModule(this, ref);
-		return OpUtils.unwrap(module, ref);
+	default Op op(final OpRef ref) {
+		return op(Collections.singletonList(ref));
+	}
+
+	/**
+	 * Looks up an op whose constraints are specified by the given list of
+	 * {@link OpRef} descriptor.
+	 * <p>
+	 * NB: While it is typically the case that the returned {@link Op} instance is
+	 * of the requested type(s), it may differ in certain circumstances. For
+	 * example, the {@link CachedOpEnvironment} wraps the matching {@link Op}
+	 * instance in some cases so that the values it computes can be cached for
+	 * performance reasons.
+	 * </p>
+	 * 
+	 * @param refs The list of {@link OpRef}s describing the op to match.
+	 * @return The matched op.
+	 */
+	default Op op(final List<OpRef> refs) {
+		final OpCandidate match = matcher().findMatch(this, refs);
+		return OpUtils.unwrap(match.getModule(), match.getRef());
 	}
 
 	/**
@@ -229,7 +249,7 @@ public interface OpEnvironment extends Contextual {
 	 *         inputs, ready to run.
 	 */
 	default Module module(final String name, final Object... args) {
-		return matcher().findModule(this, OpRef.create(name, args));
+		return matcher().findMatch(this, OpRef.create(name, args)).getModule();
 	}
 
 	/**
@@ -244,10 +264,8 @@ public interface OpEnvironment extends Contextual {
 	 * @return A {@link Module} wrapping the best {@link Op}, with populated
 	 *         inputs, ready to run.
 	 */
-	default <OP extends Op> Module module(final Class<OP> type,
-		final Object... args)
-	{
-		return matcher().findModule(this, OpRef.create(type, args));
+	default Module module(final Class<? extends Op> type, final Object... args) {
+		return matcher().findMatch(this, OpRef.create(type, args)).getModule();
 	}
 
 	/**
@@ -260,7 +278,6 @@ public interface OpEnvironment extends Contextual {
 	 */
 	default Module module(final Op op, final Object... args) {
 		final Module module = info(op).cInfo().createModule(op);
-		getContext().inject(module.getDelegateObject());
 		return matcher().assignInputs(module, args);
 	}
 
@@ -304,15 +321,9 @@ public interface OpEnvironment extends Contextual {
 	// -- Operation shortcuts - global namespace --
 
 	/** Executes the "eval" operation on the given arguments. */
-	@OpMethod(op = Ops.Eval.class)
-	default Object eval(final Object... args) {
-		return run(Ops.Eval.NAME, args);
-	}
-
-	/** Executes the "eval" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.eval.DefaultEval.class)
 	default Object eval(final String expression) {
-		final Object result = run(net.imagej.ops.eval.DefaultEval.class,
+		final Object result = run(net.imagej.ops.Ops.Eval.class,
 			expression);
 		return result;
 	}
@@ -320,21 +331,15 @@ public interface OpEnvironment extends Contextual {
 	/** Executes the "eval" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.eval.DefaultEval.class)
 	default Object eval(final String expression, final Map<String, Object> vars) {
-		final Object result = run(net.imagej.ops.eval.DefaultEval.class, expression,
+		final Object result = run(net.imagej.ops.Ops.Eval.class, expression,
 			vars);
 		return result;
 	}
 
 	/** Executes the "help" operation on the given arguments. */
-	@OpMethod(op = Ops.Help.class)
-	default Object help(final Object... args) {
-		return run(Ops.Help.NAME, args);
-	}
-
-	/** Executes the "help" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.help.HelpForOp.class)
 	default String help(final Op op) {
-		final String result = (String) run(net.imagej.ops.help.HelpForOp.class, op);
+		final String result = (String) run(net.imagej.ops.Ops.Help.class, op);
 		return result;
 	}
 
@@ -342,7 +347,7 @@ public interface OpEnvironment extends Contextual {
 	@OpMethod(op = net.imagej.ops.help.HelpForNamespace.class)
 	default String help(final Namespace namespace) {
 		final String result = (String) run(
-			net.imagej.ops.help.HelpForNamespace.class, namespace);
+			net.imagej.ops.Ops.Help.class, namespace);
 		return result;
 	}
 
@@ -350,14 +355,14 @@ public interface OpEnvironment extends Contextual {
 	@OpMethod(op = net.imagej.ops.help.HelpCandidates.class)
 	default String help() {
 		final String result = (String) run(
-			net.imagej.ops.help.HelpCandidates.class);
+			net.imagej.ops.Ops.Help.class);
 		return result;
 	}
 
 	/** Executes the "help" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.help.HelpCandidates.class)
 	default String help(final String name) {
-		final String result = (String) run(net.imagej.ops.help.HelpCandidates.class,
+		final String result = (String) run(net.imagej.ops.Ops.Help.class,
 			name);
 		return result;
 	}
@@ -365,7 +370,7 @@ public interface OpEnvironment extends Contextual {
 	/** Executes the "help" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.help.HelpCandidates.class)
 	default String help(final String name, final Class<? extends Op> opType) {
-		final String result = (String) run(net.imagej.ops.help.HelpCandidates.class,
+		final String result = (String) run(net.imagej.ops.Ops.Help.class,
 			name, opType);
 		return result;
 	}
@@ -375,7 +380,7 @@ public interface OpEnvironment extends Contextual {
 	default String help(final String name, final Class<? extends Op> opType,
 		final Integer arity)
 	{
-		final String result = (String) run(net.imagej.ops.help.HelpCandidates.class,
+		final String result = (String) run(net.imagej.ops.Ops.Help.class,
 			name, opType, arity);
 		return result;
 	}
@@ -385,30 +390,18 @@ public interface OpEnvironment extends Contextual {
 	default String help(final String name, final Class<? extends Op> opType,
 		final Integer arity, final SpecialOp.Flavor flavor)
 	{
-		final String result = (String) run(net.imagej.ops.help.HelpCandidates.class,
+		final String result = (String) run(net.imagej.ops.Ops.Help.class,
 			name, opType, arity, flavor);
 		return result;
-	}
-
-	/** Executes the "identity" operation on the given arguments. */
-	@OpMethod(op = Ops.Identity.class)
-	default Object identity(final Object... args) {
-		return run(Ops.Identity.NAME, args);
 	}
 
 	/** Executes the "identity" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.identity.DefaultIdentity.class)
 	default <A> A identity(final A arg) {
 		@SuppressWarnings("unchecked")
-		final A result = (A) run(net.imagej.ops.identity.DefaultIdentity.class,
+		final A result = (A) run(net.imagej.ops.Ops.Identity.class,
 			arg);
 		return result;
-	}
-
-	/** Executes the "join" operation on the given arguments. */
-	@OpMethod(op = Ops.Join.class)
-	default Object join(final Object... args) {
-		return run(Ops.Join.NAME, args);
 	}
 
 	/** Executes the "join" operation on the given arguments. */
@@ -418,19 +411,18 @@ public interface OpEnvironment extends Contextual {
 		final UnaryOutputFactory<A, B> outputFactory)
 	{
 		@SuppressWarnings("unchecked")
-		final C result = (C) run(net.imagej.ops.join.DefaultJoin2Computers.class,
+		final C result = (C) run(net.imagej.ops.Ops.Join.class,
 			out, in, first, second, outputFactory);
 		return result;
 	}
 
 	/** Executes the "join" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.join.DefaultJoin2Inplaces.class)
-	default <A> A join(final A arg, final UnaryInplaceOp<A> first,
-		final UnaryInplaceOp<A> second)
+	default <A, B extends A, C extends B> C join(final C arg,
+		final UnaryInplaceOp<A, B> first, final UnaryInplaceOp<B, C> second)
 	{
 		@SuppressWarnings("unchecked")
-		final A result = (A) run(net.imagej.ops.join.DefaultJoin2Inplaces.class,
-			arg, first, second);
+		final C result = (C) run(net.imagej.ops.Ops.Join.class, arg, first, second);
 		return result;
 	}
 
@@ -441,56 +433,50 @@ public interface OpEnvironment extends Contextual {
 		final UnaryOutputFactory<A, A> outputFactory)
 	{
 		@SuppressWarnings("unchecked")
-		final A result = (A) run(net.imagej.ops.join.DefaultJoinNComputers.class,
+		final A result = (A) run(net.imagej.ops.Ops.Join.class,
 			out, in, ops, outputFactory);
 		return result;
 	}
 
 	/** Executes the "join" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.join.DefaultJoinNInplaces.class)
-	default <A> A join(final A arg, final List<? extends UnaryInplaceOp<A>> ops) {
+	default <I, O extends I> O join(final O arg,
+		final List<? extends UnaryInplaceOp<I, O>> ops)
+	{
 		@SuppressWarnings("unchecked")
-		final A result = (A) run(net.imagej.ops.join.DefaultJoinNInplaces.class,
-			arg, ops);
+		final O result = (O) run(net.imagej.ops.Ops.Join.class, arg, ops);
 		return result;
 	}
 
 	/** Executes the "join" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.join.DefaultJoinInplaceAndComputer.class)
-	default <A, B> B join(final B out, final A in, final UnaryInplaceOp<A> first,
-		final UnaryComputerOp<A, B> second)
+	default <AI, AO extends AI, B> B join(final B out, final AO in,
+		final UnaryInplaceOp<AI, AO> first, final UnaryComputerOp<AO, B> second)
 	{
 		@SuppressWarnings("unchecked")
-		final B result = (B) run(
-			net.imagej.ops.join.DefaultJoinInplaceAndComputer.class, out, in, first,
+		final B result = (B) run(net.imagej.ops.Ops.Join.class, out, in, first,
 			second);
 		return result;
 	}
 
 	/** Executes the "join" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.join.DefaultJoinComputerAndInplace.class)
-	default <A, B> B join(final B out, final A in,
-		final UnaryComputerOp<A, B> first, final UnaryInplaceOp<B> second)
+	default <A, BI, BO extends BI> BO join(final BO out, final A in,
+		final UnaryComputerOp<A, BO> first, final UnaryInplaceOp<BI, BO> second)
 	{
 		@SuppressWarnings("unchecked")
-		final B result = (B) run(
-			net.imagej.ops.join.DefaultJoinComputerAndInplace.class, out, in, first,
+		final BO result = (BO) run(net.imagej.ops.Ops.Join.class, out, in, first,
 			second);
 		return result;
 	}
 
 	/** Executes the "loop" operation on the given arguments. */
-	@OpMethod(op = Ops.Loop.class)
-	default Object loop(final Object... args) {
-		return run(Ops.Loop.NAME, args);
-	}
-
-	/** Executes the "loop" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.loop.DefaultLoopInplace.class)
-	default <A> A loop(final A arg, final UnaryInplaceOp<A> op, final int n) {
+	default <I, O extends I> O loop(final O arg, final UnaryInplaceOp<I, O> op,
+		final int n)
+	{
 		@SuppressWarnings("unchecked")
-		final A result = (A) run(net.imagej.ops.loop.DefaultLoopInplace.class, arg,
-			op, n);
+		final O result = (O) run(net.imagej.ops.Ops.Loop.class, arg, op, n);
 		return result;
 	}
 
@@ -500,15 +486,31 @@ public interface OpEnvironment extends Contextual {
 		final UnaryOutputFactory<A, A> outputFactory, final int n)
 	{
 		@SuppressWarnings("unchecked")
-		final A result = (A) run(net.imagej.ops.loop.DefaultLoopComputer.class, out,
+		final A result = (A) run(net.imagej.ops.Ops.Loop.class, out,
 			in, op, outputFactory, n);
 		return result;
 	}
 
 	/** Executes the "map" operation on the given arguments. */
-	@OpMethod(op = Ops.Map.class)
-	default Object map(final Object... args) {
-		return run(Ops.Map.NAME, args);
+	@OpMethod(op = net.imagej.ops.map.MapNullaryIterable.class)
+	default <EO> Iterable<EO> map(final Iterable<EO> out,
+		final NullaryComputerOp<EO> op)
+	{
+		@SuppressWarnings("unchecked")
+		final Iterable<EO> result = (Iterable<EO>) run(net.imagej.ops.Ops.Map.class,
+			out, op);
+		return result;
+	}
+
+	/** Executes the "map" operation on the given arguments. */
+	@OpMethod(op = net.imagej.ops.map.MapNullaryII.class)
+	default <EO> Iterable<EO> map(final IterableInterval<EO> out,
+		final NullaryComputerOp<EO> op)
+	{
+		@SuppressWarnings("unchecked")
+		final IterableInterval<EO> result = (IterableInterval<EO>) run(
+			net.imagej.ops.Ops.Map.class, out, op);
+		return result;
 	}
 
 	/** Executes the "map" operation on the given arguments. */
@@ -650,7 +652,7 @@ public interface OpEnvironment extends Contextual {
 		@SuppressWarnings("unchecked")
 		final RandomAccessibleInterval<EO> result =
 			(RandomAccessibleInterval<EO>) run(
-				net.imagej.ops.map.MapViewRAIToRAI.class, input, op, type);
+				net.imagej.ops.Ops.Map.class, input, op, type);
 		return result;
 	}
 
@@ -662,7 +664,7 @@ public interface OpEnvironment extends Contextual {
 	{
 		@SuppressWarnings("unchecked")
 		final RandomAccessible<EO> result = (RandomAccessible<EO>) run(
-			net.imagej.ops.map.MapViewRandomAccessToRandomAccess.class, input, op,
+			net.imagej.ops.Ops.Map.class, input, op,
 			type);
 		return result;
 	}
@@ -676,56 +678,58 @@ public interface OpEnvironment extends Contextual {
 	{
 		@SuppressWarnings("unchecked")
 		final IterableInterval<EO> result = (IterableInterval<EO>) run(
-			net.imagej.ops.map.MapViewIIToII.class, input,
+			net.imagej.ops.Ops.Map.class, input,
 			op, type);
 		return result;
 	}
 
 	/** Executes the "map" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.map.MapIIInplaceParallel.class)
-	default <A> IterableInterval<A> map(final IterableInterval<A> arg,
-		final UnaryInplaceOp<A> op)
+	default <EI, EO extends EI> IterableInterval<EO> map(
+		final IterableInterval<EO> arg, final UnaryInplaceOp<EI, EO> op)
 	{
 		@SuppressWarnings("unchecked")
-		final IterableInterval<A> result = (IterableInterval<A>) run(
-			net.imagej.ops.map.MapIIInplaceParallel.class, arg, op);
+		final IterableInterval<EO> result = (IterableInterval<EO>) run(
+			net.imagej.ops.Ops.Map.class, arg, op);
 		return result;
 	}
 
 	/** Executes the "map" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.map.MapIterableInplace.class)
-	default <A> Iterable<A> map(final Iterable<A> arg, final UnaryInplaceOp<A> op) {
+	default <EI, EO extends EI> Iterable<EO> map(final Iterable<EO> arg,
+		final UnaryInplaceOp<EI, EO> op)
+	{
 		@SuppressWarnings("unchecked")
-		final Iterable<A> result = (Iterable<A>) run(
-			net.imagej.ops.map.MapIterableInplace.class, arg, op);
+		final Iterable<EO> result = (Iterable<EO>) run(net.imagej.ops.Ops.Map.class,
+			arg, op);
 		return result;
 	}
 
 	/** Executes the "map" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.map.neighborhood.MapNeighborhood.class)
-	default <I, O> IterableInterval<O> map(
-		final IterableInterval<O> out,
-		final RandomAccessibleInterval<I> in, final UnaryComputerOp<Iterable<I>, O> op,
-		final Shape shape)
+	@OpMethod(op = net.imagej.ops.map.neighborhood.DefaultMapNeighborhood.class)
+	default <EI, EO> IterableInterval<EO> map(
+		final IterableInterval<EO> out,
+		final RandomAccessibleInterval<EI> in, final Shape shape,
+		final UnaryComputerOp<Iterable<EI>, EO> op)
 	{
 		@SuppressWarnings("unchecked")
-		final IterableInterval<O> result =
-			(IterableInterval<O>) run(
-				net.imagej.ops.map.neighborhood.MapNeighborhood.class, out, in, op, shape);
+		final IterableInterval<EO> result =
+			(IterableInterval<EO>) run(
+				net.imagej.ops.Ops.Map.class, out, in, op, shape);
 		return result;
 	}
 
 	/** Executes the "map" operation on the given arguments. */
 	@OpMethod(
 		op = net.imagej.ops.map.neighborhood.MapNeighborhoodWithCenter.class)
-	default <I, O> IterableInterval<O> map(
-		final IterableInterval<O> out, final RandomAccessibleInterval<I> in,
-		final CenterAwareComputerOp<I, O> func, final Shape shape)
+	default <EI, EO> IterableInterval<EO> map(
+		final IterableInterval<EO> out, final RandomAccessibleInterval<EI> in,
+		final Shape shape, final CenterAwareComputerOp<EI, EO> func)
 	{
 		@SuppressWarnings("unchecked")
-		final IterableInterval<O> result =
-			(IterableInterval<O>) run(
-				net.imagej.ops.map.neighborhood.MapNeighborhoodWithCenter.class, out, in, func, shape);
+		final IterableInterval<EO> result =
+			(IterableInterval<EO>) run(
+				net.imagej.ops.Ops.Map.class, out, in, func, shape);
 		return result;
 	}
 
@@ -735,68 +739,68 @@ public interface OpEnvironment extends Contextual {
 		final Iterable<EI> in, final UnaryComputerOp<EI, EO> op)
 	{
 		@SuppressWarnings("unchecked")
-		final Iterable<EO> result = (Iterable<EO>) run(
-			net.imagej.ops.map.MapIterableToIterable.class, out, in, op);
+		final Iterable<EO> result = (Iterable<EO>) run(net.imagej.ops.Ops.Map.class,
+			out, in, op);
 		return result;
 	}
 
 	/** Executes the "map" operation on the given arguments. */
 	@OpMethod(ops = { net.imagej.ops.map.MapIIAndIIInplaceParallel.class,
 		net.imagej.ops.map.MapIIAndIIInplace.class })
-	default <EA> IterableInterval<EA> map(final IterableInterval<EA> arg,
-		final IterableInterval<EA> in, final BinaryInplaceOp<EA> op)
+	default <EI, EO extends EI> IterableInterval<EO> map(
+		final IterableInterval<EO> arg, final IterableInterval<EO> in,
+		final BinaryInplaceOp<EI, EO> op)
 	{
 		@SuppressWarnings("unchecked")
-		final IterableInterval<EA> result = (IterableInterval<EA>) run(
-			net.imagej.ops.map.MapIIAndIIInplaceParallel.class, arg, in, op);
+		final IterableInterval<EO> result = (IterableInterval<EO>) run(
+			net.imagej.ops.Ops.Map.class, arg, in, op);
 		return result;
 	}
 
 	/** Executes the "map" operation on the given arguments. */
 	@OpMethod(ops = { net.imagej.ops.map.MapBinaryInplace1s.IIAndIIParallel.class,
 		net.imagej.ops.map.MapBinaryInplace1s.IIAndII.class })
-	default <EA, EI> IterableInterval<EA> map(final IterableInterval<EA> arg,
-		final IterableInterval<EI> in, final BinaryInplace1Op<EA, EI> op)
+	default <EI1, EI2, EO extends EI1> IterableInterval<EO> map(
+		final IterableInterval<EO> arg, final IterableInterval<EI2> in,
+		final BinaryInplace1Op<EI1, EI2, EO> op)
 	{
 		@SuppressWarnings("unchecked")
-		final IterableInterval<EA> result = (IterableInterval<EA>) run(
+		final IterableInterval<EO> result = (IterableInterval<EO>) run(
 			Ops.Map.class, arg, in, op);
 		return result;
 	}
 
 	/** Executes the "map" operation on the given arguments. */
-	@OpMethod(ops = { net.imagej.ops.map.MapBinaryInplace1s.IIAndRAIParallel.class,
+	@OpMethod(ops = {
+		net.imagej.ops.map.MapBinaryInplace1s.IIAndRAIParallel.class,
 		net.imagej.ops.map.MapBinaryInplace1s.IIAndRAI.class })
-	default <EA, EI> IterableInterval<EA> map(final IterableInterval<EA> arg,
-		final RandomAccessibleInterval<EI> in, final BinaryInplace1Op<EA, EI> op)
+	default <EI1, EI2, EO extends EI1> IterableInterval<EO> map(
+		final IterableInterval<EO> arg, final RandomAccessibleInterval<EI2> in,
+		final BinaryInplace1Op<EI1, EI2, EO> op)
 	{
 		@SuppressWarnings("unchecked")
-		final IterableInterval<EA> result = (IterableInterval<EA>) run(
+		final IterableInterval<EO> result = (IterableInterval<EO>) run(
 			Ops.Map.class, arg, in, op);
 		return result;
 	}
 
 	/** Executes the "map" operation on the given arguments. */
-	@OpMethod(ops = { net.imagej.ops.map.MapBinaryInplace1s.RAIAndIIParallel.class,
+	@OpMethod(ops = {
+		net.imagej.ops.map.MapBinaryInplace1s.RAIAndIIParallel.class,
 		net.imagej.ops.map.MapBinaryInplace1s.RAIAndII.class })
-	default <EA, EI> RandomAccessibleInterval<EA> map(final RandomAccessibleInterval<EA> arg,
-		final IterableInterval<EI> in, final BinaryInplace1Op<EA, EI> op)
+	default <EI1, EI2, EO extends EI1> RandomAccessibleInterval<EO> map(
+		final RandomAccessibleInterval<EO> arg, final IterableInterval<EI2> in,
+		final BinaryInplace1Op<EI1, EI2, EO> op)
 	{
 		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<EA> result = (RandomAccessibleInterval<EA>) run(
-			Ops.Map.class, arg, in, op);
+		final RandomAccessibleInterval<EO> result =
+			(RandomAccessibleInterval<EO>) run(Ops.Map.class, arg, in, op);
 		return result;
 	}
 
 	/** Executes the "slicewise" operation on the given arguments. */
-	@OpMethod(op = Ops.Slicewise.class)
-	default Object slicewise(final Object... args) {
-		return run(Ops.Slicewise.NAME, args);
-	}
-
-	/** Executes the "slicewise" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.slicewise.SlicewiseRAI2RAI.class)
-	default <I, O> RandomAccessibleInterval<O> slicewise(
+	@OpMethod(op = net.imagej.ops.slice.SliceRAI2RAI.class)
+	default <I, O> RandomAccessibleInterval<O> slice(
 		final RandomAccessibleInterval<O> out, final RandomAccessibleInterval<I> in,
 		final UnaryComputerOp<RandomAccessibleInterval<I>, RandomAccessibleInterval<O>> op,
 		final int... axisIndices)
@@ -804,14 +808,14 @@ public interface OpEnvironment extends Contextual {
 		@SuppressWarnings("unchecked")
 		final RandomAccessibleInterval<O> result =
 			(RandomAccessibleInterval<O>) run(
-				net.imagej.ops.slicewise.SlicewiseRAI2RAI.class, out, in, op,
+				net.imagej.ops.Ops.Slice.class, out, in, op,
 				axisIndices);
 		return result;
 	}
 
 	/** Executes the "slicewise" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.slicewise.SlicewiseRAI2RAI.class)
-	default <I, O> RandomAccessibleInterval<O> slicewise(
+	@OpMethod(op = net.imagej.ops.slice.SliceRAI2RAI.class)
+	default <I, O> RandomAccessibleInterval<O> slice(
 		final RandomAccessibleInterval<O> out, final RandomAccessibleInterval<I> in,
 		final UnaryComputerOp<RandomAccessibleInterval<I>, RandomAccessibleInterval<O>> op,
 		final int[] axisIndices, final boolean dropSingleDimensions)
@@ -819,7 +823,7 @@ public interface OpEnvironment extends Contextual {
 		@SuppressWarnings("unchecked")
 		final RandomAccessibleInterval<O> result =
 			(RandomAccessibleInterval<O>) run(
-				net.imagej.ops.slicewise.SlicewiseRAI2RAI.class, out, in, op,
+				net.imagej.ops.Ops.Slice.class, out, in, op,
 				axisIndices, dropSingleDimensions);
 		return result;
 	}
@@ -891,6 +895,11 @@ public interface OpEnvironment extends Contextual {
 		return namespace(MathNamespace.class);
 	}
 
+	/** Gateway into ops of the "morphology" namespace. */
+	default MorphologyNamespace morphology() {
+		return namespace(MorphologyNamespace.class);
+	}
+
 	/** Gateway into ops of the "stats" namespace. */
 	default StatsNamespace stats() {
 		return namespace(StatsNamespace.class);
@@ -911,6 +920,14 @@ public interface OpEnvironment extends Contextual {
 		return namespace(ThresholdNamespace.class);
 	}
 
+	/** Gateway into ops of the "topology" namespace */
+	default TopologyNamespace topology() { return namespace(TopologyNamespace.class); }
+
+	/** Gateway into ops of the "transform" namespace. */
+	default TransformNamespace transform() {
+		return namespace(TransformNamespace.class);
+	}
+
 	/** Gateway into ops of the "zernike" namespace. */
 	default ZernikeNamespace zernike() {
 		return namespace(ZernikeNamespace.class);
@@ -928,5 +945,4 @@ public interface OpEnvironment extends Contextual {
 		}
 		return outputs.size() == 1 ? outputs.get(0) : outputs;
 	}
-
 }

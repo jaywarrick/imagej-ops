@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
  * A facet consists of three vertices. The triangles orientation
  * is counter clock wise. 
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  *
  */
 public class TriangularFacet extends UpdateablePointSet<TriangularFacet> implements Facet {

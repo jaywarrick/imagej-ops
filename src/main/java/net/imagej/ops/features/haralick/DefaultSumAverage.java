@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -43,8 +43,8 @@ import org.scijava.plugin.Plugin;
 /**
  * Implementation of Sum Average Haralick Feature
  * 
- * @author Andreas Graumann, University of Konstanz
- * @author Christian Dietz, University of Konstanz
+ * @author Andreas Graumann (University of Konstanz)
+ * @author Christian Dietz (University of Konstanz)
  */
 @Plugin(type = Ops.Haralick.SumAverage.class, label = "Haralick: Sum Average")
 public class DefaultSumAverage<T extends RealType<T>> extends
@@ -61,11 +61,11 @@ public class DefaultSumAverage<T extends RealType<T>> extends
 	}
 
 	@Override
-	public void compute1(final IterableInterval<T> input,
+	public void compute(final IterableInterval<T> input,
 		final DoubleType output)
 	{
 		final double[][] matrix = getCooccurrenceMatrix(input);
-		final double[] pxplusy = coocPXPlusFunc.compute1(matrix);
+		final double[] pxplusy = coocPXPlusFunc.calculate(matrix);
 
 		final int nrGrayLevels = matrix.length;
 

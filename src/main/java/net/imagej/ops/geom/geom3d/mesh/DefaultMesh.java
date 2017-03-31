@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ import net.imglib2.RealLocalizable;
 /**
  * This is the default implementation of {@link Mesh}.
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 public class DefaultMesh implements Mesh, Iterable<Facet> {
 
@@ -108,10 +108,12 @@ public class DefaultMesh implements Mesh, Iterable<Facet> {
 	 * @param f the facet to add
 	 */
 	public void addFace(final TriangularFacet f) {
-		facets.add(f);
-		area += f.getArea();
-
-		vertices.addAll(f.getVertices());
+		if (f.getArea() > 0) {
+			facets.add(f);
+			area += f.getArea();
+	
+			vertices.addAll(f.getVertices());
+		}
 	}
 
 	/**

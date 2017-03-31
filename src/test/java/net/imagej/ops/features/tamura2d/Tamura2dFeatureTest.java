@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,10 @@ import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.features.AbstractFeatureTest;
+import net.imglib2.img.Img;
+import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.integer.ByteType;
 
 import org.junit.Test;
 
@@ -40,27 +44,35 @@ import org.junit.Test;
  * 
  * Test for {@Link Tamura2d}-Features
  * 
- * @author Andreas Graumann, University of Konstanz
+ * @author Andreas Graumann (University of Konstanz)
  *
  */
 public class Tamura2dFeatureTest extends AbstractFeatureTest {
 
 	@Test
 	public void testContrastFeature() {
-		assertEquals(Ops.Tamura.Contrast.NAME, 63.7185, ops.tamura().contrast(
-			random).getRealDouble(), 1e-3);
+		assertEquals(Ops.Tamura.Contrast.NAME, 63.7185, ((RealType<?>) ops.run(
+			DefaultContrastFeature.class, random)).getRealDouble(), 1e-3);
 	}
 
 	@Test
 	public void testDirectionalityFeature() {
-		assertEquals(Ops.Tamura.Directionality.NAME, 0.007819, ops.tamura()
-				.directionality(random, 16).getRealDouble(), 1e-3);
+		assertEquals(Ops.Tamura.Directionality.NAME, 0.007819, ((RealType<?>) ops
+			.run(DefaultDirectionalityFeature.class, random, 16)).getRealDouble(),
+			1e-3);
 	}
 
 	@Test
 	public void testCoarsenessFeature() {
-		assertEquals(Ops.Tamura.Coarseness.NAME, 43.614, ops.tamura().coarseness(
-			random).getRealDouble(), 1e-3);
+		assertEquals(Ops.Tamura.Coarseness.NAME, 43.614, ((RealType<?>) ops.run(
+			DefaultCoarsenessFeature.class, random)).getRealDouble(), 1e-3);
+
+		// NB: according to the implementation, this 2x2 image should have exactly 0
+		// coarseness.
+		byte[] arr = new byte[] {0, -1, 0, 0};
+		Img<ByteType> in = ArrayImgs.bytes(arr, 2, 2);
+		assertEquals(Ops.Tamura.Coarseness.NAME, 0.0, ((RealType<?>) ops.run(
+			DefaultCoarsenessFeature.class, in)).getRealDouble(), 0.0);
 	}
 
 }

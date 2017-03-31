@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -53,12 +53,12 @@ public class EvalTest extends AbstractOpTest {
 		vars.put("b", 3);
 		vars.put("c", 5);
 
-		assertEquals(7, ops.eval("a+c", vars));
-		assertEquals(3, ops.eval("c-a", vars));
-		assertEquals(6, ops.eval("a*b", vars));
-		assertEquals(2, ops.eval("c/a", vars));
-		assertEquals(1, ops.eval("c%a", vars));
-		assertEquals(17, ops.eval("a+b*c", vars));
+		assertEquals(7, ops.run(DefaultEval.class, "a+c", vars));
+		assertEquals(3, ops.run(DefaultEval.class, "c-a", vars));
+		assertEquals(6, ops.run(DefaultEval.class, "a*b", vars));
+		assertEquals(2, ops.run(DefaultEval.class, "c/a", vars));
+		assertEquals(1, ops.run(DefaultEval.class, "c%a", vars));
+		assertEquals(17, ops.run(DefaultEval.class, "a+b*c", vars));
 	}
 
 }

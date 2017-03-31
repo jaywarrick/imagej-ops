@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,11 +31,8 @@
 package net.imagej.ops.geom.geom2d;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
-import net.imagej.ops.special.function.Functions;
-import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.RealLocalizable;
-import net.imglib2.roi.geometric.Polygon;
 import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.util.Pair;
 
@@ -44,32 +41,25 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@code geom.feretsDiameter}.
  * 
- * @author Daniel Seebacher, University of Konstanz.
+ * @author Tim-Oliver Buchholz, University of Konstanz
  */
-@Plugin(type = Ops.Geometric.FeretsDiameter.class,
-	label = "Geometric (2D): Ferets Diameter")
-public class DefaultFeretsDiameter extends
-	AbstractUnaryFunctionOp<Polygon, DoubleType> implements Ops.Geometric.FeretsDiameter
-{
+@Plugin(type = Ops.Geometric.FeretsDiameter.class, label = "Geometric (2D): Ferets Diameter")
+public class DefaultFeretsDiameter extends AbstractUnaryHybridCF<Pair<RealLocalizable, RealLocalizable>, DoubleType>
+		implements Ops.Geometric.FeretsDiameter {
 
-	private UnaryFunctionOp<Polygon, Pair<RealLocalizable, RealLocalizable>> function;
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void initialize() {
-		function = (UnaryFunctionOp) Functions.unary(ops(), Ops.Geometric.Feret.class, Pair.class, in());
+	public void compute(final Pair<RealLocalizable, RealLocalizable> input, final DoubleType output) {
+
+		final RealLocalizable p1 = input.getA();
+		final RealLocalizable p2 = input.getB();
+
+		output.set(Math.hypot(p1.getDoublePosition(0) - p2.getDoublePosition(0),
+				p1.getDoublePosition(1) - p2.getDoublePosition(1)));
 	}
 
 	@Override
-	public DoubleType compute1(final Polygon input) {
-		Pair<RealLocalizable, RealLocalizable> ferets = function.compute1(input);
-
-		RealLocalizable p1 = ferets.getA();
-		RealLocalizable p2 = ferets.getB();
-
-		return new DoubleType(Math.hypot(p1.getDoublePosition(0) - p2
-			.getDoublePosition(0), p1.getDoublePosition(1) - p2.getDoublePosition(
-				1)));
+	public DoubleType createOutput(Pair<RealLocalizable, RealLocalizable> input) {
+		return new DoubleType();
 	}
 
 }

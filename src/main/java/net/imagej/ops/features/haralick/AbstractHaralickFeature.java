@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,8 @@ package net.imagej.ops.features.haralick;
 
 import net.imagej.ops.Contingent;
 import net.imagej.ops.Ops;
-import net.imagej.ops.image.cooccurrencematrix.CooccurrenceMatrix2D;
-import net.imagej.ops.image.cooccurrencematrix.MatrixOrientation;
+import net.imagej.ops.image.cooccurrenceMatrix.CooccurrenceMatrix2D;
+import net.imagej.ops.image.cooccurrenceMatrix.MatrixOrientation;
 import net.imagej.ops.special.function.Functions;
 import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
@@ -46,7 +46,7 @@ import org.scijava.plugin.Parameter;
 /**
  * Abstract class for HaralickFeatures.
  * 
- * @author Christian Dietz, University of Konstanz
+ * @author Christian Dietz (University of Konstanz)
  * @param <T>
  */
 public abstract class AbstractHaralickFeature<T extends RealType<T>> extends
@@ -83,7 +83,7 @@ public abstract class AbstractHaralickFeature<T extends RealType<T>> extends
 	 * @return the {@link CooccurrenceMatrix2D}
 	 */
 	protected double[][] getCooccurrenceMatrix(final IterableInterval<T> input) {
-		return coocFunc.compute1(input);
+		return coocFunc.calculate(input);
 	}
 
 	@Override

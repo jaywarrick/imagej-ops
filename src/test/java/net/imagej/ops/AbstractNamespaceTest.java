@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ package net.imagej.ops;
 
 import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -40,6 +39,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.scijava.command.CommandService;
@@ -48,7 +48,6 @@ import org.scijava.plugin.Parameter;
 import org.scijava.util.ClassUtils;
 import org.scijava.util.ConversionUtils;
 import org.scijava.util.GenericUtils;
-import org.scijava.util.MiscUtils;
 
 /**
  * Base class for unit testing of namespaces. In particular, this class has
@@ -75,7 +74,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		boolean success = true; // whether the test will succeed
 		for (final String op : ops.ops()) {
 			final String ns = OpUtils.getNamespace(op);
-			if (!MiscUtils.equal(namespace, ns)) continue;
+			if (!Objects.equals(namespace, ns)) continue;
 			if (!checkComplete(namespaceClass, op)) success = false;
 		}
 		assertTrue("Coverage mismatch", success);
@@ -185,12 +184,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 			if (!checkVarArgs(method)) success = false;
 
 			for (final Class<? extends Op> opType : opTypes(method)) {
-				if (opType.isInterface()) {
-					if (!checkOpIface(method, qName, opType)) success = false;
-				}
-				else {
-					if (!checkOpImpl(method, qName, opType, coverSet)) success = false;
-				}
+				if (!checkOpImpl(method, qName, opType, coverSet)) success = false;
 			}
 		}
 
@@ -199,7 +193,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		int missingCount = 0;
 		for (final OpInfo info : infos) {
 			int requiredCount = 0, inputCount = 0;
-			for (final ModuleItem<?> input : info.cInfo().inputs()) {
+			for (final ModuleItem<?> input : info.inputs()) {
 				if (input.isRequired()) requiredCount++;
 				inputCount++;
 			}
@@ -257,48 +251,6 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 	}
 
 	/**
-	 * Checks whether the given op interface matches the specified method,
-	 * particularly with respect to the interface's {@code NAME} constant.
-	 * @param method The method to which the {@link Op} should be compared.
-	 * @param qName The fully qualified (with namespace) name of the op.
-	 * @param opType The {@link Op} to which the method should be compared.
-	 * @return true iff the method and {@link Op} match up.
-	 */
-	private boolean checkOpIface(final Method method, final String qName,
-		final Class<? extends Op> opType)
-	{
-		try {
-			final Field nameField = opType.getField("NAME");
-			if (nameField.getType() != String.class) {
-				error("Non-String NAME field", opType, method);
-				return false;
-			}
-			final String nameFieldValue = (String) nameField.get(null);
-			if (!qName.equals(nameFieldValue)) {
-				error("NAME field mismatch", opType, method);
-				return false;
-			}
-		}
-		catch (final NoSuchFieldException exc) {
-			error("No NAME field", opType, method);
-			return false;
-		}
-		catch (final IllegalAccessException exc) {
-			error("Inaccessible NAME field", opType, method);
-			return false;
-		}
-
-		final Object[] argTypes = method.getParameterTypes();
-		// verify that the method argument is "Object..." as expected
-		if (argTypes.length != 1 || argTypes[0] != Object[].class) {
-			error("Expected single Object... argument", opType, method);
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Checks whether the given op implementation matches the specified method,
 	 * including op name, as well as input and output type parameters.
 	 * 
@@ -316,9 +268,9 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		// Then we can pass Types here instead of Class instances.
 		// final Object[] argTypes = method.getGenericParameterTypes();
 		final Object[] argTypes = method.getParameterTypes();
-		final OpRef<Op> ref = OpRef.create(qName, argTypes);
+		final OpRef ref = OpRef.create(qName, argTypes);
 		final OpInfo info = ops.info(opType);
-		final OpCandidate<Op> candidate = new OpCandidate<>(ops, ref, info);
+		final OpCandidate candidate = new OpCandidate(ops, ref, info);
 
 		// check input types
 		if (!inputTypesMatch(candidate)) {
@@ -339,14 +291,14 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		return true;
 	}
 
-	private boolean inputTypesMatch(final OpCandidate<Op> candidate) {
+	private boolean inputTypesMatch(final OpCandidate candidate) {
 		// check for assignment compatibility, including generics
 		if (!matcher.typesMatch(candidate)) return false;
 
 		// also check that raw types exactly match
 		final Object[] paddedArgs = matcher.padArgs(candidate);
 		int i = 0;
-		for (final ModuleItem<?> input : candidate.cInfo().inputs()) {
+		for (final ModuleItem<?> input : candidate.inputs()) {
 			final Object arg = paddedArgs[i++];
 			if (!typeMatches(arg, input.getType())) return false;
 		}
@@ -363,10 +315,10 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 	}
 
 	private boolean outputTypesMatch(final Type returnType,
-		final OpCandidate<Op> candidate)
+		final OpCandidate candidate)
 	{
 		final List<Type> outTypes = new ArrayList<>();
-		for (final ModuleItem<?> output : candidate.cInfo().outputs()) {
+		for (final ModuleItem<?> output : candidate.outputs()) {
 			outTypes.add(output.getGenericType());
 		}
 		if (outTypes.size() == 0) return returnType == void.class;
@@ -417,7 +369,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		int outputCount = 0;
 		String returnType = "void";
 		String castPrefix = "";
-		for (final ModuleItem<?> output : info.cInfo().outputs()) {
+		for (final ModuleItem<?> output : info.outputs()) {
 			if (++outputCount == 1) {
 				returnType = typeString(output);
 				castPrefix = "(" + castTypeString(output) + ") ";
@@ -441,7 +393,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		int optionalIndex = 0;
 		final StringBuilder args = new StringBuilder();
 		args.append(className);
-		for (final ModuleItem<?> input : info.cInfo().inputs()) {
+		for (final ModuleItem<?> input : info.inputs()) {
 			if (!input.isRequired()) {
 				// leave off unspecified optional arguments
 				if (++optionalIndex > optionalsToFill) continue;

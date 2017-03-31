@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,9 @@ package net.imagej.ops.geom.geom3d;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.geom.geom3d.mesh.Mesh;
-import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imagej.ops.special.function.Functions;
 import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.Priority;
@@ -43,31 +43,38 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@link net.imagej.ops.Ops.Geometric.Compactness}.
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz.
+ * Based on http://www.sciencedirect.com/science/article/pii/S003132030700324X.
+ * 
+ * In the paper compactness is defined as area^3/volume^2. For a sphere this is
+ * minimized and results in 36*PI. To get values between (0,1] we use
+ * (36*PI)/(area^3/volume^2).
+ * 
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
-@Plugin(type = Ops.Geometric.Compactness.class,
-	label = "Geometric (3D): Compactness", priority = Priority.VERY_HIGH_PRIORITY)
-public class DefaultCompactness extends AbstractUnaryFunctionOp<Mesh, DoubleType>
-	implements Ops.Geometric.Compactness
-{
+@Plugin(type = Ops.Geometric.Compactness.class, label = "Geometric (3D): Compactness", priority = Priority.VERY_HIGH_PRIORITY)
+public class DefaultCompactness extends AbstractUnaryHybridCF<Mesh, DoubleType> implements Ops.Geometric.Compactness {
 
-	private UnaryFunctionOp<Mesh, DoubleType> surfacePixel;
+	private UnaryFunctionOp<Mesh, DoubleType> surfaceArea;
 
 	private UnaryFunctionOp<Mesh, DoubleType> volume;
 
 	@Override
 	public void initialize() {
-		surfacePixel = Functions.unary(ops(), Ops.Geometric.BoundaryPixelCount.class,
-			DoubleType.class, in());
+		surfaceArea = Functions.unary(ops(), Ops.Geometric.BoundarySize.class, DoubleType.class, in());
 		volume = Functions.unary(ops(), Ops.Geometric.Size.class, DoubleType.class, in());
 	}
 
 	@Override
-	public DoubleType compute1(final Mesh input) {
-		double s3 = Math.pow(surfacePixel.compute1(input).get(), 3);
-		double v2 = Math.pow(volume.compute1(input).get(), 2);
+	public void compute(final Mesh input, final DoubleType output) {
+		final double s3 = Math.pow(surfaceArea.calculate(input).get(), 3);
+		final double v2 = Math.pow(volume.calculate(input).get(), 2);
+		final double c = s3 / v2;
+		output.set((36.0 * Math.PI) / c);
+	}
 
-		return new DoubleType((v2 * 36.0 * Math.PI) / s3);
+	@Override
+	public DoubleType createOutput(Mesh input) {
+		return new DoubleType();
 	}
 
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@ package net.imagej.ops.geom.geom3d;
 import net.imagej.ops.Ops;
 import net.imagej.ops.geom.GeometricOp;
 import net.imagej.ops.geom.geom3d.mesh.Mesh;
-import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.Priority;
@@ -42,18 +42,23 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@link net.imagej.ops.Ops.Geometric.BoundarySize}.
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz.
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.BoundarySize.class,
 	label = "Geometric (3D): Surface Area",
 	priority = Priority.VERY_HIGH_PRIORITY)
-public class DefaultSurfaceArea extends AbstractUnaryFunctionOp<Mesh, DoubleType>
+public class DefaultSurfaceArea extends AbstractUnaryHybridCF<Mesh, DoubleType>
 	implements GeometricOp<Mesh, DoubleType>, Ops.Geometric.BoundarySize
 {
 
 	@Override
-	public DoubleType compute1(final Mesh input) {
-		return new DoubleType(input.getSurfaceArea());
+	public void compute(final Mesh input, final DoubleType output) {
+		output.set(input.getSurfaceArea());
+	}
+	
+	@Override
+	public DoubleType createOutput(Mesh input) {
+		return new DoubleType();
 	}
 
 }

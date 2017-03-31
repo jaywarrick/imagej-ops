@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -43,8 +43,8 @@ import org.scijava.plugin.Plugin;
  * {@link Op} to calculate the {@code stats.max} using {@code stats.sum} and
  * {@code stats.size}.
  * 
- * @author Daniel Seebacher, University of Konstanz.
- * @author Christian Dietz, University of Konstanz.
+ * @author Daniel Seebacher (University of Konstanz)
+ * @author Christian Dietz (University of Konstanz)
  * @param <I> input type
  * @param <O> output type
  */
@@ -65,8 +65,8 @@ public class DefaultMean<I extends RealType<I>, O extends RealType<O>> extends
 	}
 
 	@Override
-	public void compute1(final Iterable<I> input, final O output) {
-		output.setReal(sumFunc.compute1(input).getRealDouble() /
-			areaFunc.compute1(input).getRealDouble());
+	public void compute(final Iterable<I> input, final O output) {
+		output.setReal(sumFunc.calculate(input).getRealDouble() /
+			areaFunc.calculate(input).getRealDouble());
 	}
 }

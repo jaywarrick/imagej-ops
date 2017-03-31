@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@ import net.imagej.ops.special.computer.AbstractBinaryComputerOp;
  * @author Stefan Helfrich (University of Konstanz)
  */
 public abstract class AbstractCenterAwareComputerOp<I, O> extends
-	AbstractBinaryComputerOp<I, Iterable<I>, O> implements
+	AbstractBinaryComputerOp<Iterable<I>, I, O> implements
 	CenterAwareComputerOp<I, O>
 {
 	// NB: Empty.

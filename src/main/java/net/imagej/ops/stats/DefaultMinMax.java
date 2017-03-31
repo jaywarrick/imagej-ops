@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -42,8 +42,8 @@ import org.scijava.plugin.Plugin;
 /**
  * {@link Op} to calculate the {@code stats.minMax}.
  * 
- * @author Daniel Seebacher, University of Konstanz.
- * @author Christian Dietz, University of Konstanz.
+ * @author Daniel Seebacher (University of Konstanz)
+ * @author Christian Dietz (University of Konstanz)
  * @param <I> input type
  */
 @Plugin(type = Ops.Stats.MinMax.class, label = "Statistics: MinMax")
@@ -52,9 +52,9 @@ public class DefaultMinMax<I extends RealType<I>> extends
 {
 
 	@Override
-	public Pair<I, I> compute1(final Iterable<I> input) {
-		double tmpMin = Double.MAX_VALUE;
-		double tmpMax = Double.MIN_VALUE;
+	public Pair<I, I> calculate(final Iterable<I> input) {
+		double tmpMin = Double.POSITIVE_INFINITY;
+		double tmpMax = Double.NEGATIVE_INFINITY;
 
 		for (final I in : input) {
 			final double n = in.getRealDouble();

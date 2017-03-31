@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,6 @@ import net.imagej.ops.special.inplace.UnaryInplaceOp;
  * @author Christian Dietz (University of Konstanz)
  * @author Curtis Rueden
  */
-public interface JoinNInplaces<A> extends UnaryInplaceOp<A>, JoinNOps<UnaryInplaceOp<A>> {
+public interface JoinNInplaces<I, O extends I> extends UnaryInplaceOp<I, O>, JoinNOps<UnaryInplaceOp<I, O>> {
 	// NB: Marker interface.
 }

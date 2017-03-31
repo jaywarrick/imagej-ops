@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -27,14 +27,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+
 package net.imagej.ops;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.util.List;
+import java.util.Objects;
 
-import org.scijava.util.MiscUtils;
+import org.scijava.util.GenericUtils;
 
 /**
  * Data structure which identifies an op by name and/or type(s) and/or argument
@@ -47,22 +50,19 @@ import org.scijava.util.MiscUtils;
  * @author Christian Dietz (University of Konstanz)
  * @author Curtis Rueden
  */
-public class OpRef<OP extends Op> {
+public class OpRef {
 
 	/** Name of the op, or null for any name. */
-	private String name;
+	private final String name;
 
-	/** Type of the op, or null for any type. */
-	private Class<OP> type;
-
-	/** Extra types which the op must match. */
-	private Collection<? extends Class<?>> extraTypes;
+	/** Types which the op must match. */
+	private final Collection<Type> types;
 
 	/** The op's output parameter types, or null for no constraints. */
-	private Collection<? extends Class<?>> outTypes;
+	private final List<Type> outTypes;
 
 	/** Arguments to be passed to the op. */
-	private Object[] args;
+	private final Object[] args;
 
 	// -- Static construction methods --
 
@@ -72,8 +72,8 @@ public class OpRef<OP extends Op> {
 	 * @param name name of the op, or null for any name.
 	 * @param args arguments to the op.
 	 */
-	public static OpRef<Op> create(final String name, final Object... args) {
-		return new OpRef<>(name, null, null, null, args);
+	public static OpRef create(final String name, final Object... args) {
+		return new OpRef(name, null, null, args);
 	}
 
 	/**
@@ -82,37 +82,34 @@ public class OpRef<OP extends Op> {
 	 * @param type type of op, or null for any type.
 	 * @param args arguments to the op.
 	 */
-	public static <OP extends Op> OpRef<OP> create(final Class<OP> type,
-		final Object... args)
-	{
-		return new OpRef<>(null, type, null, null, args);
+	public static OpRef create(final Type type, final Object... args) {
+		return new OpRef(null, types(type), null, args);
 	}
 
 	/**
 	 * Creates a new op reference.
 	 * 
-	 * @param type type of op, or null for any type.
-	 * @param extraType the additional type constraint.
+	 * @param type1 first type constraint of the op.
+	 * @param type2 second type constraint of the op.
 	 * @param outType the type of the op's primary output, or null for any type.
 	 * @param args arguments to the op.
 	 */
-	public static <OP extends Op> OpRef<OP> createTypes(final Class<OP> type,
-		final Class<?> extraType, final Class<?> outType, final Object... args)
+	public static OpRef createTypes(final Type type1, final Type type2,
+		final Type outType, final Object... args)
 	{
-		return new OpRef<>(null, type, set(extraType), set(outType), args);
+		return new OpRef(null, types(type1, type2), types(outType), args);
 	}
 
 	/**
 	 * Creates a new op reference.
 	 * 
-	 * @param type type of op, or null for any type.
-	 * @param extraTypes additional types which the ops must match.
+	 * @param types type constraints of op, or null for any type.
 	 * @param args arguments to the op.
 	 */
-	public static <OP extends Op> OpRef<OP> createTypes(final Class<OP> type,
-		final Collection<? extends Class<?>> extraTypes, final Object... args)
+	public static OpRef createTypes(final Collection<? extends Type> types,
+		final Object... args)
 	{
-		return new OpRef<>(null, type, extraTypes, null, args);
+		return new OpRef(null, types, null, args);
 	}
 
 	// -- Constructor --
@@ -121,19 +118,16 @@ public class OpRef<OP extends Op> {
 	 * Creates a new op reference.
 	 * 
 	 * @param name name of the op, or null for any name.
-	 * @param type type of op, or null for any type.
-	 * @param extraTypes additional types which the ops must match.
+	 * @param types types which the ops must match.
 	 * @param outTypes the op's required output types.
 	 * @param args arguments to the op.
 	 */
-	public OpRef(final String name, final Class<OP> type,
-		final Collection<? extends Class<?>> extraTypes,
-		final Collection<? extends Class<?>> outTypes, final Object... args)
+	public OpRef(final String name, final Collection<? extends Type> types,
+		final Collection<? extends Type> outTypes, final Object... args)
 	{
 		this.name = name;
-		this.type = type;
-		this.extraTypes = extraTypes;
-		this.outTypes = outTypes;
+		this.types = list(types);
+		this.outTypes = list(outTypes);
 		this.args = args;
 	}
 
@@ -144,18 +138,16 @@ public class OpRef<OP extends Op> {
 		return name;
 	}
 
-	/** Gets the type of the op. */
-	public Class<OP> getType() {
-		return type;
+	/** Gets the types which the op must match. */
+	public Collection<Type> getTypes() {
+		return types;
 	}
 
-	/** Gets the types with which the op must match. */
-	public Collection<? extends Class<?>> getExtraTypes() {
-		return extraTypes;
-	}
-
-	/** Gets the op's output types, or null for no constraints. */
-	public Collection<? extends Class<?>> getOutTypes() {
+	/**
+	 * Gets the op's output types (one constraint per output), or null for no
+	 * constraints.
+	 */
+	public List<Type> getOutTypes() {
 		return outTypes;
 	}
 
@@ -168,10 +160,10 @@ public class OpRef<OP extends Op> {
 	public String getLabel() {
 		final StringBuilder sb = new StringBuilder();
 		append(sb, name);
-		if (type != null) append(sb, type.getName());
-		if (extraTypes != null) {
-			for (final Class<?> t : extraTypes) {
-				append(sb, t.getName());
+		if (types != null) {
+			for (final Type t : types) {
+				// FIXME: Use better Type-to-string approach, once it exists.
+				append(sb, t instanceof Class ? ((Class<?>) t).getName() : t.toString());
 			}
 		}
 		return sb.toString();
@@ -179,11 +171,11 @@ public class OpRef<OP extends Op> {
 
 	/** Determines whether the op's required types match the given class. */
 	public boolean typesMatch(final Class<?> c) {
-		if (type != null && !type.isAssignableFrom(c)) return false;
-		if (extraTypes != null) {
-			for (final Class<?> t : extraTypes) {
-				if (!t.isAssignableFrom(c)) return false;
-			}
+		if (types == null) return true;
+		for (final Type t : types) {
+			// FIXME: Use generic assignability test, once it exists.
+			final Class<?> raw = GenericUtils.getClass(t);
+			if (!raw.isAssignableFrom(c)) return false;
 		}
 		return true;
 	}
@@ -216,21 +208,25 @@ public class OpRef<OP extends Op> {
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
-		final OpRef<?> other = (OpRef<?>) obj;
-		if (!MiscUtils.equal(name, other.name)) return false;
-		if (!MiscUtils.equal(type, other.type)) return false;
-		if (!MiscUtils.equal(extraTypes, other.extraTypes)) return false;
+		final OpRef other = (OpRef) obj;
+		if (!Objects.equals(name, other.name)) return false;
+		if (!Objects.equals(types, other.types)) return false;
+		if (!Objects.equals(outTypes, other.outTypes)) return false;
 		if (!Arrays.equals(args, other.args)) return false;
 		return true;
 	}
 
 	@Override
 	public int hashCode() {
-		int hash = 31;
-		for (final Object o : args) {
-			hash += o.hashCode() * 31;
-		}
-		return type.hashCode() * 31 + hash;
+		return Objects.hash(name, types, outTypes, args);
+	}
+
+	// -- Utility methods --
+
+	public static List<Type> types(final Type... types) {
+		final ArrayList<Type> list = new ArrayList<>();
+		for (Type t : types) if (t != null) list.add(t);
+		return list;
 	}
 
 	// -- Helper methods --
@@ -241,8 +237,10 @@ public class OpRef<OP extends Op> {
 		sb.append(s);
 	}
 
-	private static <E> Set<E> set(final E element) {
-		return element == null ? null : Collections.singleton(element);
+	private List<Type> list(final Collection<? extends Type> c) {
+		final ArrayList<Type> list = new ArrayList<>();
+		if (c != null) list.addAll(c);
+		return list;
 	}
 
 }

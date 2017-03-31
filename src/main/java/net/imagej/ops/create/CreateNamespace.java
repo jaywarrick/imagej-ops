@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,6 @@ import net.imglib2.img.ImgFactory;
 import net.imglib2.roi.labeling.ImgLabeling;
 import net.imglib2.roi.labeling.LabelingMapping;
 import net.imglib2.type.NativeType;
-import net.imglib2.type.Type;
 import net.imglib2.type.numeric.ComplexType;
 import net.imglib2.type.numeric.IntegerType;
 import net.imglib2.type.numeric.real.DoubleType;
@@ -110,7 +109,7 @@ public class CreateNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final Img<T> result = (Img<T>) ops().run(
-			net.imagej.ops.create.img.CreateImgFromDimsAndType.class, in1, in2);
+			net.imagej.ops.Ops.Create.Img.class, in1, in2);
 		return result;
 	}
 
@@ -120,7 +119,7 @@ public class CreateNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final Img<T> result = (Img<T>) ops().run(
-			net.imagej.ops.create.img.CreateImgFromDimsAndType.class, in1, in2,
+			net.imagej.ops.Ops.Create.Img.class, in1, in2,
 			factory);
 		return result;
 	}
@@ -129,7 +128,7 @@ public class CreateNamespace extends AbstractNamespace {
 	public <T extends NativeType<T>> Img<T> img(final IterableInterval<T> in) {
 		@SuppressWarnings("unchecked")
 		final Img<T> result = (Img<T>) ops().run(
-			net.imagej.ops.create.img.CreateImgFromII.class, in);
+			net.imagej.ops.Ops.Create.Img.class, in);
 		return result;
 	}
 
@@ -139,7 +138,7 @@ public class CreateNamespace extends AbstractNamespace {
 	public <T extends NativeType<T>> Img<T> img(final Img<T> in) {
 		@SuppressWarnings("unchecked")
 		final Img<T> result = (Img<T>) ops().run(
-			net.imagej.ops.create.img.CreateImgFromImg.class, in);
+			net.imagej.ops.Ops.Create.Img.class, in);
 		return result;
 	}
 
@@ -147,7 +146,7 @@ public class CreateNamespace extends AbstractNamespace {
 	public Img<DoubleType> img(final Interval interval) {
 		@SuppressWarnings("unchecked")
 		final Img<DoubleType> result = (Img<DoubleType>) ops().run(
-			net.imagej.ops.create.img.CreateImgFromInterval.class, interval);
+			net.imagej.ops.Ops.Create.Img.class, interval);
 		return result;
 	}
 
@@ -157,16 +156,11 @@ public class CreateNamespace extends AbstractNamespace {
 	{
 		@SuppressWarnings("unchecked")
 		final Img<T> result = (Img<T>) ops().run(
-			net.imagej.ops.create.img.CreateImgFromRAI.class, in);
+			net.imagej.ops.Ops.Create.Img.class, in);
 		return result;
 	}
 
 	// -- imgFactory --
-
-	@OpMethod(op = net.imagej.ops.Ops.Create.ImgFactory.class)
-	public Object imgFactory(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Create.ImgFactory.class, args);
-	}
 
 	@OpMethod(op = net.imagej.ops.create.imgFactory.DefaultCreateImgFactory.class)
 	public <T extends NativeType<T>> ImgFactory<T> imgFactory() {
@@ -174,7 +168,7 @@ public class CreateNamespace extends AbstractNamespace {
 		// https://github.com/imglib/imglib2/issues/91
 		@SuppressWarnings("unchecked")
 		final ImgFactory<T> result = (ImgFactory<T>) ops().run(
-			net.imagej.ops.create.imgFactory.DefaultCreateImgFactory.class);
+			net.imagej.ops.Ops.Create.ImgFactory.class);
 		return result;
 	}
 
@@ -202,11 +196,6 @@ public class CreateNamespace extends AbstractNamespace {
 
 	// -- imgLabeling --
 
-	@OpMethod(op = net.imagej.ops.Ops.Create.ImgLabeling.class)
-	public Object imgLabeling(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Create.ImgLabeling.class, args);
-	}
-
 	@OpMethod(
 		op = net.imagej.ops.create.imgLabeling.DefaultCreateImgLabeling.class)
 	public <L, T extends IntegerType<T>> ImgLabeling<L, T> imgLabeling(
@@ -215,7 +204,7 @@ public class CreateNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, T> result =
 			(ImgLabeling<L, T>) ops().run(
-				net.imagej.ops.create.imgLabeling.DefaultCreateImgLabeling.class, dims);
+				Ops.Create.ImgLabeling.class, dims);
 		return result;
 	}
 
@@ -227,7 +216,7 @@ public class CreateNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, T> result =
 			(ImgLabeling<L, T>) ops().run(
-				net.imagej.ops.create.imgLabeling.DefaultCreateImgLabeling.class, dims,
+				Ops.Create.ImgLabeling.class, dims,
 				outType);
 		return result;
 	}
@@ -240,7 +229,7 @@ public class CreateNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, T> result =
 			(ImgLabeling<L, T>) ops().run(
-				net.imagej.ops.create.imgLabeling.DefaultCreateImgLabeling.class, dims,
+				Ops.Create.ImgLabeling.class, dims,
 				outType, fac);
 		return result;
 	}
@@ -254,7 +243,7 @@ public class CreateNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, T> result =
 			(ImgLabeling<L, T>) ops().run(
-				net.imagej.ops.create.imgLabeling.DefaultCreateImgLabeling.class, dims,
+				Ops.Create.ImgLabeling.class, dims,
 				outType, fac, maxNumLabelSets);
 		return result;
 	}
@@ -267,7 +256,7 @@ public class CreateNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, T> result =
 			(ImgLabeling<L, T>) ops().run(
-				net.imagej.ops.create.imgLabeling.CreateImgLabelingFromInterval.class,
+				Ops.Create.ImgLabeling.class,
 				interval);
 		return result;
 	}
@@ -280,7 +269,7 @@ public class CreateNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, T> result =
 			(ImgLabeling<L, T>) ops().run(
-				net.imagej.ops.create.imgLabeling.CreateImgLabelingFromInterval.class,
+				Ops.Create.ImgLabeling.class,
 				interval, outType);
 		return result;
 	}
@@ -293,7 +282,7 @@ public class CreateNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, T> result =
 			(ImgLabeling<L, T>) ops().run(
-				net.imagej.ops.create.imgLabeling.CreateImgLabelingFromInterval.class,
+				Ops.Create.ImgLabeling.class,
 				interval, outType, fac);
 		return result;
 	}
@@ -307,24 +296,19 @@ public class CreateNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, T> result =
 			(ImgLabeling<L, T>) ops().run(
-				net.imagej.ops.create.imgLabeling.CreateImgLabelingFromInterval.class,
+				Ops.Create.ImgLabeling.class,
 				interval, outType, fac, maxNumLabelSets);
 		return result;
 	}
 
 	// -- imgPlus --
 
-	@OpMethod(op = net.imagej.ops.Ops.Create.ImgPlus.class)
-	public Object imgPlus(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Create.ImgPlus.class, args);
-	}
-
 	@OpMethod(op = net.imagej.ops.create.imgPlus.DefaultCreateImgPlus.class)
 	public <T> ImgPlus<T> imgPlus(final Img<T> img) {
 		@SuppressWarnings("unchecked")
 		final ImgPlus<T> result =
 			(ImgPlus<T>) ops().run(
-				net.imagej.ops.create.imgPlus.DefaultCreateImgPlus.class, img);
+				Ops.Create.ImgPlus.class, img);
 		return result;
 	}
 
@@ -335,24 +319,19 @@ public class CreateNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgPlus<T> result =
 			(ImgPlus<T>) ops()
-				.run(net.imagej.ops.create.imgPlus.DefaultCreateImgPlus.class, img,
+				.run(Ops.Create.ImgPlus.class, img,
 					metadata);
 		return result;
 	}
 
 	// -- integerType --
 
-	@OpMethod(op = net.imagej.ops.Ops.Create.IntegerType.class)
-	public Object integerType(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Create.IntegerType.class, args);
-	}
-
 	@OpMethod(
 		op = net.imagej.ops.create.integerType.DefaultCreateIntegerType.class)
 	public IntegerType integerType() {
 		final IntegerType result =
 			(IntegerType) ops().run(
-				net.imagej.ops.create.integerType.DefaultCreateIntegerType.class);
+				Ops.Create.IntegerType.class);
 		return result;
 	}
 
@@ -361,229 +340,143 @@ public class CreateNamespace extends AbstractNamespace {
 	public IntegerType integerType(final long maxValue) {
 		final IntegerType result =
 			(IntegerType) ops().run(
-				net.imagej.ops.create.integerType.DefaultCreateIntegerType.class,
+				Ops.Create.IntegerType.class,
 				maxValue);
 		return result;
 	}
-
+	
 	// -- kernel --
 
 	/** Executes the "kernel" operation on the given arguments. */
-	@OpMethod(op = Ops.Create.Kernel.class)
-	public Object kernel(final Object... args) {
-		return ops().run(Ops.Create.Kernel.NAME, args);
-	}
-
-	/** Executes the "kernel" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernel.CreateKernel.class)
-	public <T extends ComplexType<T>> Img<T> kernel(final double[]... values) {
+	@OpMethod(op = net.imagej.ops.create.kernel.CreateKernel2D.class)
+	public <T extends ComplexType<T>> RandomAccessibleInterval<T> kernel(
+		final double[]... values)
+	{
 		@SuppressWarnings("unchecked")
-		final Img<T> result = (Img<T>) ops().run(net.imagej.ops.create.kernel.CreateKernel.class,
-				new Object[] { values });
+		final RandomAccessibleInterval<T> result =
+			(RandomAccessibleInterval<T>) ops().run(
+				Ops.Create.Kernel.class, new Object[] {
+					values });
 		return result;
 	}
 
 	/** Executes the "kernel" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernel.CreateKernel.class)
-	public <T extends ComplexType<T>> Img<T> kernel(final T outType, final double[]... values) {
+	@OpMethod(op = net.imagej.ops.create.kernel.CreateKernel2D.class)
+	public <T extends ComplexType<T>> RandomAccessibleInterval<T> kernel(
+		final double[][] values, final T outType)
+	{
 		@SuppressWarnings("unchecked")
-		final Img<T> result = (Img<T>) ops().run(net.imagej.ops.create.kernel.CreateKernel.class, outType, values);
-		return result;
-	}
-
-	/** Executes the "kernel" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernel.CreateKernel.class)
-	public <T extends ComplexType<T>> Img<T> kernel(final T outType, final ImgFactory<T> fac,
-			final double[]... values) {
-		@SuppressWarnings("unchecked")
-		final Img<T> result = (Img<T>) ops().run(net.imagej.ops.create.kernel.CreateKernel.class, outType, fac, values);
+		final RandomAccessibleInterval<T> result =
+			(RandomAccessibleInterval<T>) ops().run(Ops.Create.Kernel.class, values,
+				outType);
 		return result;
 	}
 
 	// -- kernelGauss --
 
 	/** Executes the "kernelGauss" operation on the given arguments. */
-	@OpMethod(op = Ops.Create.KernelGauss.class)
-	public Object kernelGauss(final Object... args) {
-		return ops().run(Ops.Create.KernelGauss.NAME, args);
-	}
-
-	/** Executes the "kernelGauss" operation on the given arguments. */
 	@OpMethod(
-		op = net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class)
-	public <T extends ComplexType<T>> Img<T> kernelGauss(final int numDimensions,
-		final double sigma)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class,
-				numDimensions, sigma);
-		return result;
-	}
-
-	/** Executes the "kernelGauss" operation on the given arguments. */
-	@OpMethod(
-		op = net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class)
-	public <T extends ComplexType<T>> Img<T> kernelGauss(final T outType,
-		final int numDimensions, final double sigma)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class,
-				outType, numDimensions, sigma);
-		return result;
-	}
-
-	/** Executes the "kernelGauss" operation on the given arguments. */
-	@OpMethod(
-		op = net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class)
-	public <T extends ComplexType<T>> Img<T> kernelGauss(final T outType,
-		final ImgFactory<T> fac, final int numDimensions, final double sigma)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class,
-				outType, fac, numDimensions, sigma);
-		return result;
-	}
-
-
-	/** Executes the "kernelGauss" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelGauss.CreateKernelGauss.class)
-	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelGauss(
+		op = net.imagej.ops.create.kernelGauss.CreateKernelGaussDoubleType.class)
+	public RandomAccessibleInterval<DoubleType> kernelGauss(
 		final double... sigma)
 	{
 		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelGauss.CreateKernelGauss.class, sigma);
+		final RandomAccessibleInterval<DoubleType> result =
+			(RandomAccessibleInterval<DoubleType>) ops().run(
+				Ops.Create.KernelGauss.class, sigma);
 		return result;
 	}
 
 	/** Executes the "kernelGauss" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelGauss.CreateKernelGauss.class)
-	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelGauss(
-		final T outType, final double... sigma)
+	@OpMethod(
+		op = net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetric.class)
+	public <T extends ComplexType<T>> RandomAccessibleInterval<T> kernelGauss(
+		final Double sigma, final int numDimensions, final T outType)
 	{
 		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelGauss.CreateKernelGauss.class, outType,
-				sigma);
+		final RandomAccessibleInterval<T> result =
+			(RandomAccessibleInterval<T>) ops().run(Ops.Create.KernelGauss.class,
+				sigma, numDimensions, outType);
 		return result;
 	}
 
 	/** Executes the "kernelGauss" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelGauss.CreateKernelGauss.class)
-	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelGauss(
-		final T outType, final ImgFactory<T> fac, final double... sigma)
+	@OpMethod(
+		op = net.imagej.ops.create.kernelGauss.CreateKernelGaussSymmetricDoubleType.class)
+	public RandomAccessibleInterval<DoubleType> kernelGauss(final Double sigma,
+		final int numDimensions)
 	{
 		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelGauss.CreateKernelGauss.class, outType,
-				fac, sigma);
+		final RandomAccessibleInterval<DoubleType> result =
+			(RandomAccessibleInterval<DoubleType>) ops().run(
+				Ops.Create.KernelGauss.class, sigma, numDimensions);
 		return result;
 	}
 
-
+	/** Executes the "kernelGauss" operation on the given arguments. */
+	@OpMethod(
+		op = net.imagej.ops.create.kernelGauss.DefaultCreateKernelGauss.class)
+	public <T extends ComplexType<T> & NativeType<T>> RandomAccessibleInterval<T>
+		kernelGauss(final double[] sigma, final T outType)
+	{
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<T> result =
+			(RandomAccessibleInterval<T>) ops().run(Ops.Create.KernelGauss.class,
+				sigma, outType);
+		return result;
+	}
 
 	// -- kernelLog --
 
 	/** Executes the "kernelLog" operation on the given arguments. */
-	@OpMethod(op = Ops.Create.KernelLog.class)
-	public Object kernelLog(final Object... args) {
-		return ops().run(Ops.Create.KernelLog.NAME, args);
-	}
-
-	/** Executes the "kernelLog" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class)
-	public
-		<T extends ComplexType<T>> Img<T> kernelLog(final int numDimensions,
-			final double sigma)
-	{
+	@OpMethod(
+		op = net.imagej.ops.create.kernelLog.CreateKernelLogDoubleType.class)
+	public RandomAccessibleInterval<DoubleType> kernelLog(final double... sigma) {
 		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class,
-				numDimensions, sigma);
+		final RandomAccessibleInterval<DoubleType> result =
+			(RandomAccessibleInterval<DoubleType>) ops().run(
+				Ops.Create.KernelLog.class, sigma);
 		return result;
 	}
 
 	/** Executes the "kernelLog" operation on the given arguments. */
 	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class)
-	public
-		<T extends ComplexType<T>> Img<T> kernelLog(final T outType,
-			final int numDimensions, final double sigma)
+	public <T extends ComplexType<T>> RandomAccessibleInterval<T> kernelLog(
+		final Double sigma, final int numDimensions, final T outType)
 	{
 		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class,
-				outType, numDimensions, sigma);
+		final RandomAccessibleInterval<T> result =
+			(RandomAccessibleInterval<T>) ops().run(Ops.Create.KernelLog.class, sigma,
+				numDimensions, outType);
 		return result;
 	}
 
 	/** Executes the "kernelLog" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class)
-	public
-		<T extends ComplexType<T>> Img<T> kernelLog(final T outType,
-			final ImgFactory<T> fac, final int numDimensions, final double sigma)
+	@OpMethod(
+		op = net.imagej.ops.create.kernelLog.CreateKernelLogSymmetricDoubleType.class)
+	public RandomAccessibleInterval<DoubleType> kernelLog(final Double sigma,
+		final int numDimensions)
 	{
 		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(
-				net.imagej.ops.create.kernelLog.CreateKernelLogSymmetric.class,
-				outType, fac, numDimensions, sigma);
+		final RandomAccessibleInterval<DoubleType> result =
+			(RandomAccessibleInterval<DoubleType>) ops().run(
+				Ops.Create.KernelLog.class, sigma, numDimensions);
 		return result;
 	}
 
 	/** Executes the "kernelLog" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLog.class)
-	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelLog(
-		final double... sigma)
+	@OpMethod(op = net.imagej.ops.create.kernelLog.DefaultCreateKernelLog.class)
+	public <T extends ComplexType<T>> RandomAccessibleInterval<T> kernelLog(
+		final double[] sigma, final T outType)
 	{
 		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(net.imagej.ops.create.kernelLog.CreateKernelLog.class,
-				sigma);
+		final RandomAccessibleInterval<T> result =
+			(RandomAccessibleInterval<T>) ops().run(Ops.Create.KernelLog.class, sigma,
+				outType);
 		return result;
 	}
-
-	/** Executes the "kernelLog" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLog.class)
-	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelLog(
-		final T outType, final double... sigma)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(net.imagej.ops.create.kernelLog.CreateKernelLog.class,
-				outType, sigma);
-		return result;
-	}
-
-	/** Executes the "kernelLog" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.create.kernelLog.CreateKernelLog.class)
-	public <T extends ComplexType<T> & NativeType<T>> Img<T> kernelLog(
-		final T outType, final ImgFactory<T> fac, final double... sigma)
-	{
-		@SuppressWarnings("unchecked")
-		final Img<T> result =
-			(Img<T>) ops().run(net.imagej.ops.create.kernelLog.CreateKernelLog.class,
-				outType, fac, sigma);
-		return result;
-	}
-
 
 	// -- labelingMapping --
-
-	@OpMethod(op = net.imagej.ops.Ops.Create.LabelingMapping.class)
-	public Object labelingMapping(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Create.LabelingMapping.class, args);
-	}
 
 	@OpMethod(
 		op = net.imagej.ops.create.labelingMapping.DefaultCreateLabelingMapping.class)
@@ -593,7 +486,7 @@ public class CreateNamespace extends AbstractNamespace {
 		final LabelingMapping<L> result =
 			(LabelingMapping<L>) ops()
 				.run(
-					net.imagej.ops.create.labelingMapping.DefaultCreateLabelingMapping.class);
+					Ops.Create.LabelingMapping.class);
 		return result;
 	}
 
@@ -605,7 +498,7 @@ public class CreateNamespace extends AbstractNamespace {
 		final LabelingMapping<L> result =
 			(LabelingMapping<L>) ops()
 				.run(
-					net.imagej.ops.create.labelingMapping.DefaultCreateLabelingMapping.class,
+					Ops.Create.LabelingMapping.class,
 					maxNumSets);
 		return result;
 	}
@@ -615,7 +508,7 @@ public class CreateNamespace extends AbstractNamespace {
 	@OpMethod(op = net.imagej.ops.create.nativeType.DefaultCreateNativeType.class)
 	public DoubleType nativeType() {
 		final DoubleType result = (DoubleType) ops().run(
-			net.imagej.ops.create.nativeType.DefaultCreateNativeType.class);
+			net.imagej.ops.Ops.Create.NativeType.class);
 		return result;
 	}
 
@@ -624,7 +517,7 @@ public class CreateNamespace extends AbstractNamespace {
 	public <T extends NativeType<T>> T nativeType(final Class<T> type) {
 		@SuppressWarnings("unchecked")
 		final T result = (T) ops().run(
-			net.imagej.ops.create.nativeType.CreateNativeTypeFromClass.class, type);
+			net.imagej.ops.Ops.Create.NativeType.class, type);
 		return result;
 	}
 
@@ -634,7 +527,7 @@ public class CreateNamespace extends AbstractNamespace {
 	public <T> T object(final Class<T> in) {
 		@SuppressWarnings("unchecked")
 		final T result = (T) ops().run(
-			net.imagej.ops.create.object.CreateObjectFromClass.class, in);
+			net.imagej.ops.Ops.Create.Object.class, in);
 		return result;
 	}
 

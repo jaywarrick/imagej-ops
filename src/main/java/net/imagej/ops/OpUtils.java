@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,14 +30,23 @@
 
 package net.imagej.ops;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import net.imagej.ops.OpCandidate.StatusCode;
 
+import org.scijava.Context;
+import org.scijava.command.CommandInfo;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleInfo;
 import org.scijava.module.ModuleItem;
+import org.scijava.plugin.SciJavaPlugin;
+import org.scijava.service.Service;
+import org.scijava.util.GenericUtils;
 
 /**
  * Utility methods for working with ops. In particular, this class contains
@@ -66,6 +75,20 @@ public final class OpUtils {
 		return result;
 	}
 
+	/**
+	 * Gets the given {@link ModuleInfo}'s list of inputs, excluding special ones
+	 * like {@link Service}s and {@link Context}s.
+	 */
+	public static List<ModuleItem<?>> inputs(final ModuleInfo info) {
+		final List<ModuleItem<?>> inputs = asList(info.inputs());
+		return filter(inputs, input -> !isInjectable(input.getType()));
+	}
+
+	/** Gets the given {@link ModuleInfo}'s list of outputs. */
+	public static List<ModuleItem<?>> outputs(final ModuleInfo info) {
+		return asList(info.outputs());
+	}
+
 	/** Gets the namespace portion of the given op name. */
 	public static String getNamespace(final String opName) {
 		if (opName == null) return null;
@@ -90,10 +113,8 @@ public final class OpUtils {
 	 * @throws IllegalStateException if the op does not conform to the expected
 	 *           types.
 	 */
-	public static <OP extends Op> OP unwrap(final Module module,
-		final OpRef<OP> ref)
-	{
-		return unwrap(module, ref.getType(), ref.getExtraTypes());
+	public static Op unwrap(final Module module, final OpRef ref) {
+		return unwrap(module, ref.getTypes());
 	}
 
 	/**
@@ -101,32 +122,31 @@ public final class OpUtils {
 	 * instance of the specified type(s).
 	 * 
 	 * @param module The module to unwrap.
-	 * @param type The expected type of {@link Op}.
-	 * @param types Other required types for the op.
+	 * @param types Required types for the op.
 	 * @return The unwrapped {@link Op}.
 	 * @throws IllegalStateException if the op does not conform to the expected
 	 *           types.
 	 */
-	public static <OP extends Op> OP unwrap(final Module module,
-		final Class<OP> type, final Collection<? extends Class<?>> types)
+	public static Op unwrap(final Module module,
+		final Collection<? extends Type> types)
 	{
 		if (module == null) return null;
 		final Object delegate = module.getDelegateObject();
-		final Class<?> opType = type == null ? Op.class : type;
-		if (!opType.isInstance(delegate)) {
-			throw new IllegalStateException(delegate.getClass().getName() +
-				" is not of type " + opType.getName());
-		}
 		if (types != null) {
-			for (final Class<?> t : types) {
-				if (!t.isInstance(delegate)) {
+			for (final Type t : types) {
+				// FIXME: Use generic isInstance test, once it exists.
+				final Class<?> raw = GenericUtils.getClass(t);
+				if (!raw.isInstance(delegate)) {
 					throw new IllegalStateException(delegate.getClass().getName() +
-						" is not of type " + t.getName());
+						" is not of type " + raw.getName());
 				}
 			}
 		}
-		@SuppressWarnings("unchecked")
-		final OP op = (OP) delegate;
+		if (!(delegate instanceof Op)) {
+			throw new IllegalStateException(delegate.getClass().getName() +
+				" is not an Op");
+		}
+		final Op op = (Op) delegate;
 		return op;
 	}
 
@@ -176,10 +196,56 @@ public final class OpUtils {
 		final ModuleItem<?> special)
 	{
 		final StringBuilder sb = new StringBuilder();
-		final String outputString = paramString(info.outputs(), null).trim();
+		final String outputString = paramString(outputs(info), null).trim();
 		if (!outputString.isEmpty()) sb.append("(" + outputString + ") =\n\t");
 		sb.append(info.getDelegateClassName());
-		sb.append("(" + paramString(info.inputs(), special) + ")");
+		sb.append("(" + paramString(inputs(info), special) + ")");
+		return sb.toString();
+	}
+
+	/**
+	 * Similar to {@link #opString(ModuleInfo)} but prints a cleaner,
+	 * more abstract representation of the Op method call in the format
+	 * {@code return <= baseOp(param1, param2)}. Intended to be presented to users
+	 * as the limited information reduces utility for debugging.
+	 */
+	public static String simpleString(final CommandInfo info) {
+		final StringBuilder sb = new StringBuilder();
+		final String outputString = paramString(outputs(info), null, ", ").trim();
+		if (!outputString.isEmpty()) sb.append("" + outputString + "  <=  ");
+
+		final Class<? extends SciJavaPlugin> type = info.getAnnotation().type();
+		sb.append(type.getSimpleName());
+		sb.append("(" + paramString(inputs(info), null, ", ") + ")");
+		return sb.toString().replaceAll("\n|\t", "");
+	}
+
+	/**
+	 * Returns a method call for the given {@link Op} using its name and the
+	 * correct count of parameters. Assumes the op will be called via an
+	 * {@link OpService} of the name "ops".
+	 */
+	public static String opCall(final CommandInfo info) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("ops.run(");
+		try {
+			// try using the short name
+			final String shortName = getOpName(info);
+			sb.append("\"");
+			sb.append(shortName);
+			sb.append("\"");
+		} catch (final Exception e) {
+			// Use the class name if any errors pop up
+			sb.append(info.getAnnotation().type().getName());
+		}
+
+		for (final ModuleItem<?> item : inputs(info)) {
+			sb.append(", ");
+			sb.append(item.getType().getSimpleName());
+		}
+		sb.append(")");
+
 		return sb.toString();
 	}
 
@@ -190,32 +256,35 @@ public final class OpUtils {
 	 * matches, or too many matches, are found.
 	 * </p>
 	 * 
-	 * @param candidates The list of candidates from which a match was desired.
-	 * @param matches The list of matching modules.
+	 * @param candidates The list of already-analyzed candidates from which a
+	 *          match was desired.
+	 * @param matches The list of matching candidates with attached {@link Module}
+	 *          instances.
 	 * @return A multi-line string describing the situation: 1) the type of match
 	 *         failure; 2) the list of matching ops (if any); 3) the request
 	 *         itself; and 4) the list of candidates including status (i.e.,
 	 *         whether it matched, and if not, why not).
+	 * @see OpMatchingService#filterMatches(List)
 	 */
-	public static <OP extends Op> String matchInfo(
-		final List<OpCandidate<OP>> candidates, final List<Module> matches)
+	public static String matchInfo(final List<OpCandidate> candidates,
+		final List<OpCandidate> matches)
 	{
 		final StringBuilder sb = new StringBuilder();
 
-		final OpRef<OP> ref = candidates.get(0).getRef();
+		final OpRef ref = candidates.get(0).getRef();
 		if (matches.isEmpty()) {
 			// no matches
 			sb.append("No matching '" + ref.getLabel() + "' op\n");
 		}
 		else {
 			// multiple matches
-			final double priority = matches.get(0).getInfo().getPriority();
+			final double priority = matches.get(0).cInfo().getPriority();
 			sb.append("Multiple '" + ref.getLabel() + "' ops of priority " +
 				priority + ":\n");
 			int count = 0;
-			for (final Module module : matches) {
+			for (final OpCandidate match : matches) {
 				sb.append(++count + ". ");
-				sb.append(opString(module.getInfo()) + "\n");
+				sb.append(opString(match.getModule().getInfo()) + "\n");
 			}
 		}
 
@@ -226,7 +295,7 @@ public final class OpUtils {
 		sb.append("\n");
 		sb.append("Candidates:\n");
 		int count = 0;
-		for (final OpCandidate<OP> candidate : candidates) {
+		for (final OpCandidate candidate : candidates) {
 			final ModuleInfo info = candidate.opInfo().cInfo();
 			sb.append(++count + ". ");
 			sb.append("\t" + opString(info, candidate.getStatusItem()) + "\n");
@@ -234,7 +303,7 @@ public final class OpUtils {
 			if (status != null) sb.append("\t" + status + "\n");
 			if (candidate.getStatusCode() == StatusCode.DOES_NOT_CONFORM) {
 				// show argument values when a contingent op rejects them
-				for (final ModuleItem<?> item : info.inputs()) {
+				for (final ModuleItem<?> item : inputs(info)) {
 					final Object value = item.getValue(candidate.getModule());
 					sb.append("\t\t" + item.getName() + " = " + value + "\n");
 				}
@@ -243,24 +312,71 @@ public final class OpUtils {
 		return sb.toString();
 	}
 
+	/** Gets the string name of an op. */
+	public static String getOpName(final CommandInfo info) {
+		return new OpInfo(info).getName();
+	}
+
 	// -- Helper methods --
 
-	/** Helper method of {@link #opString(ModuleInfo, ModuleItem)}. */
+	/** Converts {@link Iterable} to {@link List}. */
+	private static <T> List<T> asList(final Iterable<T> iterable) {
+		final ArrayList<T> list = new ArrayList<>();
+		iterable.forEach(input -> list.add(input));
+		return list;
+	}
+
+	/** Filters a list with the given predicate, concealing boilerplate crap. */
+	private static <T> List<T> filter(final List<T> list, final Predicate<T> p) {
+		return list.stream().filter(p).collect(Collectors.toList());
+	}
+
+	// TODO: Move to Context.
+	private static boolean isInjectable(final Class<?> type) {
+		return Service.class.isAssignableFrom(type) || //
+			Context.class.isAssignableFrom(type);
+	}
+
+	/**
+	 * Helper method of {@link #opString(ModuleInfo, ModuleItem)} which parses a set of items
+	 * with a default delimiter of ","
+	 */
 	private static String paramString(final Iterable<ModuleItem<?>> items,
 		final ModuleItem<?> special)
+	{
+		return paramString(items, special, ",");
+	}
+
+	/**
+	 * As {@link #paramString(Iterable, ModuleItem)} with an optional delimiter.
+	 */
+	private static String paramString(final Iterable<ModuleItem<?>> items,
+		final ModuleItem<?> special, final String delim) {
+		return paramString(items, special, delim, false);
+	}
+
+	/**
+	 * As {@link #paramString(Iterable, ModuleItem, String)} with a toggle to control
+	 * if inputs are types only or include the names.
+	 */
+	private static String paramString(final Iterable<ModuleItem<?>> items,
+		final ModuleItem<?> special, final String delim, final boolean typeOnly)
 	{
 		final StringBuilder sb = new StringBuilder();
 		boolean first = true;
 		for (final ModuleItem<?> item : items) {
 			if (first) first = false;
-			else sb.append(",");
+			else sb.append(delim);
 			sb.append("\n");
 			if (item == special) sb.append("==>"); // highlight special item
 			sb.append("\t\t");
-			sb.append(item.getType().getSimpleName() + " " + item.getName());
-			if (!item.isRequired()) sb.append("?");
+			sb.append(item.getType().getSimpleName());
+
+			if (!typeOnly){
+				sb.append(" " + item.getName());
+				if (!item.isRequired()) sb.append("?");
+			}
 		}
 		return sb.toString();
 	}
-
 }

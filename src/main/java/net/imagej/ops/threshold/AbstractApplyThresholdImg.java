@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 package net.imagej.ops.threshold;
 
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.computer.BinaryComputerOp;
 import net.imagej.ops.special.computer.Computers;
 import net.imagej.ops.special.function.Functions;
 import net.imagej.ops.special.function.UnaryFunctionOp;
@@ -57,8 +58,8 @@ public abstract class AbstractApplyThresholdImg<T> extends
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void initialize() {
-		applyThresholdComp = Computers.binary(ops(), Ops.Threshold.Apply.class,
-			out(), in(), in().firstElement());
+		applyThresholdComp = (BinaryComputerOp) Computers.binary(ops(), Ops.Threshold.Apply.class,
+			out() == null ? IterableInterval.class : out(), in(), in().firstElement());
 		histCreator = (UnaryFunctionOp) Functions.unary(ops(),
 			Ops.Image.Histogram.class, Histogram1d.class, in());
 		imgCreator = (UnaryFunctionOp) Functions.unary(ops(), Ops.Create.Img.class,
@@ -69,7 +70,7 @@ public abstract class AbstractApplyThresholdImg<T> extends
 
 	@Override
 	public Img<BitType> createOutput(final IterableInterval<T> input) {
-		return imgCreator.compute1(input);
+		return imgCreator.calculate(input);
 	}
 
 }

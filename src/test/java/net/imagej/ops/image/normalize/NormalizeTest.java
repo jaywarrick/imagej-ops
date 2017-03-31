@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,7 @@ public class NormalizeTest extends AbstractOpTest {
 		Img<ByteType> in = generateByteArrayTestImg(true, 5, 5);
 		Img<ByteType> out = in.factory().create(in, new ByteType());
 
-		ops.image().normalize(out, in);
+		ops.run(NormalizeIIComputer.class, out, in);
 
 		final Pair<ByteType, ByteType> minMax2 = ops.stats().minMax(out);
 

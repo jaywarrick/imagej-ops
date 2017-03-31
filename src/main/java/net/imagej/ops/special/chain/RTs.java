@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -82,7 +82,7 @@ public final class RTs {
 		return (UnaryHybridCF) Hybrids.unaryCF(ops, opType, RealType.class, in, otherArgs);
 	}
 
-	public static <A extends RealType<A>> UnaryInplaceOp<A> inplace(
+	public static <A extends RealType<A>> UnaryInplaceOp<? super A, A> inplace(
 		final OpEnvironment ops, final Class<? extends Op> opType, final A arg,
 		final Object... otherArgs)
 	{

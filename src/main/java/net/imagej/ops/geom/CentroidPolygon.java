@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@code geom.centroid}.
  * 
- * @author Daniel Seebacher, University of Konstanz.
+ * @author Daniel Seebacher (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.Centroid.class, label = "Geometric: Center of Gravity")
 public class CentroidPolygon extends
@@ -59,14 +59,15 @@ public class CentroidPolygon extends
 	}
 
 	@Override
-	public RealLocalizable compute1(final Polygon input) {
+	public RealLocalizable calculate(final Polygon input) {
 
-		double area = sizeFunc.compute1(input).get();
+		double area = sizeFunc.calculate(input).get();
 		double cx = 0;
 		double cy = 0;
-		for (int i = 0; i < input.getVertices().size() - 1; i++) {
+		for (int i = 0; i < input.getVertices().size(); i++) {
 			RealLocalizable p0 = input.getVertices().get(i);
-			RealLocalizable p1 = input.getVertices().get(i + 1);
+			RealLocalizable p1 = input.getVertices().get((i + 1) % input.getVertices()
+					.size());
 
 			double p0_x = p0.getDoublePosition(0);
 			double p0_y = p0.getDoublePosition(1);

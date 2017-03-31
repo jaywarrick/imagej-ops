@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,7 @@ import org.scijava.thread.ThreadService;
 /**
  * Gaussian filter, wrapping {@link Gauss3} of imglib2-algorithms.
  * 
- * @author Christian Dietz, University of Konstanz
+ * @author Christian Dietz (University of Konstanz)
  * @param <T> type of input and output
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -72,7 +72,7 @@ public class DefaultGaussRAI<T extends RealType<T> & NativeType<T>> extends
 	private OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds;
 
 	@Override
-	public void compute1(final RandomAccessibleInterval<T> input,
+	public void compute(final RandomAccessibleInterval<T> input,
 		final RandomAccessibleInterval<T> output)
 	{
 

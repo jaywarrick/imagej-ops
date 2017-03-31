@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.type.NativeType;
 import net.imglib2.type.Type;
 import net.imglib2.util.Intervals;
 import net.imglib2.util.Util;
@@ -48,7 +49,7 @@ import org.scijava.plugin.Plugin;
  * Copies a {@link RandomAccessibleInterval} into another
  * {@link RandomAccessibleInterval}
  * 
- * @author Christian Dietz, University of Konstanz
+ * @author Christian Dietz (University of Konstanz)
  * @param <T>
  */
 @Plugin(type = Ops.Copy.RAI.class, priority = 1.0)
@@ -65,25 +66,29 @@ public class CopyRAI<T> extends
 	public RandomAccessibleInterval<T> createOutput(
 		final RandomAccessibleInterval<T> input)
 	{
-		return createFunc.compute1(input);
+		return createFunc.calculate(input);
 	}
 
 	@Override
 	public void initialize() {
-		final Class<?> outTypeClass =
-			out() == null ? Type.class : Util.getTypeFromInterval(out()).getClass();
-		final T inType = Util.getTypeFromInterval(in());
-		final UnaryComputerOp<T, ?> typeComputer =
-			Computers.unary(ops(), Ops.Copy.Type.class, outTypeClass, inType);
+		final Object outType = out() == null ? Type.class : Util
+			.getTypeFromInterval(out());
+
+		final Object inType = in() == null ? NativeType.class : Util
+			.getTypeFromInterval(in());
+
+		final UnaryComputerOp<?, ?> typeComputer = Computers.unary(ops(),
+			Ops.Copy.Type.class, outType, inType);
 		mapComputer = RAIs.computer(ops(), Ops.Map.class, in(), typeComputer);
 		createFunc = RAIs.function(ops(), Ops.Create.Img.class, in(), inType);
+
 	}
 
 	@Override
-	public void compute1(final RandomAccessibleInterval<T> input,
+	public void compute(final RandomAccessibleInterval<T> input,
 		final RandomAccessibleInterval<T> output)
 	{
-		mapComputer.compute1(input, output);
+		mapComputer.compute(input, output);
 	}
 
 	@Override

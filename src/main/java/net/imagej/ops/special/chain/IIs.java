@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -88,9 +88,9 @@ public final class IIs {
 			in == null ? IterableInterval.class : in, otherArgs);
 	}
 
-	public static <T> UnaryInplaceOp<IterableInterval<T>> inplace(
-		final OpEnvironment ops, final Class<? extends Op> opType,
-		final IterableInterval<T> arg, final Object... otherArgs)
+	public static <T> UnaryInplaceOp<? super IterableInterval<T>, IterableInterval<T>>
+		inplace(final OpEnvironment ops, final Class<? extends Op> opType,
+			final IterableInterval<T> arg, final Object... otherArgs)
 	{
 		return Inplaces.unary(ops, opType, arg, otherArgs);
 	}

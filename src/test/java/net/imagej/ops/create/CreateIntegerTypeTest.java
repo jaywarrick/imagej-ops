@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import net.imagej.ops.AbstractOpTest;
+import net.imagej.ops.create.integerType.DefaultCreateIntegerType;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.integer.ByteType;
 import net.imglib2.type.numeric.integer.IntType;
@@ -110,11 +111,12 @@ public class CreateIntegerTypeTest extends AbstractOpTest {
 	// -- Helper methods --
 
 	private void assertType(final Class<?> type, final long max) {
-		assertEquals(type, ops.create().integerType(max).getClass());
+		assertEquals(type, ops.run(DefaultCreateIntegerType.class, max).getClass());
 	}
 
 	private void assertNotType(final Class<?> type, final long max) {
-		assertNotEquals(type, ops.create().integerType(max).getClass());
+		assertNotEquals(type, ops.run(DefaultCreateIntegerType.class, max)
+			.getClass());
 	}
 
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -40,27 +40,23 @@ import org.scijava.plugin.Plugin;
 /**
  * {@link Op} to calculate the {@code stats.min}.
  * 
- * @author Daniel Seebacher, University of Konstanz.
- * @author Christian Dietz, University of Konstanz.
- * @param <I> input type
- * @param <O> output type
+ * @author Daniel Seebacher (University of Konstanz)
+ * @author Christian Dietz (University of Konstanz)
+ * @author Stefan Helfrich (University of Konstanz)
+ * @param <T> input type
  */
 @Plugin(type = Ops.Stats.Min.class, label = "Statistics: Min",
 	priority = Priority.VERY_HIGH_PRIORITY)
-public class IterableMin<I extends RealType<I>, O extends RealType<O>> extends
-	AbstractStatsOp<Iterable<I>, O> implements Ops.Stats.Min
+public class IterableMin<T extends RealType<T>> extends
+	AbstractStatsOp<Iterable<T>, T> implements Ops.Stats.Min
 {
 
 	@Override
-	public void compute1(final Iterable<I> input, final O output) {
-		double min = Double.MAX_VALUE;
-		for (final I in : input) {
-			final double n = in.getRealDouble();
-			if (min > n) {
-				min = n;
-			}
-		}
-
-		output.setReal(min);
+	public void compute(final Iterable<T> input, final T output) {
+		// Re-use output to compare against
+		output.setReal(output.getMaxValue());
+		for (final T in : input)
+			if (output.compareTo(in) > 0)
+				output.set(in);
 	}
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -43,14 +43,16 @@ import org.junit.Test;
  * 
  * Test for {@Link Lbp2dFeature}
  * 
- * @author Andreas Graumann, University of Konstanz
+ * @author Andreas Graumann (University of Konstanz)
  *
  */
 public class LBP2dFeatureTest extends AbstractFeatureTest {
 
 	@Test
 	public void testLbp2d() {
-		ArrayList<LongType> hist = ops.lbp().lbp2D(random, 1,4);
+		@SuppressWarnings("unchecked")
+		final ArrayList<LongType> hist = (ArrayList<LongType>) ops.run(
+			DefaultLBP2D.class, random, 1, 4);
 	
 		// Test values proved by calculating small toy example by hand.
 		assertEquals(Ops.LBP.LBP2D.NAME, 5412.0, hist.get(0).getRealDouble(), 1e-3);

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@code geom.smallestBoundingBox}.
  * 
- * @author Daniel Seebacher, University of Konstanz.
+ * @author Daniel Seebacher (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.SmallestEnclosingBoundingBox.class,
 	label = "Geometric (2D): Smallest Enclosing Rectangle")
@@ -57,14 +57,14 @@ public class DefaultSmallestEnclosingRectangle extends
 	Ops.Geometric.SmallestEnclosingBoundingBox
 {
 
-	private UnaryFunctionOp<Polygon, Polygon> convexhullFunc;
+	private UnaryFunctionOp<Polygon, Polygon> convexHullFunc;
 	private UnaryFunctionOp<Polygon, RealLocalizable> centroidFunc;
 	private UnaryFunctionOp<Polygon, DoubleType> areaFunc;
 	private UnaryFunctionOp<Polygon, Polygon> boundingBoxFunc;
 
 	@Override
 	public void initialize() {
-		convexhullFunc = Functions.unary(ops(), Ops.Geometric.ConvexHull.class, Polygon.class, in());
+		convexHullFunc = Functions.unary(ops(), Ops.Geometric.ConvexHull.class, Polygon.class, in());
 		centroidFunc = Functions.unary(ops(), Ops.Geometric.Centroid.class, RealLocalizable.class, in());
 		areaFunc = Functions.unary(ops(), Ops.Geometric.Size.class, DoubleType.class, in());
 		boundingBoxFunc = Functions.unary(ops(), Ops.Geometric.BoundingBox.class, Polygon.class, in());
@@ -106,29 +106,27 @@ public class DefaultSmallestEnclosingRectangle extends
 	}
 
 	@Override
-	public Polygon compute1(final Polygon input) {
-		Polygon ch = convexhullFunc.compute1(input);
-		RealLocalizable cog = centroidFunc.compute1(ch);
+	public Polygon calculate(final Polygon input) {
+		Polygon ch = convexHullFunc.calculate(input);
+		RealLocalizable cog = centroidFunc.calculate(ch);
 
-		Polygon minBounds = null;
+		Polygon minBounds = input;
 		double minArea = Double.POSITIVE_INFINITY;
 		// for each edge (i.e. line from P(i-1) to P(i)
 		for (int i = 1; i < ch.getVertices().size() - 1; i++) {
-			double angle = Math.atan2(ch.getVertices().get(i).getDoublePosition(1) -
+			final double angle = Math.atan2(ch.getVertices().get(i).getDoublePosition(1) -
 				ch.getVertices().get(i - 1).getDoublePosition(1), ch.getVertices().get(
 					i).getDoublePosition(0) - ch.getVertices().get(i - 1)
 						.getDoublePosition(0));
 
-			// rotate the polygon in such a manner that the line has an angle of
-			// 0
+			// rotate the polygon in such a manner that the line has an angle of 0
 			final Polygon rotatedPoly = rotate(ch, -angle, cog);
 
 			// get the bounds
-			final Polygon bounds = boundingBoxFunc.compute1(rotatedPoly);
+			final Polygon bounds = boundingBoxFunc.calculate(rotatedPoly);
 
 			// calculate the area of the bounds
-			// double area = getBoundsArea(bounds);
-			double area = areaFunc.compute1(rotatedPoly).get();
+			final double area = areaFunc.calculate(bounds).get();
 
 			// if the area of the bounds is smaller, rotate it to match the
 			// original polygon and save it.
@@ -137,16 +135,35 @@ public class DefaultSmallestEnclosingRectangle extends
 				minBounds = rotate(bounds, angle, cog);
 			}
 		}
-
-		if(minBounds == null)
-			minBounds = input;
 		
+		// edge (n-1) to 0
+		final double angle = Math.atan2(ch.getVertices().get(0).getDoublePosition(1) -
+				ch.getVertices().get(ch.getVertices().size() - 1).getDoublePosition(1), ch.getVertices().get(
+					0).getDoublePosition(0) - ch.getVertices().get(ch.getVertices().size() - 1)
+						.getDoublePosition(0));
+
+		// rotate the polygon in such a manner that the line has an angle of 0
+		final Polygon rotatedPoly = rotate(ch, -angle, cog);
+
+		// get the bounds
+		final Polygon bounds = boundingBoxFunc.calculate(rotatedPoly);
+
+		// calculate the area of the bounds
+		final double area = areaFunc.calculate(bounds).get();
+
+		// if the area of the bounds is smaller, rotate it to match the
+		// original polygon and save it.
+		if (area < minArea) {
+			minArea = area;
+			minBounds = rotate(bounds, angle, cog);
+		}
+
 		return minBounds;
 	}
 
 	@Override
 	public boolean conforms() {
-		return in() instanceof Polygon;
+		return in() != null;
 	}
 
 }
