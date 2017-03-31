@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@ import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.features.AbstractFeatureTest;
+import net.imglib2.type.numeric.RealType;
 
 import org.junit.Test;
 
@@ -40,27 +41,33 @@ import org.junit.Test;
  * 
  * Test {@Link ZernikeFeature}
  * 
- * @author Andreas Graumann, University of Konstanz
+ * @author Andreas Graumann (University of Konstanz)
  *
  */
 public class ZernikeFeatureTest extends AbstractFeatureTest {
 	
+	private static final double EPSILON = 1e-12;
+
 	@Test
 	public void testPhaseFeature() {
-		
-		assertEquals(Ops.Zernike.Phase.NAME, 180.0, ops.zernike().phase(ellipse, 4, 2).getRealDouble(), 1e-3);
-		assertEquals(Ops.Zernike.Phase.NAME, 360.0, ops.zernike().phase(rotatedEllipse, 4, 2).getRealDouble(), 1e-3);
+
+		assertEquals(Ops.Zernike.Phase.NAME, 179.92297037263532, ((RealType<?>) ops.run(
+			DefaultPhaseFeature.class, ellipse, 4, 2)).getRealDouble(), EPSILON);
+		assertEquals(Ops.Zernike.Phase.NAME, 0.0802239034925816, ((RealType<?>) ops.run(
+			DefaultPhaseFeature.class, rotatedEllipse, 4, 2)).getRealDouble(), EPSILON);
 	}
 	
 	@Test 
 	public void testMagnitudeFeature() {
-			
-		double v1 = ops.zernike().magnitude(ellipse, 4, 2).getRealDouble();
-		double v2 = ops.zernike().magnitude(rotatedEllipse, 4, 2).getRealDouble();
+
+		double v1 = ((RealType<?>) ops.run(DefaultMagnitudeFeature.class, ellipse,
+			4, 2)).getRealDouble();
+		double v2 = ((RealType<?>) ops.run(DefaultMagnitudeFeature.class,
+			rotatedEllipse, 4, 2)).getRealDouble();
 	
-		assertEquals(Ops.Zernike.Magnitude.NAME, 0.16684211008, ops.zernike().magnitude(ellipse, 4, 2).getRealDouble(), 1e-3);
+		assertEquals(Ops.Zernike.Magnitude.NAME, 0.10985876611295191, v1, EPSILON);
 		
-		// magnitude should be the same after rotating the image
+		// magnitude is the same after rotating the image
 		assertEquals(Ops.Zernike.Magnitude.NAME, v1, v2, 1e-3);
 	}
 

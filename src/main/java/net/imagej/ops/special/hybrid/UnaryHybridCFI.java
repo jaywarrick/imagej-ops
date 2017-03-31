@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -39,27 +39,29 @@ import net.imagej.ops.special.inplace.UnaryInplaceOp;
  * {@link UnaryFunctionOp} or {@link UnaryInplaceOp}.
  * <p>
  * To populate a preallocated output object, call
- * {@link UnaryComputerOp#compute1}; to compute a new output object, call
- * {@link UnaryFunctionOp#compute1}; to mutate an object inplace, call
+ * {@link UnaryComputerOp#compute}; to compute a new output object, call
+ * {@link UnaryFunctionOp#calculate}; to mutate an object inplace, call
  * {@link UnaryInplaceOp#mutate}. To do any of these things as appropriate, call
  * {@link #run(Object, Object)}.
  * </p>
  * 
  * @author Curtis Rueden
- * @param <A> type of input + output
+ * @param <I> type of input
+ * @param <O> type of output
  * @see UnaryHybridCF
+ * @see UnaryHybridCI
  */
-public interface UnaryHybridCFI<A> extends UnaryHybridCF<A, A>,
-	UnaryInplaceOp<A>
+public interface UnaryHybridCFI<I, O extends I> extends UnaryHybridCF<I, O>,
+	UnaryHybridCI<I, O>
 {
 
 	// -- UnaryOp methods --
 
 	@Override
-	default A run(final A input, final A output) {
+	default O run(final I input, final O output) {
 		if (input == output) {
 			// run as an inplace
-			return UnaryInplaceOp.super.run(input, output);
+			return UnaryHybridCI.super.run(input, output);
 		}
 		// run as a hybrid CF
 		return UnaryHybridCF.super.run(input, output);
@@ -68,14 +70,21 @@ public interface UnaryHybridCFI<A> extends UnaryHybridCF<A, A>,
 	// -- NullaryOp methods --
 
 	@Override
-	default A run(final A output) {
+	default O run(final O output) {
 		return UnaryHybridCF.super.run(output);
+	}
+
+	// -- Runnable methods --
+
+	@Override
+	default void run() {
+		setOutput(run(in(), out()));
 	}
 
 	// -- Threadable methods --
 
 	@Override
-	default UnaryHybridCFI<A> getIndependentInstance() {
+	default UnaryHybridCFI<I, O> getIndependentInstance() {
 		// NB: We assume the op instance is thread-safe by default.
 		// Individual implementations can override this assumption if they
 		// have state (such as buffers) that cannot be shared across threads.

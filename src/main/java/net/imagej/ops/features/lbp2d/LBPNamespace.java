@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ import org.scijava.plugin.Plugin;
 /**
  * Namespace for 2d local binary pattern feature
  * 
- * @author Andreas Graumann, University of Konstanz
+ * @author Andreas Graumann (University of Konstanz)
  */
 @Plugin(type = Namespace.class)
 public class LBPNamespace extends AbstractNamespace {
@@ -61,7 +61,7 @@ public class LBPNamespace extends AbstractNamespace {
 		final int histogramSize)
 	{
 		final ArrayList<LongType> result = (ArrayList<LongType>) ops().run(
-			net.imagej.ops.features.lbp2d.DefaultLBP2D.class, in, distance,
+			net.imagej.ops.Ops.LBP.LBP2D.class, in, distance,
 			histogramSize);
 		return result;
 	}
@@ -73,7 +73,7 @@ public class LBPNamespace extends AbstractNamespace {
 		final int distance, final int histogramSize)
 	{
 		final ArrayList<LongType> result = (ArrayList<LongType>) ops().run(
-			net.imagej.ops.features.lbp2d.DefaultLBP2D.class, out, in, distance,
+			net.imagej.ops.Ops.LBP.LBP2D.class, out, in, distance,
 			histogramSize);
 		return result;
 	}

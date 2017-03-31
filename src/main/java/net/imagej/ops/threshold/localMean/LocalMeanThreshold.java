@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,19 +30,20 @@
 
 package net.imagej.ops.threshold.localMean;
 
-import org.scijava.Priority;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
-
 import net.imagej.ops.Ops;
 import net.imagej.ops.map.neighborhood.CenterAwareComputerOp;
 import net.imagej.ops.special.computer.Computers;
 import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imagej.ops.threshold.LocalThresholdMethod;
 import net.imagej.ops.threshold.apply.LocalThreshold;
+import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
+
+import org.scijava.Priority;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  * LocalThresholdMethod that uses the mean and operates directly of RAIs.
@@ -51,7 +52,8 @@ import net.imglib2.type.numeric.real.DoubleType;
  * @author Martin Horn (University of Konstanz)
  * @author Stefan Helfrich (University of Konstanz)
  */
-@Plugin(type = Ops.Threshold.LocalMeanThreshold.class, priority = Priority.LOW_PRIORITY)
+@Plugin(type = Ops.Threshold.LocalMeanThreshold.class,
+	priority = Priority.LOW_PRIORITY)
 public class LocalMeanThreshold<T extends RealType<T>> extends
 	LocalThreshold<T>	implements Ops.Threshold.LocalMeanThreshold
 {
@@ -60,7 +62,7 @@ public class LocalMeanThreshold<T extends RealType<T>> extends
 	private double c;
 
 	@Override
-	protected CenterAwareComputerOp<T, BitType> unaryComputer(
+	protected CenterAwareComputerOp<T, BitType> unaryComputer(final T inClass,
 		final BitType outClass)
 	{
 		final LocalThresholdMethod<T> op = new LocalThresholdMethod<T>() {
@@ -68,7 +70,7 @@ public class LocalMeanThreshold<T extends RealType<T>> extends
 			private UnaryComputerOp<Iterable<T>, DoubleType> meanOp;
 
 			@Override
-			public void compute2(T center, Iterable<T> neighborhood, BitType output) {
+			public void compute(final Iterable<T> neighborhood, final T center, final BitType output) {
 
 				if (meanOp == null) {
 					meanOp = Computers.unary(ops(),	Ops.Stats.Mean.class, DoubleType.class, neighborhood);
@@ -76,7 +78,7 @@ public class LocalMeanThreshold<T extends RealType<T>> extends
 
 				final DoubleType m = new DoubleType();
 
-				meanOp.compute1(neighborhood, m);
+				meanOp.compute(neighborhood, m);
 				output.set(center.getRealDouble() > m.getRealDouble() - c);
 			}
 		};
@@ -84,5 +86,16 @@ public class LocalMeanThreshold<T extends RealType<T>> extends
 		op.setEnvironment(ops());
 		return op;
 	}
-	
+
+	@Override
+	public boolean conforms() {
+		RectangleShape rect = getShape() instanceof RectangleShape
+			? (RectangleShape) getShape() : null;
+		if (rect == null) {
+			return true;
+		}
+
+		return rect.getSpan() <= 2;
+	}
+
 }

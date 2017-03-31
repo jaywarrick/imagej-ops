@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -121,7 +121,7 @@ public class Convolve<I extends RealType<I>, K extends RealType<K>, O extends Re
 				// if the selected convolve op is a function and the kernel dimensions
 				// doesn't match the input image dimensions, than we can still convolve
 				// each slice individually
-				ops.slicewise(out, in, op, axisIndices);
+				ops.run(Ops.Slice.class, out, in, op, axisIndices);
 			} else {
 				throw new IllegalArgumentException(
 						"The input image has more dimensions than the kernel!");

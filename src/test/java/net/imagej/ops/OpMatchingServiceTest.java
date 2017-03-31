@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -54,13 +54,13 @@ import org.scijava.plugin.Plugin;
  */
 public class OpMatchingServiceTest extends AbstractOpTest {
 
-	/** Tests {@link OpMatchingService#findModule}. */
+	/** Tests {@link OpMatchingService#findMatch}. */
 	@Test
-	public void testFindModule() {
+	public void testFindMatch() {
 		final DoubleType value = new DoubleType(123.456);
 
-		final Module moduleByName =
-			matcher.findModule(ops, OpRef.create("test.nan", value));
+		final Module moduleByName = matcher.findMatch(ops, OpRef.create("test.nan",
+			value)).getModule();
 		assertSame(value, moduleByName.getInput("arg"));
 
 		assertFalse(Double.isNaN(value.get()));
@@ -68,8 +68,8 @@ public class OpMatchingServiceTest extends AbstractOpTest {
 		assertTrue(Double.isNaN(value.get()));
 
 		value.set(987.654);
-		final Module moduleByType =
-			matcher.findModule(ops, OpRef.create(NaNOp.class, value));
+		final Module moduleByType = matcher.findMatch(ops, OpRef.create(NaNOp.class,
+			value)).getModule();
 		assertSame(value, moduleByType.getInput("arg"));
 
 		assertFalse(Double.isNaN(value.get()));
@@ -113,22 +113,59 @@ public class OpMatchingServiceTest extends AbstractOpTest {
 
 	@Test
 	public void testNameViaInterface() {
-		assertMatches("dessert.iceCream", FlavorlessIceCream.class);
-		assertMatches("dessert.vanillaIceCream", VanillaIceCream.class);
-		assertMatches("dessert.chocolateIceCream", ChocolateIceCream.class);
-		assertMatches("dessert.sorbet", YummySorbet.class);
-		assertMatches("dessert.sherbet", GenericSherbet.class, RainbowSherbet.class);
-		assertMatches("dessert.americanSherbet", GenericSherbet.class);
-		assertMatches("dessert.rainbowSherbet", RainbowSherbet.class);
-		assertMatches("dessert.gelato", RichGelato.class);
-		assertMatches("dessert.gelati", RichGelato.class);
-		assertMatches("dessert.italianIceCream", RichGelato.class);
+		assertMatches("test.dessert.iceCream", FlavorlessIceCream.class);
+		assertMatches("test.dessert.vanillaIceCream", VanillaIceCream.class);
+		assertMatches("test.dessert.chocolateIceCream", ChocolateIceCream.class);
+		assertMatches("test.dessert.sorbet", YummySorbet.class);
+		assertMatches("test.dessert.sherbet", GenericSherbet.class,
+			RainbowSherbet.class);
+		assertMatches("test.dessert.americanSherbet", GenericSherbet.class);
+		assertMatches("test.dessert.rainbowSherbet", RainbowSherbet.class);
+		assertMatches("test.dessert.gelato", RichGelato.class);
+		assertMatches("test.dessert.gelati", RichGelato.class);
+		assertMatches("test.dessert.italianIceCream", RichGelato.class);
+	}
+
+	/** Tests if the perfect match will be selected if no priority given. */
+	@Test
+	public void testPerfectMatch() {
+		assertEquals(ops.op(Foo.class, AppleIface2.class).getClass(),
+			AppleIface2Foo.class);
+		assertEquals(ops.op(Foo.class, AppleClass2.class).getClass(),
+			AppleClass2Foo.class);
+	}
+
+	/**
+	 * Tests if the match with fewer levels of casting will be selected if no
+	 * priority given.
+	 */
+	@Test
+	public void testCastMatch() {
+		assertEquals(ops.op(Foo.class, OrangeIface2.class).getClass(),
+			OrangeIfaceFoo.class);
+		assertEquals(ops.op(Foo.class, OrangeClass2.class).getClass(),
+			OrangeClassFoo.class);
+
+		try {
+			// both AppleIface1 and AppleClass have same levels of casting.
+			ops.op(Foo.class, AppleClass1.class);
+			assertTrue(false);
+		}
+		catch (final IllegalArgumentException ex) {
+			// expected
+		}
+	}
+	
+	@Test
+	public void testLosslessMatch() {
+		// Not implemented yet
 	}
 
 	// -- Helper methods --
 
 	private Module optionalParamsModule(Object... args) {
-		return matcher.findModule(ops, OpRef.create(OptionalParams.class, args));
+		return matcher.findMatch(ops, OpRef.create(OptionalParams.class, args))
+			.getModule();
 	}
 
 	private void assertValues(final Module m, final int a, final int b,
@@ -148,12 +185,13 @@ public class OpMatchingServiceTest extends AbstractOpTest {
 	}
 
 	private void assertMatches(final String name, Class<?>... opTypes) {
-		final List<OpCandidate<Op>> candidates =
-			matcher.findCandidates(ops, OpRef.create(name));
-		final List<Module> matches = matcher.findMatches(candidates);
+		final List<OpCandidate> candidates = matcher.findCandidates(ops, OpRef
+			.create(name));
+		final List<OpCandidate> matches = matcher.filterMatches(candidates);
 		assertEquals(opTypes.length, matches.size());
-		for (int i=0; i<opTypes.length; i++) {
-			assertSame(opTypes[i], matches.get(i).getDelegateObject().getClass());
+		for (int i = 0; i < opTypes.length; i++) {
+			final Module m = matches.get(i).getModule();
+			assertSame(opTypes[i], m.getDelegateObject().getClass());
 		}
 	}
 
@@ -202,21 +240,25 @@ public class OpMatchingServiceTest extends AbstractOpTest {
 	}
 
 	public static interface IceCream extends Dessert {
-		String NAME = "dessert.iceCream";
+
+		String NAME = "test.dessert.iceCream";
 	}
 
 	public static interface Sorbet extends IceCream {
-		String NAME = "dessert.sorbet";
+
+		String NAME = "test.dessert.sorbet";
 	}
 
 	public static interface Sherbet extends IceCream {
-		String NAME = "dessert.sherbet";
-		String ALIAS = "dessert.americanSherbet";
+
+		String NAME = "test.dessert.sherbet";
+		String ALIAS = "test.dessert.americanSherbet";
 	}
 
 	public static interface Gelato extends IceCream {
-		String NAME = "dessert.gelato";
-		String ALIASES = "dessert.gelati, dessert.italianIceCream";
+
+		String NAME = "test.dessert.gelato";
+		String ALIASES = "test.dessert.gelati, test.dessert.italianIceCream";
 	}
 
 	@Plugin(type = IceCream.class)
@@ -224,12 +266,12 @@ public class OpMatchingServiceTest extends AbstractOpTest {
 		// NB: No implementation needed.
 	}
 
-	@Plugin(type = IceCream.class, name = "dessert.vanillaIceCream")
+	@Plugin(type = IceCream.class, name = "test.dessert.vanillaIceCream")
 	public static class VanillaIceCream extends NoOp implements IceCream {
 		// NB: No implementation needed.
 	}
 
-	@Plugin(type = IceCream.class, name = "dessert.chocolateIceCream")
+	@Plugin(type = IceCream.class, name = "test.dessert.chocolateIceCream")
 	public static class ChocolateIceCream extends NoOp implements IceCream {
 		// NB: No implementation needed.
 	}
@@ -245,7 +287,7 @@ public class OpMatchingServiceTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = Sherbet.class, //
-		attrs = { @Attr(name = "alias", value = "dessert.rainbowSherbet") })
+		attrs = { @Attr(name = "alias", value = "test.dessert.rainbowSherbet") })
 	public static class RainbowSherbet extends NoOp implements Sherbet {
 		// NB: No implementation needed.
 	}
@@ -253,6 +295,109 @@ public class OpMatchingServiceTest extends AbstractOpTest {
 	@Plugin(type = Gelato.class)
 	public static class RichGelato extends NoOp implements Gelato {
 		// NB: No implementation needed.
+	}
+
+	public static interface Foo extends Op {
+		// NB: No implementation needed.
+	}
+
+	public static interface AppleIface {
+		// NB: No implementation needed.
+	}
+
+	public static interface AppleIface1 extends AppleIface {
+		// NB: No implementation needed.
+	}
+
+	public static interface AppleIface2 extends AppleIface1 {
+		// NB: No implementation needed.
+	}
+
+	public static class AppleClass implements AppleIface{
+		// NB: No implementation needed.
+	}
+
+	public static class AppleClass1 extends AppleClass implements AppleIface1 {
+		// NB: No implementation needed.
+	}
+
+	public static class AppleClass2 extends AppleClass1 implements AppleIface2 {
+		// NB: No implementation needed.
+	}
+
+	public static interface OrangeIface {
+		// NB: No implementation needed.
+	}
+
+	public static interface OrangeIface1 extends OrangeIface {
+		// NB: No implementation needed.
+	}
+
+	public static interface OrangeIface2 extends OrangeIface1 {
+		// NB: No implementation needed.
+	}
+
+	public static class OrangeClass implements OrangeIface {
+		// NB: No implementation needed.
+	}
+
+	public static class OrangeClass1 extends OrangeClass implements OrangeIface1 {
+		// NB: No implementation needed.
+	}
+
+	public static class OrangeClass2 extends OrangeClass1 implements
+		OrangeIface2
+	{
+		// NB: No implementation needed.
+	}
+
+	@Plugin(type = Foo.class)
+	public static class AppleIface2Foo extends NoOp implements Foo {
+
+		@Parameter(type = ItemIO.INPUT)
+		private AppleIface2 in;
+	}
+
+	@Plugin(type = Foo.class)
+	public static class AppleIface1Foo extends NoOp implements Foo {
+
+		@Parameter(type = ItemIO.INPUT)
+		private AppleIface1 in;
+	}
+
+	@Plugin(type = Foo.class)
+	public static class AppleIfaceFoo extends NoOp implements Foo {
+
+		@Parameter(type = ItemIO.INPUT)
+		private AppleIface in;
+	}
+
+	@Plugin(type = Foo.class)
+	public static class AppleClass2Foo extends NoOp implements Foo {
+
+		@Parameter(type = ItemIO.INPUT)
+		private AppleClass2 in;
+	}
+
+	@Plugin(type = Foo.class)
+	public static class AppleClassFoo extends NoOp implements Foo {
+
+		@Parameter(type = ItemIO.INPUT)
+		private AppleClass in;
+	}
+
+	@Plugin(type = Foo.class)
+	public static class OrangeIfaceFoo extends NoOp implements Foo {
+
+		@Parameter(type = ItemIO.INPUT)
+		private OrangeIface in;
+	}
+
+	@Plugin(type = Foo.class)
+	public static class OrangeClassFoo extends NoOp implements Foo {
+
+		@Parameter(type = ItemIO.INPUT)
+		private OrangeClass in;
 	}
 
 }

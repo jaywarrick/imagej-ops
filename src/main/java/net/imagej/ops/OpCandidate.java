@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -42,10 +42,9 @@ import org.scijava.module.ModuleItem;
  * an {@link OpInfo}, as computed by the {@link OpMatchingService}.
  * 
  * @author Curtis Rueden
- * @param <OP> The type of {@link Op}.
  * @see OpMatchingService
  */
-public class OpCandidate<OP extends Op> {
+public class OpCandidate {
 
 	public static enum StatusCode {
 		MATCH,
@@ -62,15 +61,16 @@ public class OpCandidate<OP extends Op> {
 	}
 
 	private final OpEnvironment ops;
-	private final OpRef<OP> ref;
+	private final OpRef ref;
 	private final OpInfo info;
 
 	private Module module;
 	private StatusCode code;
 	private String message;
 	private ModuleItem<?> item;
+	private Object[] args;
 
-	public OpCandidate(final OpEnvironment ops, final OpRef<OP> ref,
+	public OpCandidate(final OpEnvironment ops, final OpRef ref,
 		final OpInfo info)
 	{
 		this.ops = ops;
@@ -84,7 +84,7 @@ public class OpCandidate<OP extends Op> {
 	}
 
 	/** Gets the op reference describing the desired match. */
-	public OpRef<OP> getRef() {
+	public OpRef getRef() {
 		return ref;
 	}
 
@@ -100,6 +100,16 @@ public class OpCandidate<OP extends Op> {
 	 */
 	public CommandInfo cInfo() {
 		return info.cInfo();
+	}
+
+	/** Gets the op's input parameters. */
+	public List<ModuleItem<?>> inputs() {
+		return opInfo().inputs();
+	}
+
+	/** Gets the op's output parameters. */
+	public List<ModuleItem<?>> outputs() {
+		return opInfo().outputs();
 	}
 
 	/** Sets the module instance associated with the attempted match. */
@@ -203,6 +213,14 @@ public class OpCandidate<OP extends Op> {
 		if (msg != null) sb.append(": " + msg);
 
 		return sb.toString();
+	}
+	
+	public Object[] getArgs() {
+		return args;
+	}
+	
+	public void setArgs(final Object[] args) {
+		this.args = args;
 	}
 
 	@Override

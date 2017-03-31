@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Iterator;
 
 import net.imagej.ops.AbstractOpTest;
+import net.imagej.ops.create.imgLabeling.DefaultCreateImgLabeling;
 import net.imglib2.Cursor;
 import net.imglib2.roi.labeling.ImgLabeling;
 import net.imglib2.roi.labeling.LabelingMapping;
@@ -46,7 +47,7 @@ import org.junit.Test;
 /**
  * Test @link {@link CopyLabelingMapping}.
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  *
  */
 public class CopyLabelingMappingTest extends AbstractOpTest {
@@ -55,8 +56,10 @@ public class CopyLabelingMappingTest extends AbstractOpTest {
 
 	@Before
 	public void createData() {
-		ImgLabeling<String, IntType> imgL = (ImgLabeling<String, IntType>) ops
-				.create().imgLabeling(new long[] { 10, 10 }, new IntType());
+		@SuppressWarnings("unchecked")
+		final ImgLabeling<String, IntType> imgL = (ImgLabeling<String, IntType>) ops
+			.run(DefaultCreateImgLabeling.class, new long[] { 10, 10 },
+				new IntType());
 
 		final Cursor<LabelingType<String>> inc = imgL.cursor();
 

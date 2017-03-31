@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -64,8 +64,8 @@ public final class Functions {
 	 * @param args The operation's arguments.
 	 * @return A {@link NullaryFunctionOp} with populated inputs, ready to use.
 	 */
-	public static <O, OP extends Op> NullaryFunctionOp<O> nullary(
-		final OpEnvironment ops, final Class<OP> opType, final Class<O> outType,
+	public static <O> NullaryFunctionOp<O> nullary(final OpEnvironment ops,
+		final Class<? extends Op> opType, final Class<O> outType,
 		final Object... args)
 	{
 		@SuppressWarnings("unchecked")
@@ -91,8 +91,8 @@ public final class Functions {
 	 *          value.
 	 * @return A {@link UnaryFunctionOp} with populated inputs, ready to use.
 	 */
-	public static <I, O, OP extends Op> UnaryFunctionOp<I, O> unary(
-		final OpEnvironment ops, final Class<OP> opType, final Class<O> outType,
+	public static <I, O> UnaryFunctionOp<I, O> unary(final OpEnvironment ops,
+		final Class<? extends Op> opType, final Class<O> outType,
 		final Class<I> inType, final Object... otherArgs)
 	{
 		@SuppressWarnings("unchecked")
@@ -118,9 +118,9 @@ public final class Functions {
 	 *          values.
 	 * @return A {@link UnaryFunctionOp} with populated inputs, ready to use.
 	 */
-	public static <I, O, OP extends Op> UnaryFunctionOp<I, O> unary(
-		final OpEnvironment ops, final Class<OP> opType, final Class<O> outType,
-		final I in, final Object... otherArgs)
+	public static <I, O> UnaryFunctionOp<I, O> unary(final OpEnvironment ops,
+		final Class<? extends Op> opType, final Class<O> outType, final I in,
+		final Object... otherArgs)
 	{
 		@SuppressWarnings("unchecked")
 		final UnaryFunctionOp<I, O> op = SpecialOp.op(ops, opType,
@@ -148,9 +148,9 @@ public final class Functions {
 	 *          values.
 	 * @return A {@link BinaryFunctionOp} with populated inputs, ready to use.
 	 */
-	public static <I1, I2, O, OP extends Op> BinaryFunctionOp<I1, I2, O> binary(
-		final OpEnvironment ops, final Class<OP> opType, final Class<O> outType,
-		final Class<I1> in1Type, final Class<I2> in2Type,
+	public static <I1, I2, O> BinaryFunctionOp<I1, I2, O> binary(
+		final OpEnvironment ops, final Class<? extends Op> opType,
+		final Class<O> outType, final Class<I1> in1Type, final Class<I2> in2Type,
 		final Object... otherArgs)
 	{
 		final Object[] args = OpUtils.args(otherArgs, in1Type, in2Type);
@@ -178,9 +178,10 @@ public final class Functions {
 	 *          values.
 	 * @return A {@link BinaryFunctionOp} with populated inputs, ready to use.
 	 */
-	public static <I1, I2, O, OP extends Op> BinaryFunctionOp<I1, I2, O> binary(
-		final OpEnvironment ops, final Class<OP> opType, final Class<O> outType,
-		final I1 in1, final I2 in2, final Object... otherArgs)
+	public static <I1, I2, O> BinaryFunctionOp<I1, I2, O> binary(
+		final OpEnvironment ops, final Class<? extends Op> opType,
+		final Class<O> outType, final I1 in1, final I2 in2,
+		final Object... otherArgs)
 	{
 		final Object[] args = OpUtils.args(otherArgs, in1, in2);
 		@SuppressWarnings("unchecked")

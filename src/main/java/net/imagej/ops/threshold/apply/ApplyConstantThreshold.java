@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -57,19 +57,21 @@ public class ApplyConstantThreshold<T extends RealType<T>> extends
 	private BinaryComputerOp<T, T, BitType> applyThreshold;
 	private UnaryComputerOp<Iterable<T>, Iterable<BitType>> mapper;
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void initialize() {
 		applyThreshold = Computers.binary(ops(), ApplyThresholdComparable.class,
 			BitType.class, in2(), in2());
-		mapper = Computers.unary(ops(), Ops.Map.class, out(), in(), applyThreshold);
+		mapper = (UnaryComputerOp) Computers.unary(ops(), Ops.Map.class, out() == null
+			? Iterable.class : out(), in1(), applyThreshold);
 	}
 
 	@Override
-	public void compute2(final Iterable<T> input1, final T input2,
+	public void compute(final Iterable<T> input1, final T input2,
 		final Iterable<BitType> output)
 	{
 		applyThreshold.setInput2(input2);
-		mapper.compute1(input1, output);
+		mapper.compute(input1, output);
 	}
 
 }

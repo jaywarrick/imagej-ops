@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ import org.junit.Test;
 /**
  * This class tests the {@link BitTypeVertexInterpolator}.
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz.
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 public class BitTypeVertexInterpolatorTest extends AbstractOpTest {
 

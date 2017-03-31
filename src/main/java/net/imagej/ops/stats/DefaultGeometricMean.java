@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -42,8 +42,8 @@ import org.scijava.plugin.Plugin;
  * {@link Op} to calculate the {@code stats.geometricMean} using
  * {@code stats.size} and {@code stats.sumOfLogs}.
  * 
- * @author Daniel Seebacher, University of Konstanz.
- * @author Christian Dietz, University of Konstanz.
+ * @author Daniel Seebacher (University of Konstanz)
+ * @author Christian Dietz (University of Konstanz)
  * @param <I> input type
  * @param <O> output type
  */
@@ -63,9 +63,9 @@ public class DefaultGeometricMean<I extends RealType<I>, O extends RealType<O>>
 	}
 	
 	@Override
-	public void compute1(final Iterable<I> input, final O output) {
-		final double size = sizeFunc.compute1(input).getRealDouble();
-		final double sumOfLogs = sumOfLogsFunc.compute1(input).getRealDouble();
+	public void compute(final Iterable<I> input, final O output) {
+		final double size = sizeFunc.calculate(input).getRealDouble();
+		final double sumOfLogs = sumOfLogsFunc.calculate(input).getRealDouble();
 
 		if (size != 0) {
 			output.setReal(Math.exp(sumOfLogs / size));

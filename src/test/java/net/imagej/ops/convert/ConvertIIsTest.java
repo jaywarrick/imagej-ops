@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@ import net.imagej.ops.Ops;
 import net.imagej.ops.convert.clip.ClipRealTypes;
 import net.imagej.ops.convert.copy.CopyRealTypes;
 import net.imagej.ops.convert.imageType.ConvertIIs;
+import net.imagej.ops.convert.normalizeScale.NormalizeScaleRealTypes;
 import net.imagej.ops.convert.scale.ScaleRealTypes;
 import net.imagej.ops.special.inplace.Inplaces;
 import net.imagej.ops.special.inplace.UnaryInplaceOp;
@@ -47,6 +48,7 @@ import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
 import net.imglib2.type.numeric.integer.ShortType;
+import net.imglib2.util.Pair;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -71,7 +73,8 @@ public class ConvertIIsTest extends AbstractOpTest {
 
 	@Test
 	public void testClip() {
-		ops.convert().imageType(out, in, new ClipRealTypes<ShortType, ByteType>());
+		ops.run(ConvertIIs.class, out, in,
+			new ClipRealTypes<ShortType, ByteType>());
 
 		final Cursor<ShortType> c = in.localizingCursor();
 		final RandomAccess<ByteType> ra = out.randomAccess();
@@ -84,7 +87,8 @@ public class ConvertIIsTest extends AbstractOpTest {
 
 	@Test
 	public void testCopy() {
-		ops.convert().imageType(out, in, new CopyRealTypes<ShortType, ByteType>());
+		ops.run(ConvertIIs.class, out, in,
+			new CopyRealTypes<ShortType, ByteType>());
 
 		final Cursor<ShortType> c = in.localizingCursor();
 		final RandomAccess<ByteType> ra = out.randomAccess();
@@ -97,7 +101,8 @@ public class ConvertIIsTest extends AbstractOpTest {
 
 	@Test
 	public void testScale() {
-		ops.convert().imageType(out, in, new ScaleRealTypes<ShortType, ByteType>());
+		ops.run(ConvertIIs.class, out, in,
+			new ScaleRealTypes<ShortType, ByteType>());
 
 		final Cursor<ShortType> c = in.localizingCursor();
 		final RandomAccess<ByteType> ra = out.randomAccess();
@@ -108,6 +113,20 @@ public class ConvertIIsTest extends AbstractOpTest {
 		}
 	}
 
+	@Test
+	public void testNormalizeScale() {
+		ops.run(ConvertIIs.class, out, in,
+			ops.op(NormalizeScaleRealTypes.class, out.firstElement(), in.firstElement()));
+
+		final Cursor<ShortType> c = in.localizingCursor();
+		final RandomAccess<ByteType> ra = out.randomAccess();
+		while (c.hasNext()) {
+			final short value = c.next().get();
+			ra.setPosition(c);
+			assertEquals(normalizeScale(value), ra.get().get());
+		}
+	}
+
 	// -- Helper methods --
 
 	private byte scale(final short value) {
@@ -115,9 +134,17 @@ public class ConvertIIsTest extends AbstractOpTest {
 		return (byte) Math.round((255 * norm) - 128);
 	}
 
+	private byte normalizeScale(final short value) {
+		Pair<ShortType, ShortType> minMax = ops.stats().minMax(in);
+		final double norm = (value - minMax.getA().getRealDouble()) / (minMax.getB()
+			.getRealDouble() - minMax.getA().getRealDouble());
+		return (byte) Math.round((255 * norm) - 128);
+	}
+
 	private void addNoise(final Iterable<ShortType> image) {
-		final UnaryInplaceOp<ShortType> noiseOp = Inplaces.unary(ops,
-			Ops.Filter.AddNoise.class, ShortType.class, -32768, 32767, 10000);
+		// NB: Need "? super ShortType" instead of "?" to make javac happy.
+		final UnaryInplaceOp<? super ShortType, ShortType> noiseOp = Inplaces.unary(
+			ops, Ops.Filter.AddNoise.class, ShortType.class, -32768, 32767, 10000);
 		ops.map(image, noiseOp);
 	}
 

@@ -42,13 +42,13 @@ import net.imagej.ops.OpRef;
 public class NamedFeature implements Named {
 
 	private final String name;
-	private OpRef<?> ref;
+	private OpRef ref;
 
 	public NamedFeature(String name) {
 		this.name = name;
 	}
 
-	public NamedFeature(OpRef<?> ref) {
+	public NamedFeature(OpRef ref) {
 		this(ref.getLabel());
 		this.ref = ref;
 	}
@@ -89,7 +89,7 @@ public class NamedFeature implements Named {
 		return true;
 	}
 
-	public OpRef<?> getOp() {
+	public OpRef getOp() {
 		return ref;
 	}
 }

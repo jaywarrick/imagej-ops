@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@
 
 package net.imagej.ops.cached;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -48,35 +49,56 @@ import org.scijava.command.CommandInfo;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleItem;
 import org.scijava.plugin.Parameter;
+import org.scijava.util.GenericUtils;
 
 /**
  * Creates {@link CachedFunctionOp}s which know how to cache their outputs.
  * 
- * @author Christian Dietz, University of Konstanz
+ * @author Christian Dietz (University of Konstanz)
  */
 public class CachedOpEnvironment extends CustomOpEnvironment {
 
 	@Parameter
 	private CacheService cs;
+	private Collection<Class<?>> ignoredOps;
 
 	public CachedOpEnvironment(final OpEnvironment parent) {
-		this(parent, null);
+		this(parent, null, new ArrayList<>());
 	}
 
 	public CachedOpEnvironment(final OpEnvironment parent,
 		final Collection<? extends OpInfo> prioritizedInfos)
 	{
+		this(parent, prioritizedInfos, new ArrayList<>());
+	}
+
+	public CachedOpEnvironment(final OpEnvironment parent,
+		final Collection<? extends OpInfo> prioritizedInfos,
+		final Collection<Class<?>> ignoredOps)
+	{
 		super(parent, prioritizedInfos);
-		
-		if (prioritizedInfos != null) 
-			for (final OpInfo info : prioritizedInfos) {
+
+		if (prioritizedInfos != null) for (final OpInfo info : prioritizedInfos) {
 			info.cInfo().setPriority(Priority.FIRST_PRIORITY);
 		}
+
+		this.ignoredOps = ignoredOps;
 	}
 
 	@Override
-	public Op op(final OpRef<?> ref) {
+	public Op op(final OpRef ref) {
 		final Op op = super.op(ref);
+
+		for (final Class<?> ignored : ignoredOps) {
+			for (final Type t : ref.getTypes()) {
+				// FIXME: Use generic assignability test, once it exists.
+				final Class<?> raw = GenericUtils.getClass(t);
+				if (ignored.isAssignableFrom(raw)) {
+					return op;
+				}
+			}
+		}
+
 		final Op cachedOp;
 		if (op instanceof UnaryHybridCF) {
 			cachedOp = wrapUnaryHybrid((UnaryHybridCF<?, ?>) op);
@@ -122,14 +144,16 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 	// -- Helper classes --
 
 	/**
-	 * Wraps a {@link UnaryFunctionOp} and caches the results. New inputs will result
-	 * in re-computation of the result.
+	 * Wraps a {@link UnaryFunctionOp} and caches the results. New inputs will
+	 * result in re-computation of the result.
 	 * 
-	 * @author Christian Dietz, University of Konstanz
+	 * @author Christian Dietz (University of Konstanz)
 	 * @param <I>
 	 * @param <O>
 	 */
-	class CachedFunctionOp<I, O> extends AbstractOp implements UnaryFunctionOp<I, O> {
+	class CachedFunctionOp<I, O> extends AbstractOp implements
+		UnaryFunctionOp<I, O>
+	{
 
 		@Parameter
 		private CacheService cache;
@@ -146,7 +170,7 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 		}
 
 		@Override
-		public O compute1(final I input) {
+		public O calculate(final I input) {
 
 			final Hash hash = new Hash(input, delegate, args);
 
@@ -154,7 +178,7 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 			O output = (O) cache.get(hash);
 
 			if (output == null) {
-				output = delegate.compute1(input);
+				output = delegate.calculate(input);
 				cache.put(hash, output);
 			}
 			return output;
@@ -193,10 +217,11 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 	}
 
 	/**
-	 * Wraps a {@link UnaryHybridCF} and caches the results. New inputs will result in
-	 * re-computation if {@link UnaryHybridCF} is used as {@link UnaryFunctionOp}.
+	 * Wraps a {@link UnaryHybridCF} and caches the results. New inputs will
+	 * result in re-computation if {@link UnaryHybridCF} is used as
+	 * {@link UnaryFunctionOp}.
 	 * 
-	 * @author Christian Dietz, University of Konstanz
+	 * @author Christian Dietz (University of Konstanz)
 	 * @param <I>
 	 * @param <O>
 	 */
@@ -211,14 +236,16 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 
 		private final Object[] args;
 
-		public CachedHybridOp(final UnaryHybridCF<I, O> delegate, final Object[] args) {
+		public CachedHybridOp(final UnaryHybridCF<I, O> delegate,
+			final Object[] args)
+		{
 			super(delegate, args);
 			this.delegate = delegate;
 			this.args = args;
 		}
 
 		@Override
-		public O compute1(final I input) {
+		public O calculate(final I input) {
 			final Hash hash = new Hash(input, delegate, args);
 
 			@SuppressWarnings("unchecked")
@@ -226,7 +253,7 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 
 			if (output == null) {
 				output = createOutput(input);
-				compute1(input, output);
+				compute(input, output);
 				cache.put(hash, output);
 			}
 			return output;
@@ -238,8 +265,8 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 		}
 
 		@Override
-		public void compute1(final I input, final O output) {
-			delegate.compute1(input, output);
+		public void compute(final I input, final O output) {
+			delegate.compute(input, output);
 		}
 
 		@Override

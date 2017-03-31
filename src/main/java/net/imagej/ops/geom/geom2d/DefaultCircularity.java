@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,8 @@ package net.imagej.ops.geom.geom2d;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.special.chain.RTs;
-import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.roi.geometric.Polygon;
 import net.imglib2.type.numeric.real.DoubleType;
 
@@ -42,28 +42,35 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@code geom.circularity}.
  * 
- * @author Daniel Seebacher, University of Konstanz.
+ * Based on https://imagej.nih.gov/ij/plugins/circularity.html.
+ * 
+ * @author Daniel Seebacher (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.Circularity.class,
 	label = "Geometric (2D): Circularity")
-public class DefaultCircularity extends AbstractUnaryFunctionOp<Polygon, DoubleType>
+public class DefaultCircularity extends AbstractUnaryHybridCF<Polygon, DoubleType>
 	implements Ops.Geometric.Circularity
 {
 
 	private UnaryFunctionOp<Polygon, DoubleType> areaFunc;
-	private UnaryFunctionOp<Polygon, DoubleType> perimiterFunc;
+	private UnaryFunctionOp<Polygon, DoubleType> perimeterFunc;
 
 	@Override
 	public void initialize() {
 		areaFunc = RTs.function(ops(), Ops.Geometric.Size.class, in());
-		perimiterFunc = RTs.function(ops(), Ops.Geometric.BoundarySize.class, in());
+		perimeterFunc = RTs.function(ops(), Ops.Geometric.BoundarySize.class, in());
 	}
-
+	
 	@Override
-	public DoubleType compute1(final Polygon input) {
-		return new DoubleType(4 * Math.PI * (areaFunc.compute1(input)
-			.getRealDouble() / Math.pow(perimiterFunc.compute1(input).getRealDouble(),
-				2)));
+	public void compute(Polygon input, DoubleType output) {
+		output.set(4 * Math.PI * (areaFunc.calculate(input)
+				.getRealDouble() / Math.pow(perimeterFunc.calculate(input).getRealDouble(),
+						2)));
+	}
+	
+	@Override
+	public DoubleType createOutput(Polygon input) {
+		return new DoubleType();
 	}
 
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,18 +30,20 @@
 
 package net.imagej.ops.threshold.localNiblack;
 
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
-
 import net.imagej.ops.Ops;
 import net.imagej.ops.map.neighborhood.CenterAwareComputerOp;
 import net.imagej.ops.special.computer.Computers;
 import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imagej.ops.threshold.LocalThresholdMethod;
 import net.imagej.ops.threshold.apply.LocalThreshold;
+import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
+
+import org.scijava.Priority;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  * LocalThresholdMethod using Niblack's thresholding method.
@@ -49,7 +51,8 @@ import net.imglib2.type.numeric.real.DoubleType;
  * @author Jonathan Hale
  * @author Stefan Helfrich (University of Konstanz)
  */
-@Plugin(type = Ops.Threshold.LocalNiblackThreshold.class)
+@Plugin(type = Ops.Threshold.LocalNiblackThreshold.class,
+	priority = Priority.LOW_PRIORITY)
 public class LocalNiblackThreshold<T extends RealType<T>> extends LocalThreshold<T>
 	implements Ops.Threshold.LocalNiblackThreshold
 {
@@ -61,7 +64,7 @@ public class LocalNiblackThreshold<T extends RealType<T>> extends LocalThreshold
 	private double k;
 	
 	@Override
-	protected CenterAwareComputerOp<T, BitType> unaryComputer(
+	protected CenterAwareComputerOp<T, BitType> unaryComputer(final T inClass,
 		final BitType outClass)
 	{
 		final LocalThresholdMethod<T> op = new LocalThresholdMethod<T>() {
@@ -70,7 +73,7 @@ public class LocalNiblackThreshold<T extends RealType<T>> extends LocalThreshold
 			private UnaryComputerOp<Iterable<T>, DoubleType> stdDeviation;
 
 			@Override
-			public void compute2(T center, Iterable<T> neighborhood, BitType output) {
+			public void compute(final Iterable<T> neighborhood, final T center, final BitType output) {
 
 				if (mean == null) {
 					mean = Computers.unary(ops(), Ops.Stats.Mean.class, new DoubleType(),
@@ -83,10 +86,10 @@ public class LocalNiblackThreshold<T extends RealType<T>> extends LocalThreshold
 				}
 
 				final DoubleType m = new DoubleType();
-				mean.compute1(neighborhood, m);
+				mean.compute(neighborhood, m);
 
 				final DoubleType stdDev = new DoubleType();
-				stdDeviation.compute1(neighborhood, stdDev);
+				stdDeviation.compute(neighborhood, stdDev);
 
 				output.set(center.getRealDouble() > m.getRealDouble() + k * stdDev
 					.getRealDouble() - c);
@@ -95,6 +98,17 @@ public class LocalNiblackThreshold<T extends RealType<T>> extends LocalThreshold
 
 		op.setEnvironment(ops());
 		return op;
+	}
+
+	@Override
+	public boolean conforms() {
+		RectangleShape rect = getShape() instanceof RectangleShape
+			? (RectangleShape) getShape() : null;
+		if (rect == null) {
+			return true;
+		}
+
+		return rect.getSpan() <= 2;
 	}
 
 }

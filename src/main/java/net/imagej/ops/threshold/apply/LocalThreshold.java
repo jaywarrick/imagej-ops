@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@
 
 package net.imagej.ops.threshold.apply;
 
+import net.imagej.ops.Contingent;
 import net.imagej.ops.filter.AbstractCenterAwareNeighborhoodBasedFilter;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
@@ -43,7 +44,12 @@ import net.imglib2.type.numeric.RealType;
  * @author Stefan Helfrich (University of Konstanz)
  */
 public abstract class LocalThreshold<T extends RealType<T>> extends
-	AbstractCenterAwareNeighborhoodBasedFilter<T, BitType>
+	AbstractCenterAwareNeighborhoodBasedFilter<T, BitType> implements Contingent
 {
-	// NB
+
+	@Override
+	public boolean conforms() {
+		return true;
+	}
+
 }

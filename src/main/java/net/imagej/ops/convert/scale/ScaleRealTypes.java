@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ package net.imagej.ops.convert.scale;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.convert.RealTypeConverter;
-import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.plugin.Plugin;
@@ -52,7 +51,8 @@ public class ScaleRealTypes<I extends RealType<I>, O extends RealType<O>>
 	protected double factor;
 
 	@Override
-	public void compute1(final I input, final O output) {
+	public void compute(final I input, final O output) {
+		// FIXME Throw exception if factor == 0.0
 		output.setReal((input.getRealDouble() - inMin) / factor + outMin);
 	}
 
@@ -61,11 +61,6 @@ public class ScaleRealTypes<I extends RealType<I>, O extends RealType<O>>
 		inMin = inType.getMinValue();
 		outMin = outType.getMinValue();
 		factor = (inType.getMaxValue() - inMin) / (outType.getMaxValue() - outMin);
-	}
-
-	@Override
-	public void checkInput(final IterableInterval<I> in) {
-		// nothing to do here
 	}
 
 }

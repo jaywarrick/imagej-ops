@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -39,25 +39,27 @@ import org.scijava.plugin.Parameter;
  * Abstract base class for {@link MapInplace} implementations.
  * 
  * @author Curtis Rueden
- * @param <EA> element type of inplace arguments
+ * @param <EI> element input type
+ * @param <EO> element output type
  * @param <PA> producer of arguments
  */
-public abstract class AbstractMapInplace<EA, PA> extends AbstractUnaryInplaceOp<PA>
-	implements MapInplace<EA, UnaryInplaceOp<EA>>
+public abstract class AbstractMapInplace<EI, EO extends EI, PA> extends
+	AbstractUnaryInplaceOp<PA> implements
+	MapInplace<EI, EO, UnaryInplaceOp<EI, EO>>
 {
 
 	@Parameter
-	private UnaryInplaceOp<EA> op;
+	private UnaryInplaceOp<EI, EO> op;
 
 	// -- MapOp methods --
 
 	@Override
-	public UnaryInplaceOp<EA> getOp() {
+	public UnaryInplaceOp<EI, EO> getOp() {
 		return op;
 	}
 
 	@Override
-	public void setOp(final UnaryInplaceOp<EA> op) {
+	public void setOp(final UnaryInplaceOp<EI, EO> op) {
 		this.op = op;
 	}
 

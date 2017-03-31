@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -33,15 +33,19 @@ package net.imagej.ops.special.chain;
 import net.imagej.ops.special.UnaryOp;
 
 /**
- * Base class for {@link UnaryOp} implementations that delegate to other
- * {@link UnaryOp} implementations.
+ * Base interface for {@link UnaryOp}s that delegate to other {@link UnaryOp}s.
  * 
  * @author Curtis Rueden
+ * @param <I> type of input
+ * @param <O> type of output
+ * @param <DI> type of input accepted by the worker op
+ * @param <DO> type of output accepted by the worker op
+ * @param <OP> type of the worker op
  */
-public interface DelegatingUnaryOp<T extends UnaryOp<I, O>, I, O> extends
-	UnaryOp<I, O>
+public interface DelegatingUnaryOp<I, O, DI, DO, OP extends UnaryOp<DI, DO>>
+	extends UnaryOp<I, O>
 {
 
-	T createWorker(I t);
+	OP createWorker(I t);
 
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -41,8 +41,11 @@ import net.imagej.ops.bufferfactories.ImgImgSameTypeFactory;
 import net.imagej.ops.map.MapOp;
 import net.imagej.ops.special.UnaryOutputFactory;
 import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
+import net.imagej.ops.special.computer.Computers;
 import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imagej.ops.special.inplace.AbstractUnaryInplaceOp;
+import net.imagej.ops.special.inplace.Inplaces;
+import net.imagej.ops.special.inplace.UnaryInplaceOp;
 import net.imglib2.Cursor;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
@@ -54,17 +57,17 @@ public class JoinTest extends AbstractOpTest {
 
 	private Img<ByteType> in;
 	private Img<ByteType> out;
-	private Op inplaceOp;
-	private Op computerOp;
+	private UnaryInplaceOp<? super Img<ByteType>, Img<ByteType>> inplaceOp;
+	private UnaryComputerOp<Img<ByteType>, Img<ByteType>> computerOp;
 
 	@Before
 	public void init() {
 		final long[] dims = new long[] { 10, 10 };
 		in = generateByteArrayTestImg(false, dims);
 		out = generateByteArrayTestImg(false, dims);
-		inplaceOp = ops.op(MapOp.class, Img.class, new AddOneInplace());
-		computerOp =
-			ops.op(MapOp.class, Img.class, Img.class, new AddOneComputer());
+		inplaceOp = Inplaces.unary(ops, MapOp.class, out, new AddOneInplace());
+		computerOp = Computers.unary(ops, MapOp.class, out, in,
+			new AddOneComputer());
 	}
 
 	@Test
@@ -115,7 +118,8 @@ public class JoinTest extends AbstractOpTest {
 		final UnaryOutputFactory<Img<ByteType>, Img<ByteType>> outputFactory =
 			new ImgImgSameTypeFactory<>();
 
-		ops.join(out, in, computerOp, computerOp, outputFactory);
+		ops.run(DefaultJoin2Computers.class, out, in, computerOp, computerOp,
+			outputFactory);
 
 		// test
 		final Cursor<ByteType> c = out.cursor();
@@ -137,7 +141,7 @@ public class JoinTest extends AbstractOpTest {
 		final UnaryOutputFactory<Img<ByteType>, Img<ByteType>> outputFactory =
 			new ImgImgSameTypeFactory<>();
 
-		ops.join(out, in, computers, outputFactory);
+		ops.run(DefaultJoinNComputers.class, out, in, computers, outputFactory);
 
 		// test
 		final Cursor<ByteType> c = out.cursor();
@@ -160,7 +164,7 @@ public class JoinTest extends AbstractOpTest {
 	private class AddOneComputer extends AbstractUnaryComputerOp<ByteType, ByteType> {
 
 		@Override
-		public void compute1(final ByteType input, final ByteType output) {
+		public void compute(final ByteType input, final ByteType output) {
 			output.set(input);
 			output.inc();
 		}
@@ -171,7 +175,7 @@ public class JoinTest extends AbstractOpTest {
 	{
 
 		@Override
-		public void compute1(final Img<ByteType> input,
+		public void compute(final Img<ByteType> input,
 			final Img<ByteType> output)
 		{
 			ops.run(MapOp.class, output, input, new AddOneComputer());

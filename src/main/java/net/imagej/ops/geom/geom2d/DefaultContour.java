@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -53,8 +53,12 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@code geom.contour}.
  * 
- * @author Jonathan Hale, Universitf Konstany.
- * @author Daniel Seebacher, University of Konstanz.
+ * This implementation assumes that foreground-pixels are 'true' and
+ * background-pixels are 'false'.
+ * 
+ * @author Jonathan Hale (University of Konstanz)
+ * @author Daniel Seebacher (University of Konstanz)
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.Contour.class)
 public class DefaultContour<B extends BooleanType<B>> extends
@@ -65,10 +69,6 @@ public class DefaultContour<B extends BooleanType<B>> extends
 	@Parameter(type = ItemIO.INPUT,
 		description = "Set this flag to use  refined Jacobs stopping criteria")
 	private boolean useJacobs = true;
-
-	@Parameter(type = ItemIO.INPUT,
-		description = "Set this flag to invert between foreground/background.")
-	private boolean isInverted = false;
 
 	/**
 	 * ClockwiseMooreNeighborhoodIterator Iterates clockwise through a 2D Moore
@@ -195,11 +195,10 @@ public class DefaultContour<B extends BooleanType<B>> extends
 	}
 
 	@Override
-	public Polygon compute1(final RandomAccessibleInterval<B> input) {
+	public Polygon calculate(final RandomAccessibleInterval<B> input) {
 		List<RealPoint> p = new ArrayList<>();
 
 		final B var = Util.getTypeFromInterval(input).createVariable();
-		var.set(!isInverted);
 
 		final RandomAccess<B> raInput = Views.extendValue(input, var)
 			.randomAccess();
@@ -210,10 +209,10 @@ public class DefaultContour<B extends BooleanType<B>> extends
 		double[] position = new double[2];
 		double[] startPos = new double[2];
 
-		// find first black pixel
+		// find first true pixel
 		while (cInput.hasNext()) {
-			// we are looking for a black pixel
-			if (cInput.next().get() == isInverted) {
+			// we are looking for a true pixel
+			if (cInput.next().get()) {
 				raInput.setPosition(cInput);
 				raInput.localize(startPos);
 
@@ -226,7 +225,7 @@ public class DefaultContour<B extends BooleanType<B>> extends
 				cNeigh.reset();
 
 				while (cNeigh.hasNext()) {
-					if (cNeigh.next().get() == isInverted) {
+					if (cNeigh.next().get()) {
 
 						boolean specialBacktrack = false;
 

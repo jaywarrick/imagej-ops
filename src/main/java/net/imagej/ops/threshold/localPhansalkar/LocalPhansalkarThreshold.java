@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,43 +30,51 @@
 
 package net.imagej.ops.threshold.localPhansalkar;
 
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
-
 import net.imagej.ops.Ops;
 import net.imagej.ops.map.neighborhood.CenterAwareComputerOp;
 import net.imagej.ops.special.computer.Computers;
 import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imagej.ops.threshold.LocalThresholdMethod;
 import net.imagej.ops.threshold.apply.LocalThreshold;
+import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
+import org.scijava.Priority;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+
 /**
+ * <p>
  * This is a modification of Sauvola's thresholding method to deal with low
- * contrast images.
- * 
- * In this algorithm the threshold is computed as t =
+ * contrast images. In this algorithm the threshold is computed as t =
  * mean*(1+p*exp(-q*mean)+k*((stdev/r)-1)) for an image that is normalized to
  * [0, 1].
- * 
+ * </p>
+ * <p>
  * Phansalkar recommends k = 0.25, r = 0.5, p = 2 and q = 10. In the current
  * implementation, the values of p and q are fixed but can be implemented as
  * additional parameters.
- * 
- * Originally implemented from Phansalkar's paper description by G. Landini
- * (http://fiji.sc/Auto_Local_Threshold#Phansalkar).
- * 
- * Phansalskar N. et al. Adaptive local thresholding for detection of nuclei in
- * diversity stained cytology images. International Conference on Communications
- * and Signal Processing (ICCSP), 2011, 218 - 220.
+ * </p>
+ * <p>
+ * <a href="http://fiji.sc/Auto_Local_Threshold#Phansalkar">Originally
+ * implemented</a> from Phansalkar's paper description by G. Landini.
+ * </p>
+ * <p>
+ * <i>Phansalkar N. et al. Adaptive local thresholding for detection of nuclei
+ * in diversity stained cytology images. International Conference on
+ * Communications and Signal Processing (ICCSP), 2011, 218 - 220.
+ * <a href="http://dx.doi.org/10.1109/ICCSP.2011.5739305">
+ * doi:10.1109/ICCSP.2011.5739305</a></i>
+ * </p>
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-@Plugin(type = Ops.Threshold.LocalPhansalkarThreshold.class)
-public class LocalPhansalkarThreshold<T extends RealType<T>> extends LocalThreshold<T>
-	implements Ops.Threshold.LocalPhansalkarThreshold
+@Plugin(type = Ops.Threshold.LocalPhansalkarThreshold.class,
+	priority = Priority.LOW_PRIORITY)
+public class LocalPhansalkarThreshold<T extends RealType<T>> extends
+	LocalThreshold<T> implements Ops.Threshold.LocalPhansalkarThreshold
 {
 
 	@Parameter(required = false)
@@ -77,9 +85,9 @@ public class LocalPhansalkarThreshold<T extends RealType<T>> extends LocalThresh
 
 	private double p = 2.0;
 	private double q = 10.0;
-	
+
 	@Override
-	protected CenterAwareComputerOp<T, BitType> unaryComputer(
+	protected CenterAwareComputerOp<T, BitType> unaryComputer(final T inClass,
 		final BitType outClass)
 	{
 		final LocalThresholdMethod<T> op = new LocalThresholdMethod<T>() {
@@ -88,7 +96,7 @@ public class LocalPhansalkarThreshold<T extends RealType<T>> extends LocalThresh
 			private UnaryComputerOp<Iterable<T>, DoubleType> stdDeviation;
 
 			@Override
-			public void compute2(T center, Iterable<T> neighborhood, BitType output) {
+			public void compute(final Iterable<T> neighborhood, final T center, final BitType output) {
 
 				if (mean == null) {
 					mean = Computers.unary(ops(), Ops.Stats.Mean.class, new DoubleType(),
@@ -101,10 +109,10 @@ public class LocalPhansalkarThreshold<T extends RealType<T>> extends LocalThresh
 				}
 
 				final DoubleType meanValue = new DoubleType();
-				mean.compute1(neighborhood, meanValue);
+				mean.compute(neighborhood, meanValue);
 
 				final DoubleType stdDevValue = new DoubleType();
-				stdDeviation.compute1(neighborhood, stdDevValue);
+				stdDeviation.compute(neighborhood, stdDevValue);
 
 				double threshold = meanValue.get() * (1.0d + p * Math.exp(-q * meanValue
 					.get()) + k * ((stdDevValue.get() / r) - 1.0));
@@ -115,6 +123,17 @@ public class LocalPhansalkarThreshold<T extends RealType<T>> extends LocalThresh
 
 		op.setEnvironment(ops());
 		return op;
+	}
+
+	@Override
+	public boolean conforms() {
+		RectangleShape rect = getShape() instanceof RectangleShape
+			? (RectangleShape) getShape() : null;
+		if (rect == null) {
+			return true;
+		}
+
+		return rect.getSpan() <= 2;
 	}
 
 }

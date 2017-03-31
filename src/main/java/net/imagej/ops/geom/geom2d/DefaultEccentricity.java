@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,8 @@ package net.imagej.ops.geom.geom2d;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.special.chain.RTs;
-import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.roi.geometric.Polygon;
 import net.imglib2.type.numeric.real.DoubleType;
 
@@ -42,13 +42,14 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@code geom.eccentricity}.
  * 
- * @author Daniel Seebacher, University of Konstanz.
+ * The eccentricity formula is based on "The Eccentricity of a Conic Section" by
+ * Ayoub B. Ayoub.
+ * 
+ * @author Tim-Oliver Buchholz, University of Konstanz
  */
-@Plugin(type = Ops.Geometric.Eccentricity.class,
-	label = "Geometric (2D): Eccentricity")
-public class DefaultEccentricity extends AbstractUnaryFunctionOp<Polygon, DoubleType>
-	implements Ops.Geometric.Eccentricity
-{
+@Plugin(type = Ops.Geometric.Eccentricity.class, label = "Geometric (2D): Eccentricity")
+public class DefaultEccentricity extends AbstractUnaryHybridCF<Polygon, DoubleType>
+		implements Ops.Geometric.Eccentricity {
 
 	private UnaryFunctionOp<Polygon, DoubleType> minorAxisFunc;
 	private UnaryFunctionOp<Polygon, DoubleType> majorAxisFunc;
@@ -60,9 +61,17 @@ public class DefaultEccentricity extends AbstractUnaryFunctionOp<Polygon, Double
 	}
 
 	@Override
-	public DoubleType compute1(final Polygon input) {
-		return new DoubleType(majorAxisFunc.compute1(input).getRealDouble() /
-			minorAxisFunc.compute1(input).getRealDouble());
+	public void compute(final Polygon input, final DoubleType output) {
+
+		final double a = majorAxisFunc.calculate(input).get() / 2.0;
+		final double b = minorAxisFunc.calculate(input).get() / 2.0;
+
+		output.set(Math.sqrt(1 - Math.pow(b / a, 2)));
+	}
+
+	@Override
+	public DoubleType createOutput(Polygon input) {
+		return new DoubleType();
 	}
 
 }

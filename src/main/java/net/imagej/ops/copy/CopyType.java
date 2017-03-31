@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@ import org.scijava.plugin.Plugin;
 /**
  * Copy {@link Type} to another {@link Type}
  * 
- * @author Christian Dietz, University of Konstanz
+ * @author Christian Dietz (University of Konstanz)
  * @param <T>
  */
 @Plugin(type = Ops.Copy.Type.class)
@@ -52,7 +52,7 @@ public class CopyType<T extends Type<T>> extends AbstractUnaryHybridCF<T, T>
 	}
 
 	@Override
-	public void compute1(final T input, final T output) {
+	public void compute(final T input, final T output) {
 		output.set(input);
 	}
 

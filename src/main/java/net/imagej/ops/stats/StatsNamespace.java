@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,9 @@ import net.imagej.ops.AbstractNamespace;
 import net.imagej.ops.Namespace;
 import net.imagej.ops.OpMethod;
 import net.imglib2.IterableInterval;
+import net.imglib2.algorithm.neighborhood.RectangleNeighborhood;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.util.Pair;
 
 import org.scijava.plugin.Plugin;
@@ -43,8 +45,8 @@ import org.scijava.plugin.Plugin;
  * The stats namespace contains operations related to numerical statistics.
  *
  * @author Curtis Rueden
- * @author Daniel Seebacher, University of Konstanz.
- * @author Christian Dietz, University of Konstanz.
+ * @author Daniel Seebacher (University of Konstanz)
+ * @author Christian Dietz (University of Konstanz)
  */
 @SuppressWarnings("unchecked")
 @Plugin(type = Namespace.class)
@@ -90,12 +92,50 @@ public class StatsNamespace extends AbstractNamespace {
 		return result;
 	}
 
+	@SuppressWarnings("rawtypes")
+	@OpMethod(op = net.imagej.ops.stats.IntegralMean.class)
+	public DoubleType integralMean(final DoubleType out,
+		final RectangleNeighborhood in)
+	{
+		final DoubleType result = (DoubleType) ops().run(
+			net.imagej.ops.stats.IntegralMean.class, out, in);
+		return result;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@OpMethod(op = net.imagej.ops.stats.IntegralSum.class)
+	public DoubleType integralSum(final RectangleNeighborhood in) {
+		final DoubleType result = (DoubleType) ops().run(
+			net.imagej.ops.stats.IntegralSum.class, in);
+		return result;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@OpMethod(op = net.imagej.ops.stats.IntegralSum.class)
+	public DoubleType integralSum(final DoubleType out,
+		final RectangleNeighborhood in)
+	{
+		final DoubleType result = (DoubleType) ops().run(
+			net.imagej.ops.stats.IntegralSum.class, out, in);
+		return result;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@OpMethod(op = net.imagej.ops.stats.IntegralVariance.class)
+	public DoubleType integralVariance(final DoubleType out,
+		final RectangleNeighborhood in)
+	{
+		final DoubleType result = (DoubleType) ops().run(
+			net.imagej.ops.stats.IntegralVariance.class, out, in);
+		return result;
+	}
+
 	@OpMethod(op = net.imagej.ops.stats.DefaultKurtosis.class)
 	public <T extends RealType<T>, O extends RealType<O>> O kurtosis(
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultKurtosis.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Kurtosis.class, in);
 		return result;
 	}
 
@@ -104,23 +144,19 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultKurtosis.class, out, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Kurtosis.class, out, in);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.stats.IterableMax.class)
-	public <T extends RealType<T>, O extends RealType<O>> O max(
-		final Iterable<T> in)
-	{
-		final O result = (O) ops().run(net.imagej.ops.Ops.Stats.Max.class, in);
+	public <T extends RealType<T>> T max(final Iterable<T> in) {
+		final T result = (T) ops().run(net.imagej.ops.Ops.Stats.Max.class, in);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.stats.IterableMax.class)
-	public <T extends RealType<T>, O extends RealType<O>> O max(final O out,
-		final Iterable<T> in)
-	{
-		final O result = (O) ops().run(net.imagej.ops.Ops.Stats.Max.class, out, in);
+	public <T extends RealType<T>> T max(final T out, final Iterable<T> in) {
+		final T result = (T) ops().run(net.imagej.ops.Ops.Stats.Max.class, out, in);
 		return result;
 	}
 
@@ -148,7 +184,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultMedian.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Median.class, in);
 		return result;
 	}
 
@@ -157,31 +193,26 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultMedian.class, out, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Median.class, out, in);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.stats.IterableMin.class)
-	public <T extends RealType<T>, O extends RealType<O>> O min(
-		final Iterable<T> in)
-	{
-		final O result = (O) ops().run(net.imagej.ops.Ops.Stats.Min.class, in);
+	public <T extends RealType<T>> T min(final Iterable<T> in) {
+		final T result = (T) ops().run(net.imagej.ops.Ops.Stats.Min.class, in);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.stats.IterableMin.class)
-	public <T extends RealType<T>, O extends RealType<O>> O min(final O out,
-		final Iterable<T> in)
-	{
-		final O result = (O) ops().run(net.imagej.ops.Ops.Stats.Min.class, out, in);
-
+	public <T extends RealType<T>> T min(final T out, final Iterable<T> in) {
+		final T result = (T) ops().run(net.imagej.ops.Ops.Stats.Min.class, out, in);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.stats.DefaultMinMax.class)
 	public <T extends RealType<T>> Pair<T,T> minMax(final Iterable<T> in) {
 		final Pair<T,T> result =
-			(Pair<T,T>) ops().run(net.imagej.ops.stats.DefaultMinMax.class, in);
+			(Pair<T,T>) ops().run(net.imagej.ops.Ops.Stats.MinMax.class, in);
 		return result;
 	}
 
@@ -190,7 +221,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultMoment1AboutMean.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Moment1AboutMean.class, in);
 		return result;
 	}
 
@@ -200,7 +231,7 @@ public class StatsNamespace extends AbstractNamespace {
 	{
 		final O result =
 			(O) ops()
-				.run(net.imagej.ops.stats.DefaultMoment1AboutMean.class, out, in);
+				.run(net.imagej.ops.Ops.Stats.Moment1AboutMean.class, out, in);
 		return result;
 	}
 
@@ -209,7 +240,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultMoment2AboutMean.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Moment2AboutMean.class, in);
 		return result;
 	}
 
@@ -219,7 +250,7 @@ public class StatsNamespace extends AbstractNamespace {
 	{
 		final O result =
 			(O) ops()
-				.run(net.imagej.ops.stats.DefaultMoment2AboutMean.class, out, in);
+				.run(net.imagej.ops.Ops.Stats.Moment2AboutMean.class, out, in);
 		return result;
 	}
 
@@ -228,7 +259,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultMoment3AboutMean.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Moment3AboutMean.class, in);
 		return result;
 	}
 
@@ -238,7 +269,7 @@ public class StatsNamespace extends AbstractNamespace {
 	{
 		final O result =
 			(O) ops()
-				.run(net.imagej.ops.stats.DefaultMoment3AboutMean.class, out, in);
+				.run(net.imagej.ops.Ops.Stats.Moment3AboutMean.class, out, in);
 		return result;
 	}
 
@@ -247,7 +278,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultMoment4AboutMean.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Moment4AboutMean.class, in);
 		return result;
 	}
 
@@ -257,7 +288,7 @@ public class StatsNamespace extends AbstractNamespace {
 	{
 		final O result =
 			(O) ops()
-				.run(net.imagej.ops.stats.DefaultMoment4AboutMean.class, out, in);
+				.run(net.imagej.ops.Ops.Stats.Moment4AboutMean.class, out, in);
 		return result;
 	}
 
@@ -266,7 +297,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in, final double percent)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultPercentile.class, in, percent);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Percentile.class, in, percent);
 		return result;
 	}
 
@@ -275,21 +306,21 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in, final double percent)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultPercentile.class, out, in, percent);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Percentile.class, out, in, percent);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.stats.DefaultQuantile.class)
 	public <T extends RealType<T>, O extends RealType<O>> O quantile(final Iterable<T> in, final double quantile) {
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultQuantile.class, in, quantile);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Quantile.class, in, quantile);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.stats.DefaultQuantile.class)
 	public <T extends RealType<T>, O extends RealType<O>> O quantile(final O out, final Iterable<T> in, final double quantile) {
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultQuantile.class, out, in, quantile);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Quantile.class, out, in, quantile);
 		return result;
 	}
 
@@ -298,7 +329,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final IterableInterval<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.IISize.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Size.class, in);
 		return result;
 	}
 
@@ -307,7 +338,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final IterableInterval<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.IISize.class, out, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Size.class, out, in);
 		return result;
 	}
 
@@ -315,7 +346,7 @@ public class StatsNamespace extends AbstractNamespace {
 	public <T extends RealType<T>, O extends RealType<O>> O size(
 		final Iterable<T> in)
 	{
-		final O result = (O) ops().run(net.imagej.ops.stats.DefaultSize.class, in);
+		final O result = (O) ops().run(net.imagej.ops.Ops.Stats.Size.class, in);
 		return result;
 	}
 
@@ -324,7 +355,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultSize.class, out, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Size.class, out, in);
 		return result;
 	}
 
@@ -333,7 +364,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultSkewness.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Skewness.class, in);
 		return result;
 	}
 
@@ -342,7 +373,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultSkewness.class, out, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Skewness.class, out, in);
 		return result;
 	}
 
@@ -369,7 +400,7 @@ public class StatsNamespace extends AbstractNamespace {
 	public <T extends RealType<T>, O extends RealType<O>> O sum(
 		final Iterable<T> in)
 	{
-		final O result = (O) ops().run(net.imagej.ops.stats.DefaultSum.class, in);
+		final O result = (O) ops().run(net.imagej.ops.Ops.Stats.Sum.class, in);
 		return result;
 	}
 
@@ -378,7 +409,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultSum.class, out, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.Sum.class, out, in);
 		return result;
 	}
 
@@ -387,7 +418,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultSumOfInverses.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.SumOfInverses.class, in);
 		return result;
 	}
 
@@ -396,7 +427,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final O out, final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultSumOfInverses.class, out, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.SumOfInverses.class, out, in);
 		return result;
 	}
 
@@ -405,7 +436,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultSumOfLogs.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.SumOfLogs.class, in);
 		return result;
 	}
 
@@ -414,7 +445,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final O out, final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultSumOfLogs.class, out, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.SumOfLogs.class, out, in);
 		return result;
 	}
 
@@ -423,7 +454,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultSumOfSquares.class, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.SumOfSquares.class, in);
 		return result;
 	}
 
@@ -432,7 +463,7 @@ public class StatsNamespace extends AbstractNamespace {
 		final O out, final Iterable<T> in)
 	{
 		final O result =
-			(O) ops().run(net.imagej.ops.stats.DefaultSumOfSquares.class, out, in);
+			(O) ops().run(net.imagej.ops.Ops.Stats.SumOfSquares.class, out, in);
 		return result;
 	}
 

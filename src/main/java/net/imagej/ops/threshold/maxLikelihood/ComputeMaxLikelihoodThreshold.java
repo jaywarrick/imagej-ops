@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ItemIO;
+import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -46,12 +47,12 @@ import org.scijava.plugin.Plugin;
 // the HistThresh Toolbox (relicensed BSD 2-12-13)
 
 /**
- * Implements a maximum likelihood threshold method by Dempster, Laird, & Rubin
- * and Glasbey.
+ * Implements a maximum likelihood threshold method by Dempster, Laird,
+ * {@literal &} Rubin and Glasbey.
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Ops.Threshold.MaxLikelihood.class)
+@Plugin(type = Ops.Threshold.MaxLikelihood.class, priority = Priority.HIGH_PRIORITY)
 public class ComputeMaxLikelihoodThreshold<T extends RealType<T>> extends
 		AbstractComputeThresholdHistogram<T> implements Ops.Threshold.MaxLikelihood
 {
@@ -101,6 +102,11 @@ public class ComputeMaxLikelihoodThreshold<T extends RealType<T>> extends
 		final ComputeMinimumThreshold<T> method = new ComputeMinimumThreshold<>();
 		int T = (int) method.computeBin(hist);
 
+		// NB: T might be -1 if ComputeMinimumThreshold doesn't converge
+		if (T < 0) {
+			return 0;
+		}
+
 		double eps = 0.0000001;
 
 		// % Calculate initial values for the statistics.
@@ -115,7 +121,7 @@ public class ComputeMaxLikelihoodThreshold<T extends RealType<T>> extends
 
 		// % Return if sigma2 or tau2 are zero, to avoid division by zero
 		if (sigma2 == 0 || tau2 == 0)
-			return -1;
+			return 0;
 
 		double mu_prev = Double.NaN;
 		double nu_prev = Double.NaN;
@@ -140,7 +146,7 @@ public class ComputeMaxLikelihoodThreshold<T extends RealType<T>> extends
 			if (attempts++ > MAX_ATTEMPTS) {
 				errMsg = "Max likelihood method not converging after "
 						+ MAX_ATTEMPTS + " attempts.";
-				return -1;
+				return 0;
 			}
 			for (int i = 0; i <= n; i++) {
 				double dmu2 = (i - mu) * (i - mu);
@@ -199,7 +205,7 @@ public class ComputeMaxLikelihoodThreshold<T extends RealType<T>> extends
 		double sqterm = w1 * w1 - w0 * w2;
 		if (sqterm < 0) {
 			errMsg = "Max likelihood threshold would be imaginary";
-			return -1;
+			return 0;
 		}
 
 		// % The threshold is the integer part of the solution of the quadratic

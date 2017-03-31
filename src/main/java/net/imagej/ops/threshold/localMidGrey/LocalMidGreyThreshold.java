@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,9 +30,6 @@
 
 package net.imagej.ops.threshold.localMidGrey;
 
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
-
 import net.imagej.ops.Ops;
 import net.imagej.ops.map.neighborhood.CenterAwareComputerOp;
 import net.imagej.ops.special.function.Functions;
@@ -42,6 +39,9 @@ import net.imagej.ops.threshold.apply.LocalThreshold;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Pair;
+
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
 
 /**
  * LocalThresholdMethod which thresholds against the average of the maximum and
@@ -59,7 +59,7 @@ public class LocalMidGreyThreshold<T extends RealType<T>> extends
 	private double c;
 	
 	@Override
-	protected CenterAwareComputerOp<T, BitType> unaryComputer(
+	protected CenterAwareComputerOp<T, BitType> unaryComputer(final T inClass,
 		final BitType outClass)
 	{
 		final LocalThresholdMethod<T> op = new LocalThresholdMethod<T>() {
@@ -68,14 +68,14 @@ public class LocalMidGreyThreshold<T extends RealType<T>> extends
 
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
-			public void compute2(T center, Iterable<T> neighborhood, BitType output) {
+			public void compute(final Iterable<T> neighborhood, final T center, final BitType output) {
 
 				if (minMaxFunc == null) {
 					minMaxFunc = (UnaryFunctionOp) Functions.unary(ops(),
 						Ops.Stats.MinMax.class, Pair.class, neighborhood);
 				}
 
-				final Pair<T, T> outputs = minMaxFunc.compute1(neighborhood);
+				final Pair<T, T> outputs = minMaxFunc.calculate(neighborhood);
 
 				final double minValue = outputs.getA().getRealDouble();
 				final double maxValue = outputs.getB().getRealDouble();

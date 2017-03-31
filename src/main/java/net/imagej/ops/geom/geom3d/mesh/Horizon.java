@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@ package net.imagej.ops.geom.geom3d.mesh;
  * The horizon is a polygon of all outer edges/vertices of the merged
  * {@link TriangularFacet}. 
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz.
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 public class Horizon extends UpdateablePointSet<TriangularFacet> {
 	

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,19 +31,20 @@
 package net.imagej.ops.geom;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imagej.ops.special.function.Functions;
 import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Generic implementation of {@link net.imagej.ops.Ops.Geometric.Solidity}.
  * 
- * @author Tim-Oliver Buchholz, University of Konstanz.
+ * Based on https://de.mathworks.com/help/images/ref/regionprops.html.
+ * 
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
-public abstract class AbstractSolidity<I> extends
-	AbstractUnaryFunctionOp<I, DoubleType> implements Ops.Geometric.Solidity
-{
+public abstract class AbstractSolidity<I> extends AbstractUnaryHybridCF<I, DoubleType>
+		implements Ops.Geometric.Solidity {
 
 	private UnaryFunctionOp<I, DoubleType> volume;
 
@@ -52,14 +53,17 @@ public abstract class AbstractSolidity<I> extends
 	@Override
 	public void initialize() {
 		volume = Functions.unary(ops(), Ops.Geometric.Size.class, DoubleType.class, in());
-		convexHullVolume = Functions.unary(ops(), Ops.Geometric.SizeConvexHull.class,
-			DoubleType.class, in());
+		convexHullVolume = Functions.unary(ops(), Ops.Geometric.SizeConvexHull.class, DoubleType.class, in());
 	}
 
 	@Override
-	public DoubleType compute1(final I input) {
-		return new DoubleType(volume.compute1(input).get() / convexHullVolume
-			.compute1(input).get());
+	public void compute(final I input, final DoubleType output) {
+		output.set(volume.calculate(input).get() / convexHullVolume.calculate(input).get());
+	}
+
+	@Override
+	public DoubleType createOutput(I input) {
+		return new DoubleType();
 	}
 
 }

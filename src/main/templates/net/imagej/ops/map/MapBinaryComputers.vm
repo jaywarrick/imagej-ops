@@ -61,9 +61,9 @@ public class MapBinaryComputers {
 	 * {@link MapBinaryComputer} from {@link $in1Type.name} and
 	 * {@link $in2Type.name} to {@link $outType.name}.
 	 * 
-	 * @Param <EI1> element type of first inputs
-	 * @Param <EI2> element type of second inputs
-	 * @Param <EO> element type of outputs
+	 * @param <EI1> element type of first inputs
+	 * @param <EI2> element type of second inputs
+	 * @param <EO> element type of outputs
 	 */
 	@Plugin(type = Ops.Map.class, priority = Priority.LOW_PRIORITY + $priority)
 	public static class ${in1Type.alias}And${in2Type.alias}To${outType.alias}<EI1, EI2, EO> extends
@@ -76,7 +76,7 @@ public class MapBinaryComputers {
 		}
 
 		@Override
-		public void compute2(final $in1Type.name<EI1> input1,
+		public void compute(final $in1Type.name<EI1> input1,
 			final $in2Type.name<EI2> input2, final $outType.name<EO> output)
 		{
 			Maps.map(input1, input2, output, getOp());
@@ -88,9 +88,9 @@ public class MapBinaryComputers {
 	 * Parallelized {@link MapBinaryComputer} from {@link $in1Type.name} and
 	 * {@link $in2Type.name} to {@link $outType.name}.
 	 * 
-	 * @Param <EI1> element type of first inputs
-	 * @Param <EI2> element type of second inputs
-	 * @Param <EO> element type of outputs
+	 * @param <EI1> element type of first inputs
+	 * @param <EI2> element type of second inputs
+	 * @param <EO> element type of outputs
 	 */
 	@Plugin(type = Ops.Map.class, priority = Priority.LOW_PRIORITY + $paraPrio)
 	public static class ${in1Type.alias}And${in2Type.alias}To${outType.alias}Parallel<EI1, EI2, EO> extends
@@ -103,7 +103,7 @@ public class MapBinaryComputers {
 		}
 
 		@Override
-		public void compute2(final $in1Type.name<EI1> input1,
+		public void compute(final $in1Type.name<EI1> input1,
 			final $in2Type.name<EI2> input2, final $outType.name<EO> output)
 		{
 			ops().run(ChunkerOp.class, new CursorBasedChunk() {

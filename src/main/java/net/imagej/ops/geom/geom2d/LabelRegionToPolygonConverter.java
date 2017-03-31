@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ import org.scijava.plugin.Plugin;
 /**
  * Converts a {@link LabelRegion} to a polygon
  * 
- * @author Daniel Seebacher, University of Konstanz
+ * @author Daniel Seebacher (University of Konstanz)
  */
 @SuppressWarnings("rawtypes")
 @Plugin(type = Converter.class, priority = Priority.VERY_HIGH_PRIORITY)
@@ -57,19 +57,19 @@ public class LabelRegionToPolygonConverter extends
 	AbstractConverter<LabelRegion, Polygon>
 {
 
-	@Parameter
+	@Parameter(required = false)
 	private OpService ops;
+
 	private UnaryFunctionOp<Object, Object> contourFunc;
 
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public <T> T convert(final Object src, final Class<T> dest) {
 		if (contourFunc == null) {
-			contourFunc = (UnaryFunctionOp) Functions.unary(ops, Ops.Geometric.Contour.class, dest, src, true,
-				true);
+			contourFunc = (UnaryFunctionOp) Functions.unary(ops, Ops.Geometric.Contour.class, dest, src, true);
 		}
 		// FIXME: can we make this faster?
-		final Polygon p = (Polygon) contourFunc.compute1(src);
+		final Polygon p = (Polygon) contourFunc.calculate(src);
 		return (T) p;
 	}
 
@@ -85,6 +85,7 @@ public class LabelRegionToPolygonConverter extends
 
 	@Override
 	public boolean supports(final ConversionRequest request) {
+		if (ops == null) return false;
 
 		final Object sourceObject = request.sourceObject();
 

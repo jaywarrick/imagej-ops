@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,6 @@
 
 package net.imagej.ops.filter;
 
-import org.scijava.plugin.Parameter;
-
 import net.imagej.ops.Ops.Map;
 import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
 import net.imagej.ops.special.computer.Computers;
@@ -43,6 +41,8 @@ import net.imglib2.outofbounds.OutOfBoundsBorderFactory;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
 import net.imglib2.view.Views;
 
+import org.scijava.plugin.Parameter;
+
 public abstract class AbstractNeighborhoodBasedFilter<I, O> extends
 	AbstractUnaryComputerOp<RandomAccessibleInterval<I>, IterableInterval<O>>
 {
@@ -52,25 +52,23 @@ public abstract class AbstractNeighborhoodBasedFilter<I, O> extends
 
 	@Parameter(required = false)
 	private OutOfBoundsFactory<I, RandomAccessibleInterval<I>> outOfBoundsFactory =
-		new OutOfBoundsBorderFactory<I, RandomAccessibleInterval<I>>();
+		new OutOfBoundsBorderFactory<>();
 
 	private UnaryComputerOp<Iterable<I>, O> filterOp;
 
 	private UnaryComputerOp<RandomAccessibleInterval<I>, IterableInterval<O>> map;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void initialize() {
 		filterOp = unaryComputer(out().firstElement());
-		map = (UnaryComputerOp) Computers.unary(ops(), Map.class, out(), in(),
-			filterOp, shape);
+		map = Computers.unary(ops(), Map.class, out(), in(), shape, filterOp);
 	}
 
 	@Override
-	public void compute1(RandomAccessibleInterval<I> input,
+	public void compute(RandomAccessibleInterval<I> input,
 		IterableInterval<O> output)
 	{
-		map.compute1(Views.interval(Views.extend(input, outOfBoundsFactory), input),
+		map.compute(Views.interval(Views.extend(input, outOfBoundsFactory), input),
 			output);
 	}
 
@@ -84,10 +82,6 @@ public abstract class AbstractNeighborhoodBasedFilter<I, O> extends
 	}
 
 	/**
-	 * @param inClass Class of the type in the input
-	 *          {@link RandomAccessibleInterval}
-	 * @param outClass Class of the type in the output
-	 *          {@link RandomAccessibleInterval}
 	 * @return the Computer to map to all neighborhoods of input to output.
 	 */
 	protected abstract UnaryComputerOp<Iterable<I>, O> unaryComputer(

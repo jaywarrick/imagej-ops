@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 package net.imagej.ops.create.img;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.special.chain.FunctionViaFunction;
+import net.imagej.ops.special.chain.UFViaUFSameIO;
 import net.imagej.ops.special.function.Functions;
 import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imglib2.Interval;
@@ -42,12 +42,13 @@ import org.scijava.plugin.Plugin;
 
 /**
  * Creates an {@link Img} from an {@link Interval} with no additional hints.
+ * {@link Interval} contents are not copied.
  *
  * @author Curtis Rueden
  */
 @Plugin(type = Ops.Create.Img.class)
 public class CreateImgFromInterval extends
-	FunctionViaFunction<Interval, Img<DoubleType>> implements Ops.Create.Img
+	UFViaUFSameIO<Interval, Img<DoubleType>> implements Ops.Create.Img
 {
 
 	@Override

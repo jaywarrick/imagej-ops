@@ -30,6 +30,7 @@
 
 package net.imagej.ops.math;
 
+import net.imagej.ops.Contingent;
 import net.imagej.ops.Ops;
 import net.imagej.ops.special.hybrid.AbstractBinaryHybridCFI;
 import net.imglib2.type.numeric.NumericType;
@@ -49,17 +50,32 @@ public final class NumericTypeBinaryMath {
 	private NumericTypeBinaryMath() {
 		// NB: Prevent instantiation of utility class.
 	}
+
+	@SuppressWarnings("rawtypes")
+	private static boolean compatible(NumericType in1, NumericType in2,
+		NumericType out)
+	{
+		if (out == null) {
+			return in1 == null || in2 == null || in1.getClass() == in2.getClass();
+		}
+		return in1.getClass() == in2.getClass() && in1.getClass() == out.getClass();
+	}
 #foreach ($op in $ops)
 #set ($iface = "Ops.Math.$op.name")
 
 	/** Op that $op.verbs two NumericType values. */
 	@Plugin(type = ${iface}.class, priority = Priority.HIGH_PRIORITY)
 	public static class $op.name<T extends NumericType<T>> extends
-		AbstractBinaryHybridCFI<T> implements $iface
+		AbstractBinaryHybridCFI<T, T> implements $iface, Contingent
 	{
 
 		@Override
-		public void compute2(final T input1, final T input2, final T output) {
+		public boolean conforms() {
+			return compatible(in1(), in2(), out());
+		}
+
+		@Override
+		public void compute(final T input1, final T input2, final T output) {
 			output.set(input1);
 			output.${op.function}(input2);
 		}
@@ -72,14 +88,14 @@ public final class NumericTypeBinaryMath {
 		@Override
 		public void mutate1(final T arg, final T in) {
 			final T result = arg.createVariable();
-			compute2(arg, in, result);
+			compute(arg, in, result);
 			arg.set(result);
 		}
 
 		@Override
 		public void mutate2(final T in, final T arg) {
 			final T result = arg.createVariable();
-			compute2(in, arg, result);
+			compute(in, arg, result);
 			arg.set(result);
 		}
 

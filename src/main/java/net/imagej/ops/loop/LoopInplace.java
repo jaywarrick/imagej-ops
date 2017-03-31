@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -38,14 +38,14 @@ import net.imagej.ops.special.inplace.UnaryInplaceOp;
  * 
  * @author Christian Dietz (University of Konstanz)
  */
-public interface LoopInplace<A> extends UnaryInplaceOp<A>, LoopOp<UnaryInplaceOp<A>> {
+public interface LoopInplace<I, O extends I> extends UnaryInplaceOp<I, O>, LoopOp<UnaryInplaceOp<I, O>> {
 
 	// -- UnaryInplaceOp methods --
 
 	@Override
-	default void mutate(final A arg) {
+	default void mutate(final O arg) {
 		final int n = getLoopCount();
-		final UnaryInplaceOp<A> op = getOp();
+		final UnaryInplaceOp<I, O> op = getOp();
 		for (int i = 0; i < n; i++) {
 			op.mutate(arg);
 		}

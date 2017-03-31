@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.List;
 
 import net.imagej.ops.AbstractOp;
-import net.imagej.ops.Op;
 import net.imagej.ops.OpCandidate;
 import net.imagej.ops.OpInfo;
 import net.imagej.ops.OpUtils;
@@ -54,9 +53,9 @@ public abstract class AbstractHelp extends AbstractOp implements Ops.Help {
 	@Parameter(type = ItemIO.OUTPUT)
 	private String help;
 
-	protected <OP extends Op> void help(final List<OpCandidate<OP>> candidates) {
+	protected void help(final List<OpCandidate> candidates) {
 		final ArrayList<OpInfo> infos = new ArrayList<>();
-		for (final OpCandidate<OP> candidate : candidates) {
+		for (final OpCandidate candidate : candidates) {
 			infos.add(candidate.opInfo());
 		}
 		help(infos);

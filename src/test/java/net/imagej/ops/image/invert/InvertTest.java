@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,7 @@ public class InvertTest extends AbstractOpTest {
 		Img<ByteType> in = generateByteArrayTestImg(true, 5, 5);
 		Img<ByteType> out = in.factory().create(in, new ByteType());
 
-		ops.image().invert(out, in);
+		ops.run(InvertII.class, out, in);
 
 		ByteType firstIn = in.firstElement();
 		ByteType firstOut = out.firstElement();
@@ -67,7 +67,7 @@ public class InvertTest extends AbstractOpTest {
 		Img<UnsignedByteType> in = generateUnsignedByteArrayTestImg(true, 5, 5);
 		Img<UnsignedByteType> out = in.factory().create(in, new UnsignedByteType());
 
-		ops.image().invert(out, in);
+		ops.run(InvertII.class, out, in);
 
 		UnsignedByteType firstIn = in.firstElement();
 		UnsignedByteType firstOut = out.firstElement();

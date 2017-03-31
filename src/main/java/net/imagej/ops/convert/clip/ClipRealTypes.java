@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ package net.imagej.ops.convert.clip;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.convert.RealTypeConverter;
-import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.plugin.Plugin;
@@ -50,7 +49,7 @@ public class ClipRealTypes<I extends RealType<I>, O extends RealType<O>>
 	private double outMin;
 
 	@Override
-	public void compute1(final I input, final O output) {
+	public void compute(final I input, final O output) {
 		final double v = input.getRealDouble();
 		if (v > outMax) {
 			output.setReal(outMax);
@@ -68,11 +67,6 @@ public class ClipRealTypes<I extends RealType<I>, O extends RealType<O>>
 		outMax = outType.getMaxValue();
 		outMin = outType.getMinValue();
 
-	}
-
-	@Override
-	public void checkInput(final IterableInterval<I> in) {
-		// nothing to do here
 	}
 
 }
