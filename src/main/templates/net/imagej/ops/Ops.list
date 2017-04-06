@@ -175,7 +175,7 @@ namespaces = ```
 	]],
 	[name: "image", iface: "Image", ops: [
 		[name: "ascii",                          iface: "ASCII"],
-		[name: "cooccurrenceMatrix",             iface:"CooccurrenceMatrix"],
+		[name: "cooccurrencematrix",             iface:"CooccurrenceMatrix"],
 		[name: "distancetransform",              iface: "DistanceTransform",   aliases: ["DistanceMap"]],
 		[name: "equation",                       iface: "Equation"],
 		[name: "fill",                           iface: "Fill"],
