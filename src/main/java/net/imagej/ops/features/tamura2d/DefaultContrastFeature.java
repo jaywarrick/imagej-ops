@@ -29,13 +29,15 @@
  */
 package net.imagej.ops.features.tamura2d;
 
+import org.scijava.plugin.Plugin;
+
 import net.imagej.ops.Ops;
 import net.imagej.ops.special.chain.RTs;
 import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
-
-import org.scijava.plugin.Plugin;
+import net.imglib2.view.IterableRandomAccessibleInterval;
 
 /**
  * Default implementation of tamura feature contrast.
@@ -46,24 +48,24 @@ import org.scijava.plugin.Plugin;
 public class DefaultContrastFeature<I extends RealType<I>, O extends RealType<O>>
 		extends AbstractTamuraFeature<I, O> implements Ops.Tamura.Contrast {
 
-	private UnaryFunctionOp<RandomAccessibleInterval<I>, O> m4Op;
-	private UnaryFunctionOp<RandomAccessibleInterval<I>, O> varOp;
-	private UnaryFunctionOp<RandomAccessibleInterval<I>, O> stdOp;
+	private UnaryFunctionOp<IterableInterval<I>, O> m4Op;
+	private UnaryFunctionOp<IterableInterval<I>, O> varOp;
+	private UnaryFunctionOp<IterableInterval<I>, O> stdOp;
 
 	@Override
 	public void initialize() {
-		m4Op = RTs.function(ops(), Ops.Stats.Moment4AboutMean.class, in());
-		varOp = RTs.function(ops(), Ops.Stats.Variance.class, in());
-		stdOp = RTs.function(ops(), Ops.Stats.StdDev.class, in());
+		m4Op = RTs.function(ops(), Ops.Stats.Moment4AboutMean.class, IterableRandomAccessibleInterval.create(in()));
+		varOp = RTs.function(ops(), Ops.Stats.Variance.class, IterableRandomAccessibleInterval.create(in()));
+		stdOp = RTs.function(ops(), Ops.Stats.StdDev.class, IterableRandomAccessibleInterval.create(in()));
 	}
 
 	@Override
 	public void compute(final RandomAccessibleInterval<I> input, final O output) {
 
 		// Get fourth moment about mean
-		double m4 = m4Op.calculate(input).getRealDouble();
-		double var = varOp.calculate(input).getRealDouble();
-		double std = stdOp.calculate(input).getRealDouble();
+		double m4 = m4Op.calculate(IterableRandomAccessibleInterval.create(input)).getRealDouble();
+		double var = varOp.calculate(IterableRandomAccessibleInterval.create(input)).getRealDouble();
+		double std = stdOp.calculate(IterableRandomAccessibleInterval.create(input)).getRealDouble();
 
 		double l4 = m4 / (var * var);
 
