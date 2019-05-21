@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,6 +32,10 @@ package net.imagej.ops.benchmark;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 
+import ij.IJ;
+import ij.ImagePlus;
+import ij.process.ByteProcessor;
+
 import net.imagej.ops.map.MapIIInplaceParallel;
 import net.imagej.ops.map.MapUnaryComputers.IIToIIParallel;
 import net.imagej.ops.map.MapUnaryComputers.IIToRAIParallel;
@@ -50,10 +53,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
-
-import ij.IJ;
-import ij.ImagePlus;
-import ij.process.ByteProcessor;
 
 /**
  * Benchmarks the pixel-wise add operation.

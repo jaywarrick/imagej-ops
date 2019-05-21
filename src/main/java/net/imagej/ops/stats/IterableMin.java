@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -46,7 +45,7 @@ import org.scijava.plugin.Plugin;
  * @param <T> input type
  */
 @Plugin(type = Ops.Stats.Min.class, label = "Statistics: Min",
-	priority = Priority.VERY_HIGH_PRIORITY)
+	priority = Priority.VERY_HIGH)
 public class IterableMin<T extends RealType<T>> extends
 	AbstractStatsOp<Iterable<T>, T> implements Ops.Stats.Min
 {
@@ -58,5 +57,10 @@ public class IterableMin<T extends RealType<T>> extends
 		for (final T in : input)
 			if (output.compareTo(in) > 0)
 				output.set(in);
+	}
+	
+	@Override
+	public T createOutput(Iterable<T> input) {
+		return input.iterator().next().createVariable();
 	}
 }

@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -44,7 +43,7 @@ import org.scijava.plugin.Plugin;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.Size.class, label = "Geometric: Size",
-	priority = Priority.VERY_HIGH_PRIORITY)
+	priority = Priority.VERY_HIGH)
 public class SizeII extends
 	AbstractUnaryFunctionOp<IterableInterval<?>, DoubleType> implements
 	GeometricOp<IterableInterval<?>, DoubleType>, Ops.Geometric.Size

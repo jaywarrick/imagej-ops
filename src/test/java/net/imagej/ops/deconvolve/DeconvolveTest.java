@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,7 +32,7 @@ package net.imagej.ops.deconvolve;
 import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops.AbstractOpTest;
-import net.imagej.ops.filter.convolve.ConvolveFFTF;
+import net.imagej.ops.filter.convolve.PadAndConvolveFFT;
 import net.imglib2.Cursor;
 import net.imglib2.Point;
 import net.imglib2.RandomAccessibleInterval;
@@ -43,6 +42,7 @@ import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.outofbounds.OutOfBoundsConstantValueFactory;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
+import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
@@ -52,42 +52,73 @@ import org.junit.Test;
  */
 public class DeconvolveTest extends AbstractOpTest {
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeconvolve() {
 		int[] size = new int[] { 225, 167 };
-		int[] kernelSize = new int[] { 27, 39 };
 
 		// create an input with a small sphere at the center
 		Img<FloatType> in = new ArrayImgFactory<FloatType>().create(size,
 			new FloatType());
 		placeSphereInCenter(in);
 
-		// create a kernel with a small sphere in the center
-		Img<FloatType> kernel = new ArrayImgFactory<FloatType>().create(kernelSize,
+		// crop the image so the sphere is truncated at the corner
+		// (this is useful for testing non-circulant mode)
+		IntervalView<FloatType> incropped = Views.interval(in, new long[] {
+			size[0] / 2, size[1] / 2 }, new long[] { size[0] - 1, size[1] - 1 });
+
+		incropped = Views.zeroMin(incropped);
+
+		RandomAccessibleInterval<FloatType> kernel = ops.create().kernelGauss(
+			new double[] { 4.0, 4.0 }, new FloatType());
+
+		RandomAccessibleInterval<FloatType> convolved = ops.create().img(incropped,
 			new FloatType());
-		placeSphereInCenter(kernel);
+		RandomAccessibleInterval<FloatType> deconvolved = ops.create().img(
+			incropped, new FloatType());
+		RandomAccessibleInterval<FloatType> deconvolved2 = ops.create().img(
+			incropped, new FloatType());
 
-		// convolve and calculate the sum of output
-		@SuppressWarnings("unchecked")
-		final Img<FloatType> convolved = (Img<FloatType>) ops.run(
-			ConvolveFFTF.class, in, kernel);
+		// convolve
+		convolved = (Img<FloatType>) ops.run(PadAndConvolveFFT.class, convolved,
+			incropped, kernel);
 
-		@SuppressWarnings("unchecked")
-		final RandomAccessibleInterval<FloatType> deconvolved2 =
-			(RandomAccessibleInterval<FloatType>) ops.run(RichardsonLucyF.class,
-				convolved, kernel, null, new OutOfBoundsConstantValueFactory<>(Util
-					.getTypeFromInterval(in).createVariable()), 10);
+		// deconvolve with standard Richardson Lucy
+		deconvolved = (RandomAccessibleInterval<FloatType>) ops.run(
+			PadAndRichardsonLucy.class, deconvolved, convolved, kernel, null,
+			new OutOfBoundsConstantValueFactory<>(Util.getTypeFromInterval(in)
+				.createVariable()), 10);
 
-		assertEquals(size[0], deconvolved2.dimension(0));
-		assertEquals(size[1], deconvolved2.dimension(1));
-		final Cursor<FloatType> deconvolved2Cursor = Views.iterable(deconvolved2)
+		// deconvolve with accelerated non-circulant Richardson Lucy
+		deconvolved2 = (RandomAccessibleInterval<FloatType>) ops.run(
+			PadAndRichardsonLucy.class, deconvolved2, convolved, kernel, null,
+			new OutOfBoundsConstantValueFactory<>(Util.getTypeFromInterval(in)
+				.createVariable()), null, null, null, 10, true, true);
+
+		assertEquals(incropped.dimension(0), deconvolved.dimension(0));
+		assertEquals(incropped.dimension(1), deconvolved.dimension(1));
+
+		assertEquals(incropped.dimension(0), deconvolved2.dimension(0));
+		assertEquals(incropped.dimension(1), deconvolved2.dimension(1));
+
+		final Cursor<FloatType> deconvolvedCursor = Views.iterable(deconvolved)
 			.cursor();
-		float[] deconvolved2Values = { 1.0936068E-14f, 2.9685445E-14f,
-			4.280788E-15f, 3.032084E-18f, 1.1261E-39f, 0.0f, -8.7E-44f, -8.11881E-31f,
-			-2.821192E-18f, 1.8687104E-20f, -2.927517E-23f, 1.2815774E-29f,
-			-1.0611375E-19f, -5.2774515E-21f, -6.154334E-20f };
-		for (int i = 0; i < deconvolved2Values.length; i++) {
-			assertEquals(deconvolved2Values[i], deconvolved2Cursor.next().get(),
+
+		final Cursor<FloatType> deconvolvedCursor2 = Views.iterable(deconvolved2)
+			.cursor();
+
+		float[] deconvolvedValues = { 3.6045982E-4f, 0.0016963598f, 0.0053468645f,
+			0.011868152f, 0.019616995f, 0.025637051f, 0.028158935f, 0.027555753f,
+			0.025289025f, 0.02266813f, 0.020409783f, 0.018752098f, 0.017683199f,
+			0.016951872f, 0.016685976f };
+
+		float[] deconvolvedValues2 = { 0.2630328f, 0.3163978f, 0.37502986f,
+			0.436034f, 0.4950426f, 0.5468085f, 0.58636993f, 0.6105018f, 0.6186566f,
+			0.61295974f, 0.59725416f, 0.575831f, 0.5524411f, 0.5307535f, 0.5109127f };
+
+		for (int i = 0; i < deconvolvedValues.length; i++) {
+			assertEquals(deconvolvedValues[i], deconvolvedCursor.next().get(), 0.0f);
+			assertEquals(deconvolvedValues2[i], deconvolvedCursor2.next().get(),
 				0.0f);
 		}
 	}
@@ -100,7 +131,7 @@ public class DeconvolveTest extends AbstractOpTest {
 		for (int d = 0; d < img.numDimensions(); d++)
 			center.setPosition(img.dimension(d) / 2, d);
 
-		HyperSphere<FloatType> hyperSphere = new HyperSphere<>(img, center, 2);
+		HyperSphere<FloatType> hyperSphere = new HyperSphere<>(img, center, 30);
 
 		for (final FloatType value : hyperSphere) {
 			value.setReal(1);

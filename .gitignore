@@ -10,3 +10,9 @@
 /.idea/
 /*.iml
 *.db
+
+# Apple #
+.DS_Store
+
+# VIM editor #
+.*.swp

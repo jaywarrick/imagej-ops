@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -49,7 +48,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 @Plugin(type = Ops.Transform.Project.class, //
-	priority = Priority.LOW_PRIORITY + 1)
+	priority = Priority.LOW + 1)
 public class DefaultProjectParallel<T, V> extends
 	AbstractUnaryComputerOp<RandomAccessibleInterval<T>, IterableInterval<V>>
 	implements Contingent, Parallel, Ops.Transform.Project
@@ -70,14 +69,14 @@ public class DefaultProjectParallel<T, V> extends
 
 			@Override
 			public void
-				execute(int startIndex, final int stepSize, final int numSteps)
+				execute(long startIndex, final long stepSize, final long numSteps)
 			{
 				final RandomAccess<T> access = input.randomAccess();
 				final Cursor<V> cursor = output.localizingCursor();
 
 				setToStart(cursor, startIndex);
 
-				int ctr = 0;
+				long ctr = 0;
 				while (ctr < numSteps) {
 					for (int d = 0; d < input.numDimensions(); d++) {
 						if (d != dim) {

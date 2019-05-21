@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,7 +32,7 @@ import net.imglib2.Cursor;
 
 public abstract class CursorBasedChunk implements Chunk {
 	
-	public static void setToStart(final Cursor<?> c, int startIndex) {
+	public static void setToStart(final Cursor<?> c, long startIndex) {
 		c.reset();
 		c.jumpFwd(startIndex + 1);
 	}

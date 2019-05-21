@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,6 +38,7 @@ import net.imagej.ops.OpMethod;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.labeling.ConnectedComponents.StructuringElement;
 import net.imglib2.roi.labeling.ImgLabeling;
+import net.imglib2.type.BooleanType;
 import net.imglib2.type.numeric.IntegerType;
 
 import org.scijava.plugin.Plugin;
@@ -50,6 +50,10 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Namespace.class)
 public class LabelingNamespace extends AbstractNamespace {
+
+	// -- Labeling namespace ops --
+
+	// -- CCA --
 
 	@OpMethod(op = net.imagej.ops.labeling.cca.DefaultCCA.class)
 	public <T extends IntegerType<T>, L, I extends IntegerType<I>>
@@ -86,6 +90,41 @@ public class LabelingNamespace extends AbstractNamespace {
 		final ImgLabeling<L, I> result =
 			(ImgLabeling<L, I>) ops().run(
 				net.imagej.ops.Ops.Labeling.CCA.class, in, element);
+		return result;
+	}
+
+	// -- merge --
+
+	@OpMethod(op = net.imagej.ops.labeling.MergeLabeling.class)
+	public <L, I extends IntegerType<I>> ImgLabeling<L, I> merge(
+		final ImgLabeling<L, I> in1, final ImgLabeling<L, I> in2)
+	{
+		@SuppressWarnings("unchecked")
+		final ImgLabeling<L, I> result = (ImgLabeling<L, I>) ops().run(
+			net.imagej.ops.Ops.Labeling.Merge.class, in1, in2);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.labeling.MergeLabeling.class)
+	public <L, I extends IntegerType<I>> ImgLabeling<L, I> merge(
+		final ImgLabeling<L, I> out, final ImgLabeling<L, I> in1,
+		final ImgLabeling<L, I> in2)
+	{
+		@SuppressWarnings("unchecked")
+		final ImgLabeling<L, I> result = (ImgLabeling<L, I>) ops().run(
+			net.imagej.ops.Ops.Labeling.Merge.class, out, in1, in2);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.labeling.MergeLabeling.class)
+	public <L, I extends IntegerType<I>, B extends BooleanType<B>>
+		ImgLabeling<L, I> merge(final ImgLabeling<L, I> out,
+			final ImgLabeling<L, I> in1, final ImgLabeling<L, I> in2,
+			final RandomAccessibleInterval<B> mask)
+	{
+		@SuppressWarnings("unchecked")
+		final ImgLabeling<L, I> result = (ImgLabeling<L, I>) ops().run(
+			net.imagej.ops.Ops.Labeling.Merge.class, out, in1, in2, mask);
 		return result;
 	}
 

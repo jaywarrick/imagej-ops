@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,8 +30,6 @@ package net.imagej.ops.image.distancetransform;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Random;
-
 import net.imagej.ops.AbstractOpTest;
 import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccess;
@@ -41,6 +38,7 @@ import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.real.FloatType;
 
 import org.junit.Test;
+import org.scijava.util.MersenneTwisterFast;
 
 /**
  * @author Simon Schmid (University of Konstanz)
@@ -48,6 +46,7 @@ import org.junit.Test;
 public class DistanceTransform2DTest extends AbstractOpTest {
 
 	private static final double EPSILON = 0.0001;
+	private static final long SEED = 0x12345678;
 
 	@SuppressWarnings("unchecked")
 	@Test
@@ -77,7 +76,7 @@ public class DistanceTransform2DTest extends AbstractOpTest {
 	 */
 	private void generate2DImg(final RandomAccessibleInterval<BitType> in) {
 		final RandomAccess<BitType> raIn = in.randomAccess();
-		final Random random = new Random();
+		final MersenneTwisterFast random = new MersenneTwisterFast(SEED);
 
 		for (int x = 0; x < in.dimension(0); x++) {
 			for (int y = 0; y < in.dimension(1); y++) {

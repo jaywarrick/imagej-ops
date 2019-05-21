@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -45,7 +44,7 @@ import org.scijava.plugin.Plugin;
  * @author Leon Yang
  * @param <O> element type of outputs
  */
-@Plugin(type = Ops.Map.class, priority = Priority.LOW_PRIORITY + 1)
+@Plugin(type = Ops.Map.class, priority = Priority.LOW + 1)
 public class MapNullaryII<O> extends
 	AbstractMapNullaryComputer<O, IterableInterval<O>>
 {
@@ -55,8 +54,8 @@ public class MapNullaryII<O> extends
 		ops().run(ChunkerOp.class, new CursorBasedChunk() {
 
 			@Override
-			public void execute(final int startIndex, final int stepSize,
-				final int numSteps)
+			public void execute(final long startIndex, final long stepSize,
+				final long numSteps)
 			{
 				Maps.map(output, getOp(), startIndex, stepSize, numSteps);
 			}

@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,20 +29,24 @@
 package net.imagej.ops.transform.subsampleView;
 
 import static org.junit.Assert.assertEquals;
-
-import java.util.Random;
+import static org.junit.Assert.assertTrue;
 
 import net.imagej.ops.AbstractOpTest;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessible;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
+import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.real.DoubleType;
+import net.imglib2.util.Intervals;
+import net.imglib2.view.SubsampleIntervalView;
 import net.imglib2.view.SubsampleView;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
+import org.scijava.util.MersenneTwisterFast;
 
 /**
  * Tests {@link net.imagej.ops.Ops.Transform.SubsampleView} ops.
@@ -57,16 +60,18 @@ import org.junit.Test;
  */
 public class SubsampleViewTest extends AbstractOpTest {
 
+	private static final long SEED = 0x12345678;
+
 	@Test
 	public void defaultSubsampleTest() {
 		Img<DoubleType> img = new ArrayImgFactory<DoubleType>().create(new int[] { 10, 10 }, new DoubleType());
-		Random r = new Random();
+		MersenneTwisterFast r = new MersenneTwisterFast(SEED);
 		for (DoubleType d : img) {
 			d.set(r.nextDouble());
 		}
 
 		SubsampleView<DoubleType> il2 = Views.subsample((RandomAccessible<DoubleType>) img, 2);
-		SubsampleView<DoubleType> opr = ops.transform().subsample(img, 2);
+		SubsampleView<DoubleType> opr = ops.transform().subsampleView(img, 2);
 
 		Cursor<DoubleType> il2C = Views.interval(il2, new long[] { 0, 0 }, new long[] { 4, 4 }).localizingCursor();
 		RandomAccess<DoubleType> oprRA = opr.randomAccess();
@@ -81,13 +86,13 @@ public class SubsampleViewTest extends AbstractOpTest {
 	@Test
 	public void defaultSubsampleStepsTest() {
 		Img<DoubleType> img = new ArrayImgFactory<DoubleType>().create(new int[] { 10, 10 }, new DoubleType());
-		Random r = new Random();
+		MersenneTwisterFast r = new MersenneTwisterFast(SEED);
 		for (DoubleType d : img) {
 			d.set(r.nextDouble());
 		}
 
 		SubsampleView<DoubleType> il2 = Views.subsample((RandomAccessible<DoubleType>) img, 2, 1);
-		SubsampleView<DoubleType> opr = ops.transform().subsample(img, 2, 1);
+		SubsampleView<DoubleType> opr = ops.transform().subsampleView(img, 2, 1);
 
 		Cursor<DoubleType> il2C = Views.interval(il2, new long[] { 0, 0 }, new long[] { 4, 9 }).localizingCursor();
 		RandomAccess<DoubleType> oprRA = opr.randomAccess();
@@ -97,5 +102,51 @@ public class SubsampleViewTest extends AbstractOpTest {
 			oprRA.setPosition(il2C);
 			assertEquals(il2C.get().get(), oprRA.get().get(), 1e-10);
 		}
+	}
+	
+	@Test
+	public void testIntervalSubsample() {
+		Img<DoubleType> img = ArrayImgs.doubles(10, 10);
+		MersenneTwisterFast r = new MersenneTwisterFast(SEED);
+		for (DoubleType d : img) {
+			d.set(r.nextDouble());
+		}
+
+		SubsampleIntervalView<DoubleType> expected = Views.subsample((RandomAccessibleInterval<DoubleType>) img, 2);
+		SubsampleIntervalView<DoubleType> actual = (SubsampleIntervalView<DoubleType>) ops.transform().subsampleView((RandomAccessibleInterval<DoubleType>)img, 2);
+
+		Cursor<DoubleType> il2C = Views.interval(expected, new long[] { 0, 0 }, new long[] { 4, 4 }).localizingCursor();
+		RandomAccess<DoubleType> oprRA = actual.randomAccess();
+
+		while (il2C.hasNext()) {
+			il2C.next();
+			oprRA.setPosition(il2C);
+			assertEquals(il2C.get().get(), oprRA.get().get(), 1e-10);
+		}
+		
+		assertTrue(Intervals.equals(expected, actual));
+	}
+	
+	@Test
+	public void testIntervalSubsampleSteps() {
+		Img<DoubleType> img = ArrayImgs.doubles(10,10);
+		MersenneTwisterFast r = new MersenneTwisterFast(SEED);
+		for (DoubleType d : img) {
+			d.set(r.nextDouble());
+		}
+
+		SubsampleIntervalView<DoubleType> expected = Views.subsample((RandomAccessibleInterval<DoubleType>) img, 2, 1);
+		SubsampleIntervalView<DoubleType> actual = (SubsampleIntervalView<DoubleType>) ops.transform().subsampleView((RandomAccessibleInterval<DoubleType>)img, 2, 1);
+
+		Cursor<DoubleType> il2C = Views.interval(expected, new long[] { 0, 0 }, new long[] { 4, 9 }).localizingCursor();
+		RandomAccess<DoubleType> oprRA = actual.randomAccess();
+
+		while (il2C.hasNext()) {
+			il2C.next();
+			oprRA.setPosition(il2C);
+			assertEquals(il2C.get().get(), oprRA.get().get(), 1e-10);
+		}
+		
+		assertTrue(Intervals.equals(expected, actual));
 	}
 }

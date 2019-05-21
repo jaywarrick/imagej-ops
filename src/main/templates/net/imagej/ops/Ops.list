@@ -23,6 +23,16 @@ ops = ```
 ```
 namespaces = ```
 [
+	[name: "coloc", iface: "Coloc", ops: [
+		[name: "costes",                      iface: "Costes"],
+		[name: "icq",                         iface: "ICQ"],
+		[name: "kendallTau",		      iface: "KendallTau"],
+		[name: "manders",                     iface: "Manders"],
+		[name: "maxTKendallTau",              iface: "MaxTKendallTau"],
+		[name: "pearsons",                    iface: "Pearsons"],
+		[name: "pValue",                      iface: "PValue"],
+		[name: "spearman",                    iface: "Spearman"],
+	]],
 	[name: "convert", iface: "Convert", ops: [
 		[name: "bit",                            iface: "Bit"],
 		[name: "cfloat32",                       iface: "Cfloat32",            aliases: ["complexFloat"]],
@@ -65,6 +75,11 @@ namespaces = ```
 		[name: "kernel",                         iface: "Kernel"],
 		[name: "kernelGauss",                    iface: "KernelGauss"],
 		[name: "kernelLog",                      iface: "KernelLog"],
+		[name: "kernelBiGauss",                  iface: "KernelBiGauss"],
+		[name: "kernel2ndDerivBiGauss",          iface: "Kernel2ndDerivBiGauss"],
+		[name: "kernelDiffraction",              iface: "KernelDiffraction"],
+		[name: "kernelGabor",                    iface: "KernelGabor"],
+		[name: "kernelSobel",                    iface: "KernelSobel"],
 		[name: "labelingMapping",                iface: "LabelingMapping"],
 		[name: "nativeImg",                      iface: "NativeImg"],
 		[name: "nativeType",                     iface: "NativeType"],
@@ -84,13 +99,18 @@ namespaces = ```
 	[name: "filter", iface: "Filter", ops: [
 		[name: "addNoise",                       iface: "AddNoise"],
 		[name: "addPoissonNoise",                iface: "AddPoissonNoise"],
+		[name: "bilateral",                      iface: "Bilateral"],
 		[name: "convolve",                       iface: "Convolve"],
 		[name: "correlate",                      iface: "Correlate"],
 		[name: "createFFTOutput",                iface: "CreateFFTOutput"],
+		[name: "partialDerivative",              iface: "PartialDerivative"],
+		[name: "allPartialDerivatives",          iface: "AllPartialDerivatives"],
+		[name: "derivativeGauss",                iface: "DerivativeGauss"],
 		[name: "dog",                            iface: "DoG",                 aliases: ["differenceOfGaussian"]],
 		[name: "fft",                            iface: "FFT"],
 		[name: "fftSize",                        iface: "FFTSize"],
 		[name: "gauss",                          iface: "Gauss",               aliases: ["smooth"]],
+		[name: "hessian",                        iface: "Hessian"],
 		[name: "ifft",                           iface: "IFFT"],
 		[name: "linearFilter",                   iface: "LinearFilter"],
 		[name: "max",                            iface: "Max",                 aliases: ["maxFilter", "filterMax"]],
@@ -102,8 +122,11 @@ namespaces = ```
 		[name: "padShiftFFTKernel",              iface: "PadShiftFFTKernel"],
 		[name: "paddingIntervalCentered",        iface: "PaddingIntervalCentered"],
 		[name: "paddingIntervalOrigin",          iface: "PaddingIntervalOrigin"],
+		[name: "tubeness",                       iface: "Tubeness"],
 		[name: "sigma",                          iface: "Sigma",               aliases: ["sigmaFilter", "filterSigma"]],
+		[name: "sobel",                          iface: "Sobel"],
 		[name: "variance",                       iface: "Variance",            aliases: ["varianceFilter", "filterVariance", "var", "varFilter", "filterVar"]],
+		[name: "frangiVesselness",			 iface: "FrangiVesselness"],
 	]],
 	[name: "geom", iface: "Geometric", ops: [
 		[name: "boundary",                       iface: "Boundary"],
@@ -184,6 +207,7 @@ namespaces = ```
 		[name: "invert",                         iface: "Invert"],
 		[name: "normalize",                      iface: "Normalize",           aliases: ["norm"]],
 		[name: "squareIntegral",                 iface: "SquareIntegral"],
+		[name: "watershed",                      iface: "Watershed"],
 	]],
 	[name: "imagemoments", iface: "ImageMoments", ops: [
 		[name: "centralMoment00",                iface: "CentralMoment00"],
@@ -217,9 +241,13 @@ namespaces = ```
 	]],
 	[name: "labeling", iface: "Labeling", ops: [
 		[name: "cca",                            iface: "CCA",                 aliases: ["connectedComponents", "connectedComponentAnalysis"]],
+		[name: "merge",                          iface: "Merge"],
 	]],
 	[name: "lbp", iface: "LBP", ops: [
 		[name: "lbp2D", 				iface: "LBP2D"]
+	]],
+	[name: "linalg", iface: "LinAlg", ops: [
+	    [name: "rotate", 				         iface: "Rotate"]
 	]],
 	[name: "logic", iface: "Logic", ops: [
 		[name: "and",                            iface: "And"],
@@ -315,8 +343,16 @@ namespaces = ```
 		[name: "fillHoles",                      iface: "FillHoles"],
 		[name: "floodFill",                      iface: "FloodFill"],
 		[name: "open",                           iface: "Open"],
-		[name: "thin",                           iface: "Thin"],
+		[name: "outline",                        iface: "Outline"],
+		[name: "thinGuoHall",                    iface: "ThinGuoHall"],
+		[name: "thinHilditch",                   iface: "ThinHilditch"],
+		[name: "thinMorphological",              iface: "ThinMorphological"],
+		[name: "thinZhangSuen",                  iface: "ThinZhangSuen"],
 		[name: "topHat",                         iface: "TopHat"],
+	]],
+	[name: "segment", iface: "Segment", ops: [
+		[name: "detectRidges",                 iface: "DetectRidges"],
+		[name: "detectJunctions",              iface: "DetectJunctions"],
 	]],
 	[name: "stats", iface: "Stats", ops: [
 		[name: "geometricMean",                  iface: "GeometricMean"],
@@ -325,6 +361,7 @@ namespaces = ```
 		[name: "integralSum",                    iface: "IntegralSum"],
 		[name: "integralVariance",               iface: "IntegralVariance"],
 		[name: "kurtosis",                       iface: "Kurtosis"],
+		[name: "leastSquares",                   iface: "LeastSquares"],
 		[name: "max",                            iface: "Max"],
 		[name: "mean",                           iface: "Mean",                aliases: ["avg"]],
 		[name: "median",                         iface: "Median"],
@@ -384,6 +421,7 @@ namespaces = ```
 		[name: "rosin",                          iface: "Rosin"],
 	]],
 	[name: "topology", iface: "Topology", ops: [
+		[name: "boxCount",                       iface: "BoxCount"],
 		[name: "eulerCharacteristic26N",         iface: "EulerCharacteristic26N"],
 		[name: "eulerCharacteristic26NFloating", iface: "EulerCharacteristic26NFloating"],
 		[name: "eulerCorrection",                iface: "EulerCorrection"],
@@ -419,6 +457,7 @@ namespaces = ```
 		[name: "scaleView",                      iface: "ScaleView",                      aliases: ["resizeView"]],
 		[name: "shearView",                      iface: "ShearView"],
 		[name: "stackView",                      iface: "StackView"],
+		[name: "concatenateView",                iface: "ConcatenateView"],
 		[name: "subsampleView",                  iface: "SubsampleView"],
 		[name: "translateView",                  iface: "TranslateView"],
 		[name: "unshearView",                    iface: "UnshearView"],

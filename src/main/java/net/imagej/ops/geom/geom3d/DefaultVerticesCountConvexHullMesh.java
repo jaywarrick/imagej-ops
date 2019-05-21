@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,8 +29,8 @@
 
 package net.imagej.ops.geom.geom3d;
 
+import net.imagej.mesh.Mesh;
 import net.imagej.ops.Ops;
-import net.imagej.ops.geom.geom3d.mesh.Mesh;
 import net.imagej.ops.special.function.Functions;
 import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
@@ -45,7 +44,7 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Ops.Geometric.VerticesCountConvexHull.class,
 	label = "Geometric (3D): Convex Hull Vertices Count",
-	priority = Priority.VERY_HIGH_PRIORITY)
+	priority = Priority.VERY_HIGH)
 public class DefaultVerticesCountConvexHullMesh extends
 	AbstractUnaryHybridCF<Mesh, DoubleType>  implements
 	Ops.Geometric.VerticesCountConvexHull
@@ -60,7 +59,7 @@ public class DefaultVerticesCountConvexHullMesh extends
 
 	@Override
 	public void compute(final Mesh input, final DoubleType output) {
-		output.set(convexHullFunc.calculate(input).getVertices().size());
+		output.set(convexHullFunc.calculate(input).vertices().size());
 	}
 	
 	@Override

@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,8 +30,6 @@ package net.imagej.ops.transform.interpolateView;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Random;
-
 import net.imagej.ops.AbstractOpTest;
 import net.imglib2.RealRandomAccess;
 import net.imglib2.img.Img;
@@ -42,6 +39,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
+import org.scijava.util.MersenneTwisterFast;
 
 /**
  * Tests {@link net.imagej.ops.Ops.Transform.InterpolateView} ops.
@@ -55,17 +53,19 @@ import org.junit.Test;
  */
 public class InterpolateViewTest extends AbstractOpTest {
 
+	private static final long SEED = 0x12345678;
+
 	@Test
 	public void defaultInterpolateTest() {
 		
 		Img<DoubleType> img = new ArrayImgFactory<DoubleType>().create(new int[]{10, 10}, new DoubleType());
-		Random r = new Random();
+		MersenneTwisterFast r = new MersenneTwisterFast(SEED);
 		for (DoubleType d : img) {
 			d.set(r.nextDouble());
 		}
 		
 		RealRandomAccess<DoubleType> il2 = Views.interpolate(img, new FloorInterpolatorFactory<DoubleType>()).realRandomAccess();
-		RealRandomAccess<DoubleType> opr = ops.transform().interpolate(img, new FloorInterpolatorFactory<DoubleType>()).realRandomAccess();
+		RealRandomAccess<DoubleType> opr = ops.transform().interpolateView(img, new FloorInterpolatorFactory<DoubleType>()).realRandomAccess();
 		
 		il2.setPosition(new double[]{1.75, 5.34});
 		opr.setPosition(new double[]{1.75, 5.34});

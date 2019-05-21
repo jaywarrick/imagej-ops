@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,8 +30,6 @@ package net.imagej.ops.transform.rasterView;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Random;
-
 import net.imagej.ops.AbstractOpTest;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
@@ -45,6 +42,7 @@ import net.imglib2.view.RandomAccessibleOnRealRandomAccessible;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
+import org.scijava.util.MersenneTwisterFast;
 
 /**
  * Tests {@link net.imagej.ops.Ops.Transform.RasterView} ops.
@@ -58,17 +56,19 @@ import org.junit.Test;
  */
 public class RasterViewTest extends AbstractOpTest {
 
+	private static final long SEED = 0x12345678;
+
 	@Test
 	public void defaultRasterTest() {
 		Img<DoubleType> img = new ArrayImgFactory<DoubleType>().create(new int[]{10,  10}, new DoubleType());
-		Random r = new Random();
+		MersenneTwisterFast r = new MersenneTwisterFast(SEED);
 		for (DoubleType d : img) {
 			d.set(r.nextDouble());
 		}
 		RealRandomAccessible<DoubleType> realImg = Views.interpolate(img, new FloorInterpolatorFactory<DoubleType>());
 		
 		RandomAccessibleOnRealRandomAccessible<DoubleType> il2 = Views.raster(realImg);
-		RandomAccessibleOnRealRandomAccessible<DoubleType> opr = ops.transform().raster(realImg);
+		RandomAccessibleOnRealRandomAccessible<DoubleType> opr = ops.transform().rasterView(realImg);
 		
 		Cursor<DoubleType> il2C = Views.interval(il2, img).localizingCursor();
 		RandomAccess<DoubleType> oprRA = Views.interval(opr, img).randomAccess();

@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -59,7 +58,7 @@ public class DropSingletonDimensionsViewTest extends AbstractOpTest {
 
 		RandomAccessibleInterval<DoubleType> il2 = Views.dropSingletonDimensions(img);
 
-		RandomAccessibleInterval<DoubleType> opr = ops.transform().dropSingletonDimensions(img);
+		RandomAccessibleInterval<DoubleType> opr = ops.transform().dropSingletonDimensionsView(img);
 
 		assertEquals(il2.numDimensions(), opr.numDimensions());
 	}

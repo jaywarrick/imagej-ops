@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -53,7 +52,7 @@ import org.scijava.thread.ThreadService;
  * @param <T>
  * @param <C>
  */
-@Plugin(type = Ops.Filter.FFT.class, priority = Priority.NORMAL_PRIORITY)
+@Plugin(type = Ops.Filter.FFT.class, priority = Priority.NORMAL)
 public class FFTMethodsOpC<T extends RealType<T>, C extends ComplexType<C>>
 	extends
 	AbstractUnaryComputerOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<C>>

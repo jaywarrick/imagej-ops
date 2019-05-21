@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +29,8 @@
 
 package net.imagej.ops.stats;
 
+import java.util.Collection;
+
 import net.imagej.ops.AbstractNamespace;
 import net.imagej.ops.Namespace;
 import net.imagej.ops.OpMethod;
@@ -39,6 +40,8 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.util.Pair;
 
+import org.joml.Matrix4d;
+import org.joml.Vector3dc;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -146,6 +149,12 @@ public class StatsNamespace extends AbstractNamespace {
 		final O result =
 			(O) ops().run(net.imagej.ops.Ops.Stats.Kurtosis.class, out, in);
 		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.stats.regression.leastSquares.Quadric.class)
+	public Matrix4d leastSquares(final Collection<Vector3dc> points) {
+		return (Matrix4d) ops().run(
+			net.imagej.ops.stats.regression.leastSquares.Quadric.class, points);
 	}
 
 	@OpMethod(op = net.imagej.ops.stats.IterableMax.class)

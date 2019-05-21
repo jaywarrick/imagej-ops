@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,6 +41,7 @@ import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
 import net.imglib2.type.BooleanType;
 import net.imglib2.type.Type;
+import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.plugin.Plugin;
@@ -55,6 +55,62 @@ import org.scijava.plugin.Plugin;
 public class MorphologyNamespace extends AbstractNamespace {
 
 	// -- Morphology namespace ops --
+
+	@OpMethod(op = net.imagej.ops.morphology.thin.ThinGuoHall.class)
+	public RandomAccessibleInterval thinGuoHall(final RandomAccessibleInterval in) {
+		final RandomAccessibleInterval result =
+				(RandomAccessibleInterval) ops().run(net.imagej.ops.morphology.thin.ThinGuoHall.class, in);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.morphology.thin.ThinGuoHall.class)
+	public RandomAccessibleInterval thinGuoHall(final RandomAccessibleInterval out, final RandomAccessibleInterval in) {
+		final RandomAccessibleInterval result =
+				(RandomAccessibleInterval) ops().run(net.imagej.ops.morphology.thin.ThinGuoHall.class, out, in);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.morphology.thin.ThinHilditch.class)
+	public RandomAccessibleInterval thinHilditch(final RandomAccessibleInterval in) {
+		final RandomAccessibleInterval result =
+				(RandomAccessibleInterval) ops().run(net.imagej.ops.morphology.thin.ThinHilditch.class, in);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.morphology.thin.ThinHilditch.class)
+	public RandomAccessibleInterval thinHilditch(final RandomAccessibleInterval out, final RandomAccessibleInterval in) {
+		final RandomAccessibleInterval result =
+				(RandomAccessibleInterval) ops().run(net.imagej.ops.morphology.thin.ThinHilditch.class, out, in);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.morphology.thin.ThinMorphological.class)
+	public RandomAccessibleInterval thinMorphological(final RandomAccessibleInterval in) {
+		final RandomAccessibleInterval result =
+				(RandomAccessibleInterval) ops().run(net.imagej.ops.morphology.thin.ThinMorphological.class, in);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.morphology.thin.ThinMorphological.class)
+	public RandomAccessibleInterval thinMorphological(final RandomAccessibleInterval out, final RandomAccessibleInterval in) {
+		final RandomAccessibleInterval result =
+				(RandomAccessibleInterval) ops().run(net.imagej.ops.morphology.thin.ThinMorphological.class, out, in);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.morphology.thin.ThinZhangSuen.class)
+	public RandomAccessibleInterval thinZhangSuen(final RandomAccessibleInterval in) {
+		final RandomAccessibleInterval result =
+				(RandomAccessibleInterval) ops().run(net.imagej.ops.morphology.thin.ThinZhangSuen.class, in);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.morphology.thin.ThinZhangSuen.class)
+	public RandomAccessibleInterval thinZhangSuen(final RandomAccessibleInterval out, final RandomAccessibleInterval in) {
+		final RandomAccessibleInterval result =
+				(RandomAccessibleInterval) ops().run(net.imagej.ops.morphology.thin.ThinZhangSuen.class, out, in);
+		return result;
+	}
 
 	@OpMethod(op = net.imagej.ops.morphology.blackTopHat.ListBlackTopHat.class)
 	public <T extends RealType<T>> IterableInterval<T> blackTopHat(
@@ -271,6 +327,29 @@ public class MorphologyNamespace extends AbstractNamespace {
 		return result;
 	}
 
+	@OpMethod(op = net.imagej.ops.morphology.outline.Outline.class)
+	public <B extends BooleanType<B>> RandomAccessibleInterval<BitType> outline(
+		final RandomAccessibleInterval<BitType> out,
+		final RandomAccessibleInterval<B> in, final Boolean excludeEdges)
+	{
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<BitType> result =
+			(RandomAccessibleInterval<BitType>) ops().run(
+				net.imagej.ops.Ops.Morphology.Outline.class, out, in, excludeEdges);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.morphology.outline.Outline.class)
+	public <B extends BooleanType<B>> RandomAccessibleInterval<BitType> outline(
+		final RandomAccessibleInterval<B> in, final Boolean excludeEdges)
+	{
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<BitType> result =
+			(RandomAccessibleInterval<BitType>) ops().run(
+				net.imagej.ops.Ops.Morphology.Outline.class, in, excludeEdges);
+		return result;
+	}
+
 	@OpMethod(op = net.imagej.ops.morphology.topHat.ListTopHat.class)
 	public <T extends RealType<T>> IterableInterval<T> topHat(
 		final RandomAccessibleInterval<T> in1, final List<Shape> in2)
@@ -353,7 +432,7 @@ public class MorphologyNamespace extends AbstractNamespace {
 				.run(net.imagej.ops.morphology.fillHoles.DefaultFillHoles.class, out, in, structElement);
 		return result;
 	}
-	
+
 	@OpMethod(op = net.imagej.ops.morphology.floodFill.DefaultFloodFill.class)
 	public <T extends Type<T> & Comparable<T>> RandomAccessibleInterval<T>
 		floodFill(final RandomAccessibleInterval<T> out,

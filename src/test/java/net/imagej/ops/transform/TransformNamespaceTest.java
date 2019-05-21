@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -47,6 +46,6 @@ public class TransformNamespaceTest extends AbstractNamespaceTest {
 	 */
 	@Test
 	public void testCompleteness() {
-		assertComplete("view", TransformNamespace.class);
+		assertComplete("transform", TransformNamespace.class);
 	}
 }

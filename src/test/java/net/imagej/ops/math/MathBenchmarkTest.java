@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,7 +34,6 @@ import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.benchmark.AbstractOpBenchmark;
-import net.imagej.ops.math.divide.DivideHandleZeroMap;
 import net.imglib2.Cursor;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImg;
@@ -123,13 +121,7 @@ public class MathBenchmarkTest extends AbstractOpBenchmark {
 	}
 
 	@Test
-	public void testDivideHandleZero() {
-		ops.run(DivideHandleZeroMap.class, img1, img2);
-	}
-
-	@Test
 	public void testDivideExplicit() {
-
 		for (int i = 0; i < size; i++) {
 			float3[i] = float2[i] / float1[i];
 		}

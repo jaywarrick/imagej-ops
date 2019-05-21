@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,8 +30,6 @@ package net.imagej.ops.transform.intervalView;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Random;
-
 import net.imagej.ops.AbstractOpTest;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
@@ -42,6 +39,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
+import org.scijava.util.MersenneTwisterFast;
 
 /**
  * Tests {@link net.imagej.ops.Ops.Transform.IntervalView} ops.
@@ -55,18 +53,20 @@ import org.junit.Test;
  */
 public class IntervalViewTest extends AbstractOpTest {
 
+	private static final long SEED = 0x12345678;
+
 	@Test
 	public void defaultIntervalTest() {
 		
 		Img<DoubleType> img = new ArrayImgFactory<DoubleType>().create(new int[]{10, 10}, new DoubleType());
 		
-		Random r = new Random();
+		MersenneTwisterFast r = new MersenneTwisterFast(SEED);
 		for (DoubleType d : img) {
 			d.set(r.nextDouble());
 		}
 		
 		Cursor<DoubleType> il2 = Views.interval(img, img).localizingCursor();
-		RandomAccess<DoubleType> opr = ops.transform().interval(img, img).randomAccess();
+		RandomAccess<DoubleType> opr = ops.transform().intervalView(img, img).randomAccess();
 
 		
 		while (il2.hasNext()) {
@@ -82,13 +82,13 @@ public class IntervalViewTest extends AbstractOpTest {
 		
 		Img<DoubleType> img = new ArrayImgFactory<DoubleType>().create(new int[]{10, 10}, new DoubleType());
 		
-		Random r = new Random();
+		MersenneTwisterFast r = new MersenneTwisterFast(SEED);
 		for (DoubleType d : img) {
 			d.set(r.nextDouble());
 		}
 		
 		Cursor<DoubleType> il2 = Views.interval(img, new long[]{1, 1}, new long[]{8,9}).localizingCursor();
-		RandomAccess<DoubleType> opr = ops.transform().interval(img, new long[]{1, 1}, new long[]{8,9}).randomAccess();
+		RandomAccess<DoubleType> opr = ops.transform().intervalView(img, new long[]{1, 1}, new long[]{8,9}).randomAccess();
 		
 		while (il2.hasNext()) {
 			DoubleType e = il2.next();

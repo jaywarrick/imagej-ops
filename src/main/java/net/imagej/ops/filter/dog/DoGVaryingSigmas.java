@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -76,11 +75,10 @@ public class DoGVaryingSigmas<T extends NumericType<T> & NativeType<T>> extends
 	{
 		final T type = Util.getTypeFromInterval(t);
 		return RAIs.hybrid(ops(), Ops.Filter.DoG.class, t, //
-			RAIs.computer(ops(), Ops.Filter.Gauss.class, t, sigmas1), //
-			RAIs.computer(ops(), Ops.Filter.Gauss.class, t, sigmas2), //
+			RAIs.computer(ops(), Ops.Filter.Gauss.class, t, sigmas1, fac), //
+			RAIs.computer(ops(), Ops.Filter.Gauss.class, t, sigmas2, fac), //
 			RAIs.function(ops(), Ops.Create.Img.class, t), //
-			RAIs.function(ops(), Ops.Create.Img.class, t, type), //
-			fac);
+			RAIs.function(ops(), Ops.Create.Img.class, t, type));
 	}
 
 	@Override

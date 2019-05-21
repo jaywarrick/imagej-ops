@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +31,7 @@ package net.imagej.ops.geom.geom2d;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.geom.AbstractBoxivity;
-import net.imglib2.roi.geometric.Polygon;
+import net.imglib2.roi.geom.real.Polygon2D;
 
 import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
@@ -42,10 +41,12 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Ops.Geometric.Boxivity.class,
 	label = "Geometric (2D): Rectangularity",
-	priority = Priority.VERY_HIGH_PRIORITY)
-public class DefaultBoxivityPolygon extends AbstractBoxivity<Polygon> {
+	priority = Priority.VERY_HIGH)
+public class DefaultBoxivityPolygon extends
+	AbstractBoxivity<Polygon2D>
+{
 
 	public DefaultBoxivityPolygon() {
-		super(Polygon.class);
+		super(Polygon2D.class);
 	}
 }

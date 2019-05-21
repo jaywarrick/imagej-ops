@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -1293,7 +1292,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.nullaryFunctionA",
-		priority = Priority.HIGH_PRIORITY)
+		priority = Priority.HIGH)
 	public static class NullaryFunctionA extends NullaryFruitFunction<Apple> {
 		// NB: No implementation needed.
 	}
@@ -1304,13 +1303,13 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.nullaryHybridA",
-		priority = Priority.LOW_PRIORITY + 1)
+		priority = Priority.LOW + 1)
 	public static class NullaryHybridA extends NullaryFruitHybrid<Apple> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.nullaryHybridO",
-		priority = Priority.LOW_PRIORITY + 1)
+		priority = Priority.LOW + 1)
 	public static class NullaryHybridO extends NullaryFruitHybrid<Orange> {
 		// NB: No implementation needed.
 	}
@@ -1336,7 +1335,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryFunctionAA",
-		priority = Priority.HIGH_PRIORITY)
+		priority = Priority.HIGH)
 	public static class UnaryFunctionAA extends UnaryFruitFunction<Apple, Apple> {
 		// NB: No implementation needed.
 	}
@@ -1352,85 +1351,85 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryFunctionOO",
-		priority = Priority.HIGH_PRIORITY)
+		priority = Priority.HIGH)
 	public static class UnaryFunctionOO extends UnaryFruitFunction<Orange, Orange> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryHybridAA",
-		priority = Priority.LOW_PRIORITY)
+		priority = Priority.LOW)
 	public static class UnaryHybridAA extends UnaryFruitHybrid<Apple, Apple> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryHybridAO",
-		priority = Priority.LOW_PRIORITY)
+		priority = Priority.LOW)
 	public static class UnaryHybridAO extends UnaryFruitHybrid<Apple, Orange> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryHybridOA",
-		priority = Priority.LOW_PRIORITY)
+		priority = Priority.LOW)
 	public static class UnaryHybridOA extends UnaryFruitHybrid<Orange, Apple> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryHybridOO",
-		priority = Priority.LOW_PRIORITY)
+		priority = Priority.LOW)
 	public static class UnaryHybridOO extends UnaryFruitHybrid<Orange, Orange> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryHybridCIAA",
-		priority = Priority.VERY_LOW_PRIORITY + 20)
+		priority = Priority.VERY_LOW + 20)
 	public static class UnaryHybridCIAA extends UnaryFruitHybridCI<Apple, Apple> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryHybridCIOO",
-		priority = Priority.VERY_LOW_PRIORITY + 21)
+		priority = Priority.VERY_LOW + 21)
 	public static class UnaryHybridCIOO extends UnaryFruitHybridCI<Orange, Orange> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryHybridCILL",
-		priority = Priority.VERY_LOW_PRIORITY + 20)
+		priority = Priority.VERY_LOW + 20)
 	public static class UnaryHybridCILL extends UnaryFruitHybridCI<Lemon, Lemon> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryHybridCFIAA",
-		priority = Priority.VERY_LOW_PRIORITY + 15)
+		priority = Priority.VERY_LOW + 15)
 	public static class UnaryHybridCFIAA extends UnaryFruitHybridCFI<Apple, Apple> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryHybridCFIOO",
-		priority = Priority.VERY_LOW_PRIORITY + 15)
+		priority = Priority.VERY_LOW + 15)
 	public static class UnaryHybridCFIOO extends UnaryFruitHybridCFI<Orange, Orange> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.unaryHybridCFILL",
-		priority = Priority.VERY_LOW_PRIORITY + 21)
+		priority = Priority.VERY_LOW + 21)
 	public static class UnaryHybridCFILL extends UnaryFruitHybridCFI<Lemon, Lemon> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.inplaceA",
-		priority = Priority.VERY_LOW_PRIORITY + 21)
+		priority = Priority.VERY_LOW + 21)
 	public static class InplaceA extends FruitInplace<Apple> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.inplaceO",
-		priority = Priority.VERY_LOW_PRIORITY + 20)
+		priority = Priority.VERY_LOW + 20)
 	public static class InplaceO extends FruitInplace<Orange> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.inplaceL",
-		priority = Priority.VERY_LOW_PRIORITY + 20)
+		priority = Priority.VERY_LOW + 20)
 	public static class InplaceL extends FruitInplace<Lemon> {
 		// NB: No implementation needed.
 	}
@@ -1729,7 +1728,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryFunctionAAL",
-		priority = Priority.HIGH_PRIORITY)
+		priority = Priority.HIGH)
 	public static class BinaryFunctionAAL extends
 		BinaryFruitFunction<Apple, Apple, Lemon>
 	{
@@ -1751,7 +1750,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryFunctionOOL",
-		priority = Priority.HIGH_PRIORITY)
+		priority = Priority.HIGH)
 	public static class BinaryFunctionOOL extends
 		BinaryFruitFunction<Orange, Orange, Lemon>
 	{
@@ -1759,7 +1758,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridAAL",
-		priority = Priority.VERY_LOW_PRIORITY)
+		priority = Priority.VERY_LOW)
 	public static class BinaryHybridAAL extends
 		BinaryFruitHybrid<Apple, Apple, Lemon>
 	{
@@ -1767,7 +1766,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridAOL",
-		priority = Priority.VERY_LOW_PRIORITY)
+		priority = Priority.VERY_LOW)
 	public static class BinaryHybridAOL extends
 		BinaryFruitHybrid<Apple, Orange, Lemon>
 	{
@@ -1775,7 +1774,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridOAL",
-		priority = Priority.VERY_LOW_PRIORITY)
+		priority = Priority.VERY_LOW)
 	public static class BinaryHybridOAL extends
 		BinaryFruitHybrid<Orange, Apple, Lemon>
 	{
@@ -1783,7 +1782,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridOOL",
-		priority = Priority.VERY_LOW_PRIORITY)
+		priority = Priority.VERY_LOW)
 	public static class BinaryHybridOOL extends
 		BinaryFruitHybrid<Orange, Orange, Lemon>
 	{
@@ -1791,7 +1790,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCI1AOA",
-		priority = Priority.VERY_LOW_PRIORITY + 10)
+		priority = Priority.VERY_LOW + 10)
 	public static class BinaryHybridCI1AOA extends
 		BinaryFruitHybridCI1<Apple, Orange, Apple>
 	{
@@ -1799,7 +1798,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCI1OLO",
-		priority = Priority.VERY_LOW_PRIORITY + 11)
+		priority = Priority.VERY_LOW + 11)
 	public static class BinaryHybridCI1OLO extends
 		BinaryFruitHybridCI1<Orange, Lemon, Orange>
 	{
@@ -1807,7 +1806,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCI1LAL",
-		priority = Priority.VERY_LOW_PRIORITY + 10)
+		priority = Priority.VERY_LOW + 10)
 	public static class BinaryHybridCI1LAL extends
 		BinaryFruitHybridCI1<Lemon, Apple, Lemon>
 	{
@@ -1815,7 +1814,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCFI1AOA",
-		priority = Priority.VERY_LOW_PRIORITY + 5)
+		priority = Priority.VERY_LOW + 5)
 	public static class BinaryHybridCFI1AOA extends
 		BinaryFruitHybridCFI1<Apple, Orange, Apple>
 	{
@@ -1823,7 +1822,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCFI1OLO",
-		priority = Priority.VERY_LOW_PRIORITY + 5)
+		priority = Priority.VERY_LOW + 5)
 	public static class BinaryHybridCFI1OLO extends
 		BinaryFruitHybridCFI1<Orange, Lemon, Orange>
 	{
@@ -1831,7 +1830,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCFI1LAL",
-		priority = Priority.VERY_LOW_PRIORITY + 11)
+		priority = Priority.VERY_LOW + 11)
 	public static class BinaryHybridCFI1LAL extends
 		BinaryFruitHybridCFI1<Lemon, Apple, Lemon>
 	{
@@ -1839,7 +1838,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCIAA",
-		priority = Priority.VERY_LOW_PRIORITY + 5)
+		priority = Priority.VERY_LOW + 5)
 	public static class BinaryHybridCIAA extends
 		BinaryFruitHybridCI<Apple, Apple>
 	{
@@ -1847,7 +1846,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCIOO",
-		priority = Priority.VERY_LOW_PRIORITY + 11)
+		priority = Priority.VERY_LOW + 11)
 	public static class BinaryHybridCIOO extends
 		BinaryFruitHybridCI<Orange, Orange>
 	{
@@ -1855,7 +1854,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCILL",
-		priority = Priority.VERY_LOW_PRIORITY + 5)
+		priority = Priority.VERY_LOW + 5)
 	public static class BinaryHybridCILL extends
 		BinaryFruitHybridCI<Lemon, Lemon>
 	{
@@ -1863,7 +1862,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCFIAA",
-		priority = Priority.VERY_LOW_PRIORITY)
+		priority = Priority.VERY_LOW)
 	public static class BinaryHybridCFIAA extends
 		BinaryFruitHybridCFI<Apple, Apple>
 	{
@@ -1871,7 +1870,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCFIOO",
-		priority = Priority.VERY_LOW_PRIORITY)
+		priority = Priority.VERY_LOW)
 	public static class BinaryHybridCFIOO extends
 		BinaryFruitHybridCFI<Orange, Orange>
 	{
@@ -1879,7 +1878,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryHybridCFILL",
-		priority = Priority.VERY_LOW_PRIORITY + 11)
+		priority = Priority.VERY_LOW + 11)
 	public static class BinaryHybridCFILL extends
 		BinaryFruitHybridCFI<Lemon, Lemon>
 	{
@@ -1887,7 +1886,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryInplace1AO",
-		priority = Priority.VERY_LOW_PRIORITY + 11)
+		priority = Priority.VERY_LOW + 11)
 	public static class BinaryInplace1AO extends
 		BinaryFruitInplace1<Apple, Orange>
 	{
@@ -1895,7 +1894,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryInplace1OL",
-		priority = Priority.VERY_LOW_PRIORITY + 5)
+		priority = Priority.VERY_LOW + 5)
 	public static class BinaryInplace1OL extends
 		BinaryFruitInplace1<Orange, Lemon>
 	{
@@ -1903,7 +1902,7 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryInplace1LA",
-		priority = Priority.VERY_LOW_PRIORITY + 5)
+		priority = Priority.VERY_LOW + 5)
 	public static class BinaryInplace1LA extends
 		BinaryFruitInplace1<Lemon, Apple>
 	{
@@ -1911,19 +1910,19 @@ public class SpecialOpMatchingTest extends AbstractOpTest {
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryInplaceA",
-		priority = Priority.VERY_LOW_PRIORITY + 11)
+		priority = Priority.VERY_LOW + 11)
 	public static class BinaryInplaceA extends BinaryFruitInplace<Apple> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryInplaceO",
-		priority = Priority.VERY_LOW_PRIORITY)
+		priority = Priority.VERY_LOW)
 	public static class BinaryInplaceO extends BinaryFruitInplace<Orange> {
 		// NB: No implementation needed.
 	}
 
 	@Plugin(type = FruitOp.class, name = "test.binaryInplaceL",
-		priority = Priority.VERY_LOW_PRIORITY)
+		priority = Priority.VERY_LOW)
 	public static class BinaryInplaceL extends BinaryFruitInplace<Lemon> {
 		// NB: No implementation needed.
 	}

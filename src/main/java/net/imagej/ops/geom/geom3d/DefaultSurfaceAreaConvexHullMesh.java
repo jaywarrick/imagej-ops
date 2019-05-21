@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,9 +29,9 @@
 
 package net.imagej.ops.geom.geom3d;
 
+import net.imagej.mesh.Mesh;
 import net.imagej.ops.Ops;
 import net.imagej.ops.geom.AbstractBoundarySizeConvexHull;
-import net.imagej.ops.geom.geom3d.mesh.Mesh;
 
 import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
@@ -42,7 +41,7 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Ops.Geometric.BoundarySizeConvexHull.class,
 	label = "Geometric (3D): Surface Area Convex Hull",
-	priority = Priority.VERY_HIGH_PRIORITY)
+	priority = Priority.VERY_HIGH)
 public class DefaultSurfaceAreaConvexHullMesh extends
 	AbstractBoundarySizeConvexHull<Mesh>
 {

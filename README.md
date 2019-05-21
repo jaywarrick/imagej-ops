@@ -32,10 +32,9 @@ add_op = op("math.add", 5)
 output_image = map(input_image, add_op)
 ```
 
-For more details, see these tutorials:
-* [Using Ops](https://github.com/imagej/imagej-tutorials/tree/master/using-ops)
-* [Create a new Op](https://github.com/imagej/imagej-tutorials/tree/master/create-a-new-op)
-* [Developing external Op namespaces](http://imagej.net/Adding_new_ops)
+For more details, see the "Introduction to ImageJ Ops" tutorial notebook:
+
+  https://imagej.github.io/tutorials
 
 Working example
 ---------------
@@ -80,11 +79,11 @@ How to contribute
 
 We welcome [pull requests](https://help.github.com/articles/using-pull-requests)!
 * Use an
-  [existing op](https://github.com/imagej/imagej-tutorials/tree/master/create-a-new-op)
+  [existing op](https://github.com/imagej/tutorials/tree/master/maven-projects/create-a-new-op)
   as a starting point
 * Use [ImageJ code style](http://imagej.net/Coding_style)
 * Use
-  [small](https://www.crealytics.de/blog/2010/07/09/5-reasons-keeping-git-commits-small-admin/),
+  [small](https://crealytics.com/blog/5-reasons-keeping-git-commits-small/),
   [well-written](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
   commits
 * Use a [topic branch](http://imagej.net/Git_topic_branches)

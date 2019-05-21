@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -463,8 +462,10 @@ public class DefaultOpMatchingService extends AbstractService implements
 			}
 			// FIXME: Use generic assignability test, once it exists.
 			final Class<?> raw = GenericUtils.getClass(outType);
-			if (!ConversionUtils.canCast(outItems.next().getType(), raw)) {
-				candidate.setStatus(StatusCode.OUTPUT_TYPES_DO_NOT_MATCH);
+			final Class<?> outItemClass = outItems.next().getType();
+			if (!ConversionUtils.canCast(outItemClass, raw)) {
+				candidate.setStatus(StatusCode.OUTPUT_TYPES_DO_NOT_MATCH, //
+					"request=" + raw.getName() + ", actual=" + outItemClass.getName());
 				return false;
 			}
 		}
