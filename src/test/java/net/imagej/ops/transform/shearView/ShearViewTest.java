@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -65,7 +64,7 @@ public class ShearViewTest extends AbstractOpTest {
 		}
 
 		TransformView<DoubleType> il2 = Views.shear(Views.extendZero(img), 0, 1);
-		TransformView<DoubleType> opr = ops.transform().shear(Views.extendZero(img), 0, 1);
+		TransformView<DoubleType> opr = ops.transform().shearView(Views.extendZero(img), 0, 1);
 		Cursor<DoubleType> il2C = Views.interval(il2, new FinalInterval(new long[] { 0, 0 }, new long[] { 3, 3 }))
 				.cursor();
 		RandomAccess<DoubleType> oprRA = Views
@@ -91,7 +90,7 @@ public class ShearViewTest extends AbstractOpTest {
 				.shear(Views.extendZero(img), new FinalInterval(new long[] { 0, 0 }, new long[] { 3, 3 }), 0, 1)
 				.cursor();
 		RandomAccess<DoubleType> opr = ops.transform()
-				.shear(Views.extendZero(img), new FinalInterval(new long[] { 0, 0 }, new long[] { 3, 3 }), 0, 1)
+				.shearView(Views.extendZero(img), new FinalInterval(new long[] { 0, 0 }, new long[] { 3, 3 }), 0, 1)
 				.randomAccess();
 
 		while (il2.hasNext()) {

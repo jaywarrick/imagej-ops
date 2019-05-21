@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -61,7 +60,7 @@ public class ZeroMinViewTest extends AbstractOpTest {
 				Views.translate((RandomAccessible<DoubleType>) img, 2, 5), new long[] { 2, 5 }, new long[] { 12, 15 });
 
 		IntervalView<DoubleType> il2 = Views.zeroMin(imgTranslated);
-		IntervalView<DoubleType> opr = ops.transform().zeroMin(imgTranslated);
+		IntervalView<DoubleType> opr = ops.transform().zeroMinView(imgTranslated);
 
 		assertTrue(Views.isZeroMin(il2) == Views.isZeroMin(opr));
 	}

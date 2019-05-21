@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,6 +33,7 @@ import java.util.List;
 
 import net.imagej.ops.Contingent;
 import net.imagej.ops.Ops;
+import net.imagej.ops.map.Maps;
 import net.imagej.ops.morphology.Morphologies;
 import net.imagej.ops.special.computer.BinaryComputerOp;
 import net.imagej.ops.special.computer.Computers;
@@ -64,7 +64,7 @@ import org.scijava.plugin.Plugin;
  * @param <T> element type
  * @see net.imglib2.algorithm.morphology.Erosion
  */
-@Plugin(type = Ops.Morphology.Erode.class, priority = Priority.LOW_PRIORITY)
+@Plugin(type = Ops.Morphology.Erode.class, priority = Priority.LOW)
 public class ListErode<T extends RealType<T>> extends
 	AbstractBinaryHybridCF<RandomAccessibleInterval<T>, List<Shape>, IterableInterval<T>>
 	implements Ops.Morphology.Erode, Contingent
@@ -80,8 +80,8 @@ public class ListErode<T extends RealType<T>> extends
 
 	@Override
 	public boolean conforms() {
-		return out() == null || createOutput().iterationOrder().equals(out()
-			.iterationOrder());
+		return in1() == null || in2() == null || out() == null || //
+			Maps.compatible(in1(), out());
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

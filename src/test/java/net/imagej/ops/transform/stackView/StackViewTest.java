@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -60,12 +59,12 @@ public class StackViewTest extends AbstractOpTest {
 	public void defaultStackTest() {
 		Img<DoubleType> img = new ArrayImgFactory<DoubleType>().create(new int[] { 10, 10 }, new DoubleType());
 
-		List<RandomAccessibleInterval<DoubleType>> list = new ArrayList<>();
+		List<Img<DoubleType>> list = new ArrayList<>();
 		list.add(img);
 		list.add(img);
 		
 		RandomAccessibleInterval<DoubleType> il2 = Views.stack(list);
-		RandomAccessibleInterval<DoubleType> opr = ops.transform().stack(list);
+		RandomAccessibleInterval<DoubleType> opr = ops.transform().stackView(list);
 
 		assertEquals(il2.dimension(2), opr.dimension(2));
 	}
@@ -74,12 +73,12 @@ public class StackViewTest extends AbstractOpTest {
 	public void stackWithAccessModeTest() {
 		Img<DoubleType> img = new ArrayImgFactory<DoubleType>().create(new int[] { 10, 10 }, new DoubleType());
 
-		List<RandomAccessibleInterval<DoubleType>> list = new ArrayList<>();
+		List<Img<DoubleType>> list = new ArrayList<>();
 		list.add(img);
 		list.add(img);
 		
 		RandomAccessibleInterval<DoubleType> il2 = Views.stack(StackAccessMode.DEFAULT, list);
-		RandomAccessibleInterval<DoubleType> opr = ops.transform().stack(list, StackAccessMode.DEFAULT);
+		RandomAccessibleInterval<DoubleType> opr = ops.transform().stackView(list, StackAccessMode.DEFAULT);
 
 		assertEquals(il2.dimension(2), opr.dimension(2));
 	}

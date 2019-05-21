@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -48,7 +47,7 @@ import org.scijava.plugin.Plugin;
  * @see IntegralImg
  * @author Stefan Helfrich (University of Konstanz)
  */
-@Plugin(type = Ops.Image.Integral.class, priority = Priority.LOW_PRIORITY)
+@Plugin(type = Ops.Image.Integral.class, priority = Priority.LOW)
 public class WrappedIntegralImg<I extends RealType<I>> extends
 	AbstractUnaryFunctionOp<RandomAccessibleInterval<I>, RandomAccessibleInterval<DoubleType>>
 	implements Ops.Image.Integral

@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,8 +32,6 @@ package net.imagej.ops.create;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.util.Random;
-
 import net.imagej.ops.AbstractOpTest;
 import net.imagej.ops.create.imgLabeling.DefaultCreateImgLabeling;
 import net.imglib2.Dimensions;
@@ -47,6 +44,7 @@ import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.util.Intervals;
 
 import org.junit.Test;
+import org.scijava.util.MersenneTwisterFast;
 
 /**
  * Tests several ways to create an image
@@ -58,11 +56,12 @@ import org.junit.Test;
 public class CreateLabelingTest extends AbstractOpTest {
 
 	private static final int TEST_SIZE = 100;
+	private static final long SEED = 0x12345678;
 
 	@Test
 	public void testImageDimensions() {
 
-		final Random randomGenerator = new Random();
+		final MersenneTwisterFast randomGenerator = new MersenneTwisterFast(SEED);
 
 		for (int i = 0; i < TEST_SIZE; i++) {
 

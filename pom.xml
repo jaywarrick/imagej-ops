@@ -5,21 +5,21 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>13.1.0</version>
+		<version>26.0.0</version>
 		<relativePath />
 	</parent>
 
 	<groupId>net.imagej</groupId>
 	<artifactId>imagej-ops</artifactId>
-	<version>0.36.1-SNAPSHOT</version>
+	<version>0.44.1-SNAPSHOT</version>
 
 	<name>ImageJ Ops</name>
 	<description>ImageJ Operations: a framework for reusable algorithms.</description>
-	<url>http://imagej.net/ImageJ_Ops</url>
+	<url>https://imagej.net/ImageJ_Ops</url>
 	<inceptionYear>2014</inceptionYear>
 	<organization>
 		<name>ImageJ</name>
-		<url>http://imagej.net/</url>
+		<url>https://imagej.net/</url>
 	</organization>
 	<licenses>
 		<license>
@@ -32,7 +32,7 @@
 		<developer>
 			<id>ctrueden</id>
 			<name>Curtis Rueden</name>
-			<url>http://imagej.net/User:Rueden</url>
+			<url>https://imagej.net/User:Rueden</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -46,7 +46,7 @@
 		<developer>
 			<id>dietzc</id>
 			<name>Christian Dietz</name>
-			<url>http://imagej.net/User:Dietzc</url>
+			<url>https://imagej.net/User:Dietzc</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -60,7 +60,7 @@
 		<developer>
 			<id>bnorthan</id>
 			<name>Brian Northan</name>
-			<url>http://imagej.net/User:Bnorthan</url>
+			<url>https://imagej.net/User:Bnorthan</url>
 			<roles>
 				<role>developer</role>
 				<role>debugger</role>
@@ -71,7 +71,7 @@
 		<developer>
 			<id>gab1one</id>
 			<name>Gabriel Einsdorf</name>
-			<url>http://imagej.net/User:Gab1one</url>
+			<url>https://imagej.net/User:Gab1one</url>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -84,14 +84,6 @@
 				<role>support</role>
 			</roles>
 		</developer>
-		<developer>
-			<id>lnyng</id>
-			<name>Leon Yang</name>
-			<url>http://imagej.net/User:Leon</url>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
 	</developers>
 	<contributors>
 		<contributor>
@@ -101,18 +93,22 @@
 		</contributor>
 		<contributor>
 			<name>Johannes Schindelin</name>
-			<url>http://imagej.net/User:Schindelin</url>
+			<url>https://imagej.net/User:Schindelin</url>
 			<roles><role>founder</role></roles>
 			<properties><id>dscho</id></properties>
 		</contributor>
 		<contributor>
+			<name>Eric Czech</name>
+			<properties><id>eric-czech</id></properties>
+		</contributor>
+		<contributor>
 			<name>Richard Domander</name>
-			<url>http://imagej.net/User:Rdom</url>
+			<url>https://imagej.net/User:Rdom</url>
 			<properties><id>rimadoma</id></properties>
 		</contributor>
 		<contributor>
 			<name>Jan Eglinger</name>
-			<url>http://imagej.net/User:Eglinger</url>
+			<url>https://imagej.net/User:Eglinger</url>
 			<properties><id>imagejan</id></properties>
 		</contributor>
 		<contributor>
@@ -125,7 +121,7 @@
 		</contributor>
 		<contributor>
 			<name>Kyle Harrington</name>
-			<url>http://imagej.net/User:Kharrington</url>
+			<url>https://imagej.net/User:Kharrington</url>
 			<properties><id>kephale</id></properties>
 		</contributor>
 		<contributor>
@@ -134,17 +130,17 @@
 		</contributor>
 		<contributor>
 			<name>Stefan Helfrich</name>
-			<url>http://imagej.net/User:Stelfrich</url>
+			<url>https://imagej.net/User:Stelfrich</url>
 			<properties><id>stelfrich</id></properties>
 		</contributor>
 		<contributor>
 			<name>Mark Hiner</name>
-			<url>http://imagej.net/User:Hinerm</url>
+			<url>https://imagej.net/User:Hinerm</url>
 			<properties><id>hinerm</id></properties>
 		</contributor>
 		<contributor>
 			<name>Aparna Pal</name>
-			<url>http://imagej.net/User:Apal4</url>
+			<url>https://imagej.net/User:Apal4</url>
 			<properties><id>apal4</id></properties>
 		</contributor>
 		<contributor>
@@ -157,8 +153,13 @@
 		</contributor>
 		<contributor>
 			<name>Alison Walter</name>
-			<url>http://imagej.net/User:Awalter2</url>
+			<url>https://imagej.net/User:Awalter2</url>
 			<properties><id>awalter17</id></properties>
+		</contributor>
+		<contributor>
+			<name>Leon Yang</name>
+			<url>https://imagej.net/User:Leon</url>
+			<properties><id>lnyng</id></properties>
 		</contributor>
 		<contributor>
 			<name>Michael Zinsmaier</name>
@@ -168,8 +169,8 @@
 
 	<mailingLists>
 		<mailingList>
-			<name>ImageJ Forum</name>
-			<archive>http://forum.imagej.net/</archive>
+			<name>Image.sc Forum</name>
+			<archive>https://forum.image.sc/tags/imagej</archive>
 		</mailingList>
 	</mailingLists>
 
@@ -192,16 +193,17 @@
 		<package-name>net.imagej.ops</package-name>
 		<main-class>net.imagej.ops.Main</main-class>
 		<license.licenseName>bsd_2</license.licenseName>
-		<license.copyrightOwners>Board of Regents of the University of
-Wisconsin-Madison, University of Konstanz and Brian Northan.</license.copyrightOwners>
+		<license.copyrightOwners>ImageJ developers.</license.copyrightOwners>
 		<license.projectName>ImageJ software for multidimensional image processing and analysis.</license.projectName>
-		<scijava-common.version>2.62.1</scijava-common.version>
+
+		<!-- NB: Deploy releases to the SciJava Maven repository. -->
+		<releaseProfiles>deploy-to-scijava</releaseProfiles>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>imagej.public</id>
-			<url>http://maven.imagej.net/content/groups/public</url>
+			<id>scijava.public</id>
+			<url>https://maven.scijava.org/content/groups/public</url>
 		</repository>
 	</repositories>
 
@@ -210,6 +212,10 @@ Wisconsin-Madison, University of Konstanz and Brian Northan.</license.copyrightO
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej-mesh</artifactId>
 		</dependency>
 
 		<!-- ImgLib2 dependencies -->
@@ -229,6 +235,10 @@ Wisconsin-Madison, University of Konstanz and Brian Northan.</license.copyrightO
 			<groupId>net.imglib2</groupId>
 			<artifactId>imglib2-realtransform</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.imglib2</groupId>
+			<artifactId>imglib2-roi</artifactId>
+		</dependency>
 
 		<!-- SciJava dependencies -->
 		<dependency>
@@ -241,6 +251,11 @@ Wisconsin-Madison, University of Konstanz and Brian Northan.</license.copyrightO
 		</dependency>
 		<dependency>
 			<groupId>org.scijava</groupId>
+			<artifactId>scijava-search</artifactId>
+		</dependency>
+		<dependency>
+			<!-- Do not remove - Maven incorrectly identifies it as an unused dependency!  -->
+			<groupId>org.scijava</groupId>
 			<artifactId>scripting-javascript</artifactId>
 		</dependency>
 
@@ -248,6 +263,18 @@ Wisconsin-Madison, University of Konstanz and Brian Northan.</license.copyrightO
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.joml</groupId>
+			<artifactId>joml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.ojalgo</groupId>
+			<artifactId>ojalgo</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>gov.nist.math</groupId>
+			<artifactId>jama</artifactId>
 		</dependency>
 
 		<!-- Test scope dependencies -->
@@ -267,6 +294,7 @@ Wisconsin-Madison, University of Konstanz and Brian Northan.</license.copyrightO
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<!-- Do not remove - Maven incorrectly identifies it as an unused dependency!  -->
 			<groupId>org.scijava</groupId>
 			<artifactId>scripting-jython</artifactId>
 			<scope>test</scope>
@@ -274,6 +302,11 @@ Wisconsin-Madison, University of Konstanz and Brian Northan.</license.copyrightO
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>ij</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.imglib2</groupId>
+			<artifactId>imglib2-ij</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

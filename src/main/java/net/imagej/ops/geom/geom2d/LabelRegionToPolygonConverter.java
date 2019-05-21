@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,7 +35,7 @@ import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
 import net.imagej.ops.special.function.Functions;
 import net.imagej.ops.special.function.UnaryFunctionOp;
-import net.imglib2.roi.geometric.Polygon;
+import net.imglib2.roi.geom.real.Polygon2D;
 import net.imglib2.roi.labeling.LabelRegion;
 
 import org.scijava.Priority;
@@ -52,9 +51,9 @@ import org.scijava.plugin.Plugin;
  * @author Daniel Seebacher (University of Konstanz)
  */
 @SuppressWarnings("rawtypes")
-@Plugin(type = Converter.class, priority = Priority.VERY_HIGH_PRIORITY)
+@Plugin(type = Converter.class, priority = Priority.VERY_HIGH)
 public class LabelRegionToPolygonConverter extends
-	AbstractConverter<LabelRegion, Polygon>
+	AbstractConverter<LabelRegion, Polygon2D>
 {
 
 	@Parameter(required = false)
@@ -66,16 +65,17 @@ public class LabelRegionToPolygonConverter extends
 	@Override
 	public <T> T convert(final Object src, final Class<T> dest) {
 		if (contourFunc == null) {
-			contourFunc = (UnaryFunctionOp) Functions.unary(ops, Ops.Geometric.Contour.class, dest, src, true);
+			contourFunc = (UnaryFunctionOp) Functions.unary(ops,
+				Ops.Geometric.Contour.class, dest, src, true);
 		}
 		// FIXME: can we make this faster?
-		final Polygon p = (Polygon) contourFunc.calculate(src);
+		final Polygon2D p = (Polygon2D) contourFunc.calculate(src);
 		return (T) p;
 	}
 
 	@Override
-	public Class<Polygon> getOutputType() {
-		return Polygon.class;
+	public Class<Polygon2D> getOutputType() {
+		return Polygon2D.class;
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class LabelRegionToPolygonConverter extends
 
 		final Object sourceObject = request.sourceObject();
 
-		// we can decide if we can create a Polygon as we have to know the
+		// we can decide if we can create a Polygon2D as we have to know the
 		// dimensionality of the incoming object
 		if (sourceObject == null || !(sourceObject instanceof LabelRegion)) {
 			return false;
@@ -102,9 +102,10 @@ public class LabelRegionToPolygonConverter extends
 		Class<?> destClass = request.destClass();
 		Type destType = request.destType();
 
-		if (destClass != null && !(destClass == Polygon.class)) {
+		if (destClass != null && !(destClass == Polygon2D.class)) {
 			return false;
-		} else if (destType != null && !(destType == Polygon.class)) {
+		}
+		else if (destType != null && !(destType == Polygon2D.class)) {
 			return false;
 		}
 

@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,8 +30,6 @@ package net.imagej.ops.image.distancetransform;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Random;
-
 import net.imagej.ops.AbstractOpTest;
 import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccess;
@@ -41,6 +38,7 @@ import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.real.FloatType;
 
 import org.junit.Test;
+import org.scijava.util.MersenneTwisterFast;
 
 /**
  * @author Simon Schmid (University of Konstanz)
@@ -48,6 +46,7 @@ import org.junit.Test;
 public class DefaultDistanceTransformTest extends AbstractOpTest {
 
 	private static final double EPSILON = 0.0001;
+	private static final long SEED = 0x12345678;
 
 	@SuppressWarnings("unchecked")
 	@Test
@@ -71,13 +70,39 @@ public class DefaultDistanceTransformTest extends AbstractOpTest {
 				calibration);
 		compareResults(out, in, calibration);
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testComputer() {
+		// create 4D image
+		final RandomAccessibleInterval<BitType> in = ops.create().img(new FinalInterval(20, 20, 5, 3), new BitType());
+		generate4DImg(in);
+		
+		// create output
+		final RandomAccessibleInterval<FloatType> out = ops.create().img(in, new FloatType());
+
+		/*
+		 * test normal DT
+		 */
+		ops.run(DefaultDistanceTransform.class, out, in);
+		compareResults(out, in, new double[] { 1, 1, 1, 1 });
+
+		/*
+		 * test calibrated DT
+		 */
+		final double[] calibration = new double[] { 3.74, 5.19, 1.21, 2.21 };
+		ops.run(DefaultDistanceTransformCalibration.class, out, in,
+				calibration);
+		compareResults(out, in, calibration);
+		
+	}
 
 	/*
 	 * generate a random BitType image
 	 */
 	private void generate4DImg(final RandomAccessibleInterval<BitType> in) {
 		final RandomAccess<BitType> raIn = in.randomAccess();
-		final Random random = new Random();
+		final MersenneTwisterFast random = new MersenneTwisterFast(SEED);
 
 		for (int x = 0; x < in.dimension(0); x++) {
 			for (int y = 0; y < in.dimension(1); y++) {

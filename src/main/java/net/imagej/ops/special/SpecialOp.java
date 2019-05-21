@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -113,12 +112,12 @@ import org.scijava.InstantiableException;
  * <tr>
  * <td>1</td>
  * <td>{@link UnaryComputerOp}</td>
- * <td>{@code void compute(O, I)}</td>
+ * <td>{@code void compute(I, O)}</td>
  * </tr>
  * <tr>
  * <td>2</td>
  * <td>{@link BinaryComputerOp}</td>
- * <td>{@code void compute(O, I1, I2)}</td>
+ * <td>{@code void compute(I1, I2, O)}</td>
  * </tr>
  * <tr>
  * <th rowspan=3>function</th>
@@ -181,14 +180,14 @@ import org.scijava.InstantiableException;
  * <tr>
  * <td>1</td>
  * <td>{@link UnaryHybridCF}</td>
- * <td style="white-space: nowrap">{@code void compute(O, I)}
+ * <td style="white-space: nowrap">{@code void compute(I, O)}
  * <br>{@code O calculate(I)}</td>
  * </tr>
  * <tr>
  * <td>2</td>
  * <td>{@link BinaryHybridCF}</td>
  * <td style="white-space: nowrap">{@code O calculate(I1, I2)}
- * <br>{@code void compute(O, I1, I2)}</td>
+ * <br>{@code void compute(I1, I2, O)}</td>
  * </tr>
  * <tr>
  * <th rowspan=3>hybrid CI</th>

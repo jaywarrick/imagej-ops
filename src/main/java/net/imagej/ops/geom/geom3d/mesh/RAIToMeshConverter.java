@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +31,7 @@ package net.imagej.ops.geom.geom3d.mesh;
 
 import java.lang.reflect.Type;
 
+import net.imagej.mesh.Mesh;
 import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
 import net.imagej.ops.special.function.Functions;
@@ -52,7 +52,7 @@ import org.scijava.plugin.Plugin;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @SuppressWarnings("rawtypes")
-@Plugin(type = Converter.class, priority = Priority.VERY_HIGH_PRIORITY)
+@Plugin(type = Converter.class, priority = Priority.VERY_HIGH)
 public class RAIToMeshConverter extends
 	AbstractConverter<RandomAccessibleInterval, Mesh>
 {

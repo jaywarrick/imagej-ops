@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -48,4 +47,13 @@ public @interface OpMethod {
 
 	Class<? extends Op>[] ops() default {};
 
+	/**
+	 * A HACK to allow whitelisting known-good namespace method signatures.
+	 * <p>
+	 * Methods with this attribute set to true will still count toward namespace
+	 * completeness, but their the strict type argument check will be skipped.
+	 * <em>DO NOT USE THIS UNLESS YOU ARE CONFIDENT IT IS CORRECT AND NEEDED.</em>
+	 * </p>
+	 */
+	boolean skipTypeCheck() default false;
 }

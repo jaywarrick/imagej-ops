@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,8 +31,6 @@ package net.imagej.ops.copy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Random;
-
 import net.imagej.ops.AbstractOpTest;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
@@ -46,6 +43,7 @@ import net.imglib2.type.numeric.real.FloatType;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.scijava.util.MersenneTwisterFast;
 
 /**
  * Test {@link CopyII}
@@ -61,7 +59,7 @@ public class CopyIITest extends AbstractOpTest {
 		input = new PlanarImgFactory<DoubleType>().create(
 				new int[] { 120, 100 }, new DoubleType());
 
-		final Random r = new Random(System.currentTimeMillis());
+		final MersenneTwisterFast r = new MersenneTwisterFast(System.currentTimeMillis());
 
 		final Cursor<DoubleType> inc = input.cursor();
 

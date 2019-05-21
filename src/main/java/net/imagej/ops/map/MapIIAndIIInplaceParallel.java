@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -47,7 +46,7 @@ import org.scijava.plugin.Plugin;
  * @author Leon Yang
  * @param <EA> element type of inputs + outputs
  */
-@Plugin(type = Ops.Map.class, priority = Priority.LOW_PRIORITY + 10)
+@Plugin(type = Ops.Map.class, priority = Priority.LOW + 10)
 public class MapIIAndIIInplaceParallel<EA> extends
 	AbstractMapBinaryInplace<EA, EA, IterableInterval<EA>> implements Contingent,
 	Parallel
@@ -65,8 +64,8 @@ public class MapIIAndIIInplaceParallel<EA> extends
 		ops().run(ChunkerOp.class, new CursorBasedChunk() {
 
 			@Override
-			public void execute(final int startIndex, final int stepSize,
-				final int numSteps)
+			public void execute(final long startIndex, final long stepSize,
+				final long numSteps)
 			{
 				Maps.inplace(arg, in, (BinaryInplace1Op<EA, EA, EA>) getOp(),
 					startIndex, stepSize, numSteps);
@@ -81,8 +80,8 @@ public class MapIIAndIIInplaceParallel<EA> extends
 		ops().run(ChunkerOp.class, new CursorBasedChunk() {
 
 			@Override
-			public void execute(final int startIndex, final int stepSize,
-				final int numSteps)
+			public void execute(final long startIndex, final long stepSize,
+				final long numSteps)
 			{
 				Maps.inplace(in, arg, getOp(), startIndex, stepSize, numSteps);
 			}

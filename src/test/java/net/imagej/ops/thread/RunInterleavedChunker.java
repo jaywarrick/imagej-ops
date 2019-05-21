@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,7 +41,7 @@ import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
 
 @Plugin(type = Op.class, name = "test.chunker",
-	priority = Priority.LOW_PRIORITY)
+	priority = Priority.LOW)
 public class RunInterleavedChunker<A extends RealType<A>> extends
 	AbstractUnaryComputerOp<IterableInterval<A>, IterableInterval<A>> implements
 	Parallel
@@ -56,7 +55,7 @@ public class RunInterleavedChunker<A extends RealType<A>> extends
 
 			@Override
 			public void
-				execute(int startIndex, final int stepSize, final int numSteps)
+				execute(long startIndex, final long stepSize, final long numSteps)
 			{
 				final Cursor<A> cursor = input.localizingCursor();
 				final Cursor<A> cursorOut = output.localizingCursor();

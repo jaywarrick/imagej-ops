@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -183,8 +182,14 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 
 			if (!checkVarArgs(method)) success = false;
 
+			// HACK: Allow @OpMethod to specify that type checking should be skipped.
+			final OpMethod opMethod = method.getAnnotation(OpMethod.class);
+			final boolean checkTypes = opMethod == null || !opMethod.skipTypeCheck();
+
 			for (final Class<? extends Op> opType : opTypes(method)) {
-				if (!checkOpImpl(method, qName, opType, coverSet)) success = false;
+				if (!checkOpImpl(method, qName, opType, coverSet, checkTypes)) {
+					success = false;
+				}
 			}
 		}
 
@@ -258,31 +263,37 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 	 * @param qName The fully qualified (with namespace) name of the op.
 	 * @param opType The {@link Op} to which the method should be compared.
 	 * @param coverSet The set of ops which have already matched a method.
+	 * @param checkTypes Whether to validate that the method's type arguments and
+	 *          return type match the given op implementation's types.
 	 * @return true iff the method and {@link Op} match up.
 	 */
 	private boolean checkOpImpl(final Method method, final String qName,
-		final Class<? extends Op> opType, final OpCoverSet coverSet)
+		final Class<? extends Op> opType, final OpCoverSet coverSet,
+		final boolean checkTypes)
 	{
 		// TODO: Type matching needs to be type<->type instead of class<->type.
 		// That is, the "special class placeholder" also needs to work with Type.
 		// Then we can pass Types here instead of Class instances.
 		// final Object[] argTypes = method.getGenericParameterTypes();
 		final Object[] argTypes = method.getParameterTypes();
-		final OpRef ref = OpRef.create(qName, argTypes);
 		final OpInfo info = ops.info(opType);
-		final OpCandidate candidate = new OpCandidate(ops, ref, info);
 
-		// check input types
-		if (!inputTypesMatch(candidate)) {
-			error("Mismatched inputs", opType, method);
-			return false;
-		}
+		if (checkTypes) {
+			final OpRef ref = OpRef.create(qName, argTypes);
+			final OpCandidate candidate = new OpCandidate(ops, ref, info);
 
-		// check output types
-		final Type returnType = method.getGenericReturnType();
-		if (!outputTypesMatch(returnType, candidate)) {
-			error("Mismatched outputs", opType, method);
-			return false;
+			// check input types
+			if (!inputTypesMatch(candidate)) {
+				error("Mismatched inputs", opType, method);
+				return false;
+			}
+
+			// check output types
+			final Type returnType = method.getGenericReturnType();
+			if (!outputTypesMatch(returnType, candidate)) {
+				error("Mismatched outputs", opType, method);
+				return false;
+			}
 		}
 
 		// mark this op as covered (w.r.t. the given number of args)

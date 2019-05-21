@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -64,7 +63,7 @@ public class CollapseViewTest extends AbstractOpTest {
 		CompositeIntervalView<DoubleType, ? extends GenericComposite<DoubleType>> il2 = Views
 				.collapse(img);
 		CompositeIntervalView<DoubleType, ? extends GenericComposite<DoubleType>> opr = ops.transform()
-				.collapse(img);
+				.collapseView(img);
 
 		assertEquals(il2.numDimensions(), opr.numDimensions());
 	}
@@ -78,7 +77,7 @@ public class CollapseViewTest extends AbstractOpTest {
 				.collapse((RandomAccessible<DoubleType>) img);
 
 		CompositeView<DoubleType, ? extends GenericComposite<DoubleType>> opr = ops.transform()
-				.collapse((RandomAccessible<DoubleType>) img);
+				.collapseView((RandomAccessible<DoubleType>) img);
 
 		assertEquals(il2.numDimensions(), opr.numDimensions());
 	}
@@ -92,7 +91,7 @@ public class CollapseViewTest extends AbstractOpTest {
 				.collapse((RandomAccessibleInterval<DoubleType>) img);
 
 		CompositeIntervalView<DoubleType, ? extends GenericComposite<DoubleType>> opr = ops.transform()
-				.collapse((RandomAccessibleInterval<DoubleType>) img);
+				.collapseView((RandomAccessibleInterval<DoubleType>) img);
 
 		assertEquals(il2.numDimensions(), opr.numDimensions());
 	}

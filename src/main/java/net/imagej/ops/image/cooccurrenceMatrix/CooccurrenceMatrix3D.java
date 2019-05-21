@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -123,7 +122,8 @@ public class CooccurrenceMatrix3D<T extends RealType<T>> extends
 					// second pixel in interval and mask
 					if (sx >= 0 && sy >= 0 && sz >= 0 && sz < pixels.length
 							&& sy < pixels[sz].length
-							&& sx < pixels[sz][sy].length) {
+							&& sx < pixels[sz][sy].length
+							&& pixels[sz][sy][sx] != Integer.MAX_VALUE) {
 
 						matrix[pixels[z][y][x]][pixels[sz][sy][sx]]++;
 						nrPairs++;

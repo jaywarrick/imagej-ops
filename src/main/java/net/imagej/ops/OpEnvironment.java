@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.imagej.ops.cached.CachedOpEnvironment;
+import net.imagej.ops.coloc.ColocNamespace;
 import net.imagej.ops.convert.ConvertNamespace;
 import net.imagej.ops.copy.CopyNamespace;
 import net.imagej.ops.create.CreateNamespace;
@@ -51,6 +51,7 @@ import net.imagej.ops.geom.GeomNamespace;
 import net.imagej.ops.image.ImageNamespace;
 import net.imagej.ops.imagemoments.ImageMomentsNamespace;
 import net.imagej.ops.labeling.LabelingNamespace;
+import net.imagej.ops.linalg.LinAlgNamespace;
 import net.imagej.ops.logic.LogicNamespace;
 import net.imagej.ops.map.neighborhood.CenterAwareComputerOp;
 import net.imagej.ops.math.MathNamespace;
@@ -830,6 +831,11 @@ public interface OpEnvironment extends Contextual {
 
 	// -- Operation shortcuts - other namespaces --
 
+	/** Gateway into ops of the "coloc" namespace. */
+	default ColocNamespace coloc() {
+		return namespace(ColocNamespace.class);
+	}
+	
 	/** Gateway into ops of the "copy" namespace. */
 	default CopyNamespace copy() {
 		return namespace(CopyNamespace.class);
@@ -883,6 +889,11 @@ public interface OpEnvironment extends Contextual {
 	/** Gateway into ops of the "lbp" namespace. */
 	default LBPNamespace lbp() {
 		return namespace(LBPNamespace.class);
+	}
+
+	/** Gateway into ops of the "linalg" namespace */
+	default LinAlgNamespace linalg() {
+		return namespace(LinAlgNamespace.class);
 	}
 
 	/** Gateway into ops of the "logic" namespace. */

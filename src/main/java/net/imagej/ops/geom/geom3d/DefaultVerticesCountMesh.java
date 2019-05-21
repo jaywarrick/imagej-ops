@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,9 +29,9 @@
 
 package net.imagej.ops.geom.geom3d;
 
+import net.imagej.mesh.Mesh;
 import net.imagej.ops.Ops;
 import net.imagej.ops.geom.GeometricOp;
-import net.imagej.ops.geom.geom3d.mesh.Mesh;
 import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.type.numeric.real.DoubleType;
 
@@ -46,7 +45,7 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Ops.Geometric.VerticesCount.class,
 	label = "Geometric3D: Surface Vertices Count",
-	priority = Priority.VERY_HIGH_PRIORITY)
+	priority = Priority.VERY_HIGH)
 public class DefaultVerticesCountMesh extends
 	AbstractUnaryHybridCF<Mesh, DoubleType> implements GeometricOp<Mesh, DoubleType>,
 	Ops.Geometric.VerticesCount
@@ -54,7 +53,7 @@ public class DefaultVerticesCountMesh extends
 
 	@Override
 	public void compute(final Mesh input, final DoubleType output) {
-		output.set(input.getVertices().size());
+		output.set(input.vertices().size());
 	}
 	
 	@Override

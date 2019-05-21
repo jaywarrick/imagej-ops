@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +31,7 @@ package net.imagej.ops.geom.geom2d;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.geom.AbstractSolidity;
-import net.imglib2.roi.geometric.Polygon;
+import net.imglib2.roi.geom.real.Polygon2D;
 
 import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
@@ -41,7 +40,7 @@ import org.scijava.plugin.Plugin;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.Solidity.class,
-	label = "Geometric (2D): Solidity", priority = Priority.VERY_HIGH_PRIORITY)
-public class DefaultSolidityPolygon extends AbstractSolidity<Polygon> {
+	label = "Geometric (2D): Solidity", priority = Priority.VERY_HIGH)
+public class DefaultSolidityPolygon extends AbstractSolidity<Polygon2D> {
 	// NB: Marker Interface
 }

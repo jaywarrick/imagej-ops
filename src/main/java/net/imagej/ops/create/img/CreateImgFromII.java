@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -48,7 +47,7 @@ import org.scijava.plugin.Plugin;
  * @author Curtis Rueden
  * @param <T>
  */
-@Plugin(type = Ops.Create.Img.class, priority = Priority.HIGH_PRIORITY + 1)
+@Plugin(type = Ops.Create.Img.class, priority = Priority.HIGH + 1)
 public class CreateImgFromII<T extends NativeType<T>> extends
 	UFViaUFSameIO<IterableInterval<T>, Img<T>> implements Ops.Create.Img
 {

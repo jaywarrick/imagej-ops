@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -61,15 +60,15 @@ public class DefaultChunker extends AbstractChunker {
 
 		// TODO: is there a better way to determine the optimal chunk size?
 		
-		final int numSteps = Math.max(1, 
-			(int) (numberOfElements / Runtime.getRuntime().availableProcessors())) ;
+		final long numSteps = Math.max(1, 
+			(long) (numberOfElements / Runtime.getRuntime().availableProcessors())) ;
 		
 		final int numChunks = (int) (numberOfElements / numSteps);
 
 		final ArrayList<Future<?>> futures = new ArrayList<>(numChunks);
 
 		for (int i = 0; i < numChunks - 1; i++) {
-			final int j = i;
+			final long j = i;
 
 			futures.add(threadService.run(new Runnable() {
 

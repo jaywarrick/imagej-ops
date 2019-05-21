@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -50,7 +49,7 @@ import org.scijava.plugin.Plugin;
  * @author Martin Horn (University of Konstanz)
  * @author Stefan Helfrich (University of Konstanz)
  */
-@Plugin(type = Ops.Transform.Crop.class, priority = Priority.LOW_PRIORITY + 1)
+@Plugin(type = Ops.Transform.Crop.class, priority = Priority.LOW + 1)
 public class CropImgPlus<T extends Type<T>> extends
 	AbstractBinaryFunctionOp<ImgPlus<T>, Interval, ImgPlus<T>> implements Ops.Transform.Crop
 {

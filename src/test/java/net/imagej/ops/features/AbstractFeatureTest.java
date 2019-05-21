@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,15 +34,15 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import net.imagej.mesh.Mesh;
+import net.imagej.mesh.naive.NaiveDoubleMesh;
 import net.imagej.ops.AbstractOpTest;
 import net.imagej.ops.OpService;
-import net.imagej.ops.geom.geom3d.mesh.DefaultMesh;
-import net.imagej.ops.geom.geom3d.mesh.Mesh;
-import net.imagej.ops.geom.geom3d.mesh.TriangularFacet;
-import net.imagej.ops.geom.geom3d.mesh.Vertex;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
@@ -55,7 +54,8 @@ import net.imglib2.img.array.ArrayImg;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.img.basictypeaccess.array.ByteArray;
 import net.imglib2.roi.EllipseRegionOfInterest;
-import net.imglib2.roi.geometric.Polygon;
+import net.imglib2.roi.geom.real.DefaultWritablePolygon2D;
+import net.imglib2.roi.geom.real.Polygon2D;
 import net.imglib2.roi.labeling.ImgLabeling;
 import net.imglib2.roi.labeling.LabelRegion;
 import net.imglib2.roi.labeling.LabelRegions;
@@ -67,8 +67,10 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.RandomAccessibleIntervalCursor;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.junit.Before;
 import org.scijava.Context;
+import org.scijava.util.LongArray;
 
 /**
  * @author Daniel Seebacher (University of Konstanz)
@@ -160,13 +162,6 @@ public class AbstractFeatureTest extends AbstractOpTest {
 		 */
 		public ImageGenerator(final long seed) {
 			this.rand = new Random(seed);
-		}
-
-		/**
-		 * Default constructor, initialize with random seed.
-		 */
-		public ImageGenerator() {
-			this.rand = new Random();
 		}
 
 		/**
@@ -266,7 +261,7 @@ public class AbstractFeatureTest extends AbstractOpTest {
 		return openFloatImg(AbstractFeatureTest.class, "2d_geometric_features_testlabel.tif");
 	}
 	
-	protected static Polygon getPolygon() {
+	protected static Polygon2D getPolygon() {
 		final List<RealPoint> vertices = new ArrayList<>();
 		try {
 			Files.lines(Paths.get(AbstractFeatureTest.class.getResource("2d_geometric_features_polygon.txt").toURI()))
@@ -279,7 +274,7 @@ public class AbstractFeatureTest extends AbstractOpTest {
 		} catch (IOException | URISyntaxException exc) {
 			exc.printStackTrace();
 		}
-		return new Polygon(vertices);
+		return new DefaultWritablePolygon2D(vertices);
 	}
 
 	protected static Img<FloatType> getTestImage3D() {
@@ -287,23 +282,30 @@ public class AbstractFeatureTest extends AbstractOpTest {
 	}
 	
 	protected static Mesh getMesh() {
-		final List<Vertex> vertices = new ArrayList<>();
+		final Mesh m = new NaiveDoubleMesh();
+		// To prevent duplicates, map each (x, y, z) triple to its own index.
+		final Map<Vector3D, Long> indexMap = new HashMap<>();
+		final LongArray indices = new LongArray();
 		try {
 			Files.lines(Paths.get(AbstractFeatureTest.class.getResource("3d_geometric_features_mesh.txt").toURI()))
 										.forEach(l -> {
 											String[] coord = l.split(" ");
-											Vertex v = new Vertex(Double.parseDouble(coord[0]), 
-																  Double.parseDouble(coord[1]),
-																  Double.parseDouble(coord[2]));
-											vertices.add(v);
+											final double x = Double.parseDouble(coord[0]);
+											final double y = Double.parseDouble(coord[1]);
+											final double z = Double.parseDouble(coord[2]);
+											final Vector3D vertex = new Vector3D(x, y, z);
+											final long vIndex = indexMap.computeIfAbsent(vertex, //
+												v -> m.vertices().add(x, y, z));
+											indices.add(vIndex);
 										});
 		} catch (IOException | URISyntaxException exc) {
 			exc.printStackTrace();
 		}
-		final DefaultMesh m = new DefaultMesh();
-		for (int i = 0; i < vertices.size(); i+=3) {
-			final TriangularFacet f = new TriangularFacet(vertices.get(i), vertices.get(i+1), vertices.get(i+2));
-			m.addFace(f);
+		for (int i = 0; i < indices.size(); i += 3) {
+			final long v0 = indices.get(i);
+			final long v1 = indices.get(i + 1);
+			final long v2 = indices.get(i + 2);
+			m.triangles().add(v0, v1, v2);
 		}
 		return m;
 	}

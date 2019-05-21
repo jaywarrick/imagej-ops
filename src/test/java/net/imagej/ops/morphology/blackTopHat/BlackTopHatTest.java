@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,13 +29,11 @@
 
 package net.imagej.ops.morphology.blackTopHat;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.imagej.ops.AbstractOpTest;
-import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.algorithm.morphology.BlackTopHat;
 import net.imglib2.algorithm.neighborhood.DiamondShape;
@@ -66,14 +63,12 @@ public class BlackTopHatTest extends AbstractOpTest {
 	@Test
 	public void testSingleBlackTopHat() {
 		final Shape shape = new DiamondShape(1);
+		final List<Shape> shapes = Arrays.asList(shape);
 		@SuppressWarnings("unchecked")
 		final Img<ByteType> out1 = (Img<ByteType>) ops.run(ListBlackTopHat.class,
-			Img.class, in, shape);
+			Img.class, in, shapes);
 		final Img<ByteType> out2 = BlackTopHat.blackTopHat(in, shape, 1);
-		final Cursor<ByteType> c1 = out1.cursor();
-		final Cursor<ByteType> c2 = out2.cursor();
-		while (c1.hasNext())
-			assertEquals(c1.next().get(), c2.next().get());
+		assertIterationsEqual(out2, out1);
 	}
 
 	@Test
@@ -87,9 +82,6 @@ public class BlackTopHatTest extends AbstractOpTest {
 		final IterableInterval<ByteType> out1 = (IterableInterval<ByteType>) ops
 			.run(ListBlackTopHat.class, IterableInterval.class, in, shapes);
 		final Img<ByteType> out2 = BlackTopHat.blackTopHat(in, shapes, 1);
-		final Cursor<ByteType> c1 = out1.cursor();
-		final Cursor<ByteType> c2 = out2.cursor();
-		while (c1.hasNext())
-			assertEquals(c1.next().get(), c2.next().get());
+		assertIterationsEqual(out2, out1);
 	}
 }

@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,31 +33,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.imagej.ops.Ops;
+import net.imagej.ops.geom.GeomUtils;
 import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imglib2.RealLocalizable;
 import net.imglib2.RealPoint;
-import net.imglib2.roi.geometric.Polygon;
+import net.imglib2.roi.geom.real.DefaultWritablePolygon2D;
+import net.imglib2.roi.geom.real.Polygon2D;
 
 import org.scijava.plugin.Plugin;
 
 /**
  * Generic implementation of {@code geom.boundingBox}.
- * 
+ *
  * @author Daniel Seebacher (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.BoundingBox.class)
-public class DefaultBoundingBox extends AbstractUnaryFunctionOp<Polygon, Polygon>
-	implements Ops.Geometric.BoundingBox
+public class DefaultBoundingBox extends
+	AbstractUnaryFunctionOp<Polygon2D, Polygon2D> implements
+	Ops.Geometric.BoundingBox
 {
 
 	@Override
-	public Polygon calculate(final Polygon input) {
+	public Polygon2D calculate(final Polygon2D input) {
 		double min_x = Double.POSITIVE_INFINITY;
 		double max_x = Double.NEGATIVE_INFINITY;
 		double min_y = Double.POSITIVE_INFINITY;
 		double max_y = Double.NEGATIVE_INFINITY;
 
-		for (RealLocalizable rl : input.getVertices()) {
+		for (final RealLocalizable rl : GeomUtils.vertices(input)) {
 			if (rl.getDoublePosition(0) < min_x) {
 				min_x = rl.getDoublePosition(0);
 			}
@@ -80,7 +82,7 @@ public class DefaultBoundingBox extends AbstractUnaryFunctionOp<Polygon, Polygon
 		bounds.add(new RealPoint(max_x, max_y));
 		bounds.add(new RealPoint(max_x, min_y));
 
-		return new Polygon(bounds);
+		return new DefaultWritablePolygon2D(bounds);
 	}
 
 }

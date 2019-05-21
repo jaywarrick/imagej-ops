@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,12 +29,14 @@
 
 package net.imagej.ops.geom.geom3d;
 
+import net.imagej.mesh.Mesh;
+import net.imagej.mesh.Triangle;
 import net.imagej.ops.Ops;
 import net.imagej.ops.geom.GeometricOp;
-import net.imagej.ops.geom.geom3d.mesh.Mesh;
 import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.type.numeric.real.DoubleType;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
 
@@ -46,14 +47,24 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Ops.Geometric.BoundarySize.class,
 	label = "Geometric (3D): Surface Area",
-	priority = Priority.VERY_HIGH_PRIORITY)
+	priority = Priority.VERY_HIGH)
 public class DefaultSurfaceArea extends AbstractUnaryHybridCF<Mesh, DoubleType>
 	implements GeometricOp<Mesh, DoubleType>, Ops.Geometric.BoundarySize
 {
 
 	@Override
 	public void compute(final Mesh input, final DoubleType output) {
-		output.set(input.getSurfaceArea());
+		double total = 0;
+		for (final Triangle tri : input.triangles()) {
+			final Vector3D v0 = new Vector3D(tri.v0x(), tri.v0y(), tri.v0z());
+			final Vector3D v1 = new Vector3D(tri.v1x(), tri.v1y(), tri.v1z());
+			final Vector3D v2 = new Vector3D(tri.v2x(), tri.v2y(), tri.v2z());
+
+			final Vector3D cross = v0.subtract(v1).crossProduct(v2.subtract(v0));
+			final double norm = cross.getNorm();
+			if (norm > 0) total += norm * 0.5;
+		}
+		output.set(total);
 	}
 	
 	@Override

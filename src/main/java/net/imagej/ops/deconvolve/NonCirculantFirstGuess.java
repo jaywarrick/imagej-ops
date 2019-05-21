@@ -2,8 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2017 Board of Regents of the University of
- * Wisconsin-Madison, University of Konstanz and Brian Northan.
+ * Copyright (C) 2014 - 2018 ImageJ developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,7 +36,6 @@ import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imagej.ops.special.hybrid.Hybrids;
 import net.imagej.ops.special.hybrid.UnaryHybridCF;
 import net.imglib2.Dimensions;
-import net.imglib2.Interval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.Type;
@@ -60,16 +58,12 @@ import org.scijava.plugin.Plugin;
  * @param <C>
  */
 
-@Plugin(type = Ops.Deconvolve.FirstGuess.class,
-	priority = Priority.LOW_PRIORITY)
+@Plugin(type = Ops.Deconvolve.FirstGuess.class, priority = Priority.LOW)
 public class NonCirculantFirstGuess<I extends RealType<I>, O extends RealType<O>, K extends RealType<K>, C extends ComplexType<C>>
 	extends
 	AbstractUnaryFunctionOp<RandomAccessibleInterval<I>, RandomAccessibleInterval<O>>
 	implements Ops.Deconvolve.FirstGuess
 {
-
-	@Parameter
-	private Interval imgConvolutionInterval;
 
 	@Parameter
 	Type<O> outType;
@@ -100,7 +94,7 @@ public class NonCirculantFirstGuess<I extends RealType<I>, O extends RealType<O>
 	@Override
 	public RandomAccessibleInterval<O> calculate(RandomAccessibleInterval<I> in) {
 
-		final Img<O> firstGuess = create.calculate(imgConvolutionInterval);
+		final Img<O> firstGuess = create.calculate(in);
 
 		// set first guess to be a constant = to the average value
 
@@ -108,7 +102,11 @@ public class NonCirculantFirstGuess<I extends RealType<I>, O extends RealType<O>
 		final O s = sum.calculate(in);
 
 		// then the number of pixels
-		final long numPixels = k.dimension(0) * k.dimension(1) * k.dimension(2);
+		long numPixels = 1;
+
+		for (int d = 0; d < k.numDimensions(); d++) {
+			numPixels = numPixels * k.dimension(d);
+		}
 
 		// then the average value...
 		final double average = s.getRealDouble() / (numPixels);
