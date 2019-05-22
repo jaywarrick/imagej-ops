@@ -26,7 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
-package net.imagej.ops.image.cooccurrencematrix;
+package net.imagej.ops.image.cooccurrenceMatrix;
 
 /**
  * Simple interface for enums representing the orientation of a

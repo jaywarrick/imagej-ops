@@ -32,7 +32,7 @@ package net.imagej.ops.features.haralick;
 import net.imagej.ops.AbstractNamespace;
 import net.imagej.ops.Namespace;
 import net.imagej.ops.OpMethod;
-import net.imagej.ops.image.cooccurrencematrix.MatrixOrientation;
+import net.imagej.ops.image.cooccurrenceMatrix.MatrixOrientation;
 import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;

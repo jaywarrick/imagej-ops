@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops.AbstractOpTest;
 import net.imagej.ops.features.AbstractFeatureTest;
-import net.imagej.ops.image.cooccurrencematrix.MatrixOrientation2D;
+import net.imagej.ops.image.cooccurrenceMatrix.MatrixOrientation2D;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
